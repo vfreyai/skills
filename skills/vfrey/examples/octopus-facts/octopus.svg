@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+  <!-- an octopus: dome head, two eyes, eight wavy arms -->
+  <path d="M90 190c0-90 50-140 110-140s110 50 110 140c0 20-6 36-14 46H104c-8-10-14-26-14-46z" fill="#FF8A65"/>
+  <circle cx="160" cy="170" r="16" fill="#fff"/><circle cx="240" cy="170" r="16" fill="#fff"/>
+  <circle cx="164" cy="174" r="7" fill="#0D47A1" stroke="none"/><circle cx="244" cy="174" r="7" fill="#0D47A1" stroke="none"/>
+  <path d="M176 210q24 18 48 0"/>
+  <path d="M108 236c-30 30-10 60-44 80M138 240c-14 36 8 64-12 92M170 242c-4 40 14 60 4 98M200 244v100M230 242c4 40-14 60-4 98M262 240c14 36-8 64 12 92M292 236c30 30 10 60 44 80" stroke="#FF8A65" stroke-width="16"/>
+</svg>

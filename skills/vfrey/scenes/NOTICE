@@ -1,0 +1,5 @@
+The files in this folder (craft.md, motion.md, blocks.md) are original to vfrey in structure and wording, but their craft guidance is adapted from the skills and references of Framey, a modified version of HyperFrames by HeyGen (https://github.com/heygen-com/hyperframes), licensed under Apache-2.0.
+
+Adapted and changed: the motion-craft defaults (ease by role, springs, overlap and stagger, holds, titles that land still, transitions with a cause, common faults), the caption placement and grouping advice, and the contrast and compression notes were rewritten for vfrey's 1080x1920 frame, its local GSAP, fonts and supplied helpers (vfrey.timeline, vfrey.at, vfrey.onWord, vfrey.onLine, vfrey.block), and its offline, deterministic renderer. Material about HyperFrames' own CLI, studio, registry, cloud and media tools was left out. The numbers were adjusted for vertical short video and the label that vfrey adds.
+
+Copyright for the original work remains with HeyGen and the HyperFrames contributors. See src/scene/blocks/LICENSE (the Apache License, Version 2.0) and src/scene/blocks/NOTICE in the vfrey package. This is not affiliated with or endorsed by HeyGen.

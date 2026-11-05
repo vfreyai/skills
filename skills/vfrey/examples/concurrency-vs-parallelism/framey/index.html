@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- "What's the difference?" as a scene: a light page, two labelled pictures, one big question, a stick figure that
+     reacts to what is being said, and word-highlighted captions. The idea is the picture; vfrey only supplies the
+     voice timing (vfrey.timing), the captions helper, GSAP, fonts and the stick figure art.
+     Layout is relative: --u is one 1080th of the shorter side, so every size below is "N units" and the scene keeps its
+     proportions at 9:16 whatever the pixel size (1080x1920, 720x1280, 1440x2560). It is a portrait arrangement (two pictures
+     above, the figure below); for a wide or square frame plan a new arrangement (scenes/craft.md, section 2) the way
+     octopus-facts does with media queries on the aspect ratio. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+    <script src="vfrey/gsap.min.js"></script>
+    <script src="vfrey/vfrey.js"></script>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+      /* --mix is 0 for the opening layout and 1 for the explaining layout; everything below is a function of it. */
+      #root { --mix: 0; --u: calc(var(--vf-vmin) / 1080); position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; color: #000; font-family: "Baloo 2", "Noto Sans Arabic", "Noto Sans Bengali", "Noto Sans JP", sans-serif; }
+      #root * { box-sizing: border-box; }
+      .wash { position: absolute; left: 0; top: 0; width: 100%; height: calc(700 * var(--u)); background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.1) 20%, rgba(0,0,0,.03) 48%, rgba(0,0,0,0)); }
+      .lab { position: absolute; width: 50%; text-align: center; white-space: nowrap; line-height: 1; top: calc((118 + (70 - 118) * var(--mix)) * var(--u)); font-size: calc((60 - 8 * var(--mix)) * var(--u)); }
+      .lab.b { left: 50%; }
+      .pic { position: absolute; top: calc((268 + (172 - 268) * var(--mix)) * var(--u)); width: calc((420 - 100 * var(--mix)) * var(--u)); height: calc((500 - 200 * var(--mix)) * var(--u)); }
+      .pic img { width: 100%; height: 100%; object-fit: contain; }
+      .pic.a { left: calc((60 + 50 * var(--mix)) * var(--u)); }
+      .pic.b { right: calc((60 + 50 * var(--mix)) * var(--u)); }
+      .divider { position: absolute; left: calc(50% - 3.5 * var(--u)); top: calc(70 * var(--u)); width: calc(7 * var(--u)); height: calc(400 * var(--u)); border-radius: calc(4 * var(--u)); background: #000; opacity: var(--mix); }
+      .question { position: absolute; left: 0; width: 100%; top: calc(760 * var(--u)); text-align: center; line-height: 1.05; font-size: calc(104 * var(--u)); opacity: calc(1 - var(--mix) * 1.6); }
+      .fig { position: absolute; left: 50%; width: calc((360 + 140 * var(--mix)) * var(--u)); height: calc((360 + 140 * var(--mix)) * 1.3 * var(--u)); top: calc((1010 + (640 - 1010) * var(--mix)) * var(--u)); transform: translateX(-50%); }
+      .fig img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+      .fig img.on { opacity: 1; }
+      #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); bottom: var(--vf-caption-bottom); height: calc(250 * var(--u)); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0">
+      <div class="wash"></div>
+      <div class="divider"></div>
+      <div class="lab a">CONCURRENCY</div>
+      <div class="lab b">PARALLELISM</div>
+      <div class="pic a"><img src="cook-one.svg" alt="" /></div>
+      <div class="pic b"><img src="cook-two.svg" alt="" /></div>
+      <div class="question">What's the<br />difference?</div>
+      <div class="fig">
+        <img id="p-shrug" src="vfrey/assets/stick-shrug.svg" alt="" class="on" />
+        <img id="p-left" src="vfrey/assets/stick-point-left.svg" alt="" />
+        <img id="p-right" src="vfrey/assets/stick-point-right.svg" alt="" />
+        <img id="p-idea" src="vfrey/assets/stick-idea.svg" alt="" />
+      </div>
+      <div id="captions"></div>
+    </div>
+    <script>
+      const tl = vfrey.timeline();
+      const lines = vfrey.timing.lines;
+      // The opening (big question, shrug) lasts while the first line is spoken, then the layout settles.
+      const openingEnd = Math.min(3, Math.max(2.2, vfrey.line(0).end + 0.25));
+      tl.fromTo("#root", { "--mix": 0 }, { "--mix": 1, duration: 0.35, ease: "power2.inOut" }, openingEnd);
+      // One pose per spoken line: the hook shrugs, concurrency lines point left, parallelism lines point right, the last has the idea.
+      const POSE = ["shrug", "left", "left", "right", "left", "right", "idea"];
+      let shown = "shrug";
+      lines.forEach((line, i) => {
+        const pose = i === lines.length - 1 ? "idea" : POSE[i] || "shrug";
+        if (pose === shown) return;
+        vfrey.at(Math.max(line.start, i === 0 ? 0 : openingEnd), (tl, t) => {
+          tl.set("#p-" + shown, { className: "" }, t);
+          tl.set("#p-" + pose, { className: "on" }, t);
+        });
+        shown = pose;
+      });
+      vfrey.captions("#captions", { style: "box" });
+    </script>
+  </body>
+</html>

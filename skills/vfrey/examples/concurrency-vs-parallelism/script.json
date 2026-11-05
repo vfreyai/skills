@@ -1,0 +1,15 @@
+{
+  "title": "Concurrency vs parallelism: what's the difference?",
+  "hook": "What is the difference between concurrency and parallelism?",
+  "lines": [
+    "What is the difference between concurrency and parallelism?",
+    "Concurrency is one cook switching between two dishes: stir one, then chop for the other.",
+    "Only one thing happens at any instant, but both dishes make progress.",
+    "Parallelism is two cooks, each working on their own dish at the very same time.",
+    "Concurrency is about dealing with many things at once.",
+    "Parallelism is about doing many things at once.",
+    "So concurrency is how you structure the work, and parallelism is how it runs."
+  ],
+  "hashtags": ["#programming", "#concurrency", "#parallelism"],
+  "subject": "concurrency vs parallelism"
+}

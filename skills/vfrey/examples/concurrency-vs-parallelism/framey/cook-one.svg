@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 500" fill="none" stroke="#000" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+  <!-- one cook, two dishes: the cook turns between them -->
+  <path d="M170 120c-30-10-34-52 0-60 6-30 52-34 66-8 28-8 52 22 30 48-8 8-20 12-30 10v22H170z" fill="#fff"/>
+  <circle cx="210" cy="190" r="52" fill="#fff"/>
+  <circle cx="192" cy="184" r="5" fill="#000"/><circle cx="228" cy="184" r="5" fill="#000"/>
+  <path d="M196 208q14 12 28 0"/>
+  <path d="M150 360q0-110 60-120t60 120z" fill="#E3F2FD"/>
+  <path d="M168 270L96 330M252 270l72 60"/>
+  <rect x="30" y="330" width="110" height="64" rx="10" fill="#90CAF9"/><path d="M24 346h-14M140 346h12"/>
+  <rect x="280" y="330" width="110" height="64" rx="10" fill="#2196F3"/><path d="M276 346h-12M390 346h14"/>
+  <path d="M60 310c-8-18 8-26 0-44M100 306c-8-18 8-26 0-44" stroke="#0D47A1" stroke-width="6"/>
+  <path d="M170 440h80m-24-20 24 20-24 20M250 470h-80m24-20-24 20 24 20" stroke="#0D47A1" stroke-width="7"/>
+  <path d="M210 360v80"/>
+</svg>
