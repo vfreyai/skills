@@ -1,12 +1,13 @@
 {
   "name": "vfrey",
-  "description": "Make short videos by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
   "version": "1.0.0-beta.2",
   "author": {
     "name": "vfrey",
     "url": "https://vfrey.ai"
   },
   "homepage": "https://vfrey.ai",
+  "repository": "https://github.com/vfreyai/skills",
   "license": "MIT",
   "keywords": [
     "vfrey",
@@ -15,6 +16,8 @@
     "captions",
     "voiceover",
     "social-media",
-    "rendering"
-  ]
+    "rendering",
+    "research"
+  ],
+  "icon": "./assets/logo.png"
 }

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vfrey",
+  "version": "1.0.0-beta.2",
+  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+  "author": {
+    "name": "vfrey",
+    "url": "https://vfrey.ai"
+  },
+  "homepage": "https://vfrey.ai",
+  "repository": "https://github.com/vfreyai/skills",
+  "license": "MIT",
+  "keywords": [
+    "vfrey",
+    "video",
+    "shorts",
+    "captions",
+    "voiceover",
+    "social-media",
+    "rendering",
+    "research"
+  ]
+}

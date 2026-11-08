@@ -1,12 +1,13 @@
 {
   "name": "vfrey",
-  "description": "Make short videos by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
   "version": "1.0.0-beta.2",
   "author": {
     "name": "vfrey",
     "url": "https://vfrey.ai"
   },
   "homepage": "https://vfrey.ai",
+  "repository": "https://github.com/vfreyai/skills",
   "license": "MIT",
   "keywords": [
     "vfrey",
@@ -15,22 +16,28 @@
     "captions",
     "voiceover",
     "social-media",
-    "rendering"
+    "rendering",
+    "research"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "vfrey",
-    "shortDescription": "Make short videos by asking your agent",
-    "longDescription": "Make short videos by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+    "shortDescription": "Short videos from your agent",
+    "longDescription": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
     "developerName": "vfrey",
-    "category": "Creativity",
+    "category": "Developer Tools",
     "capabilities": [
-      "Read",
-      "Write"
+      "Write video scripts and scenes",
+      "Render videos on your machine",
+      "Research social media with vfrey search"
     ],
     "websiteURL": "https://vfrey.ai",
     "defaultPrompt": [
-      "Make me a 30-second explainer about how tides work"
-    ]
+      "Use vfrey to make a 30-second explainer about how tides work",
+      "Use vfrey to find TikTok creators in Vietnam who review skincare",
+      "Use vfrey to show me my videos and open the dashboard"
+    ],
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.png"
   }
 }

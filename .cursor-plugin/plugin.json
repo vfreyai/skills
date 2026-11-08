@@ -1,16 +1,13 @@
 {
-  "$schema": "https://cursor.com/schemas/cursor-plugin/plugin.json",
   "name": "vfrey",
-  "displayName": "vfrey",
-  "description": "Make short videos by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
   "version": "1.0.0-beta.2",
   "author": {
     "name": "vfrey"
   },
-  "publisher": "vfrey",
   "homepage": "https://vfrey.ai",
+  "repository": "https://github.com/vfreyai/skills",
   "license": "MIT",
-  "category": "developer-tools",
   "keywords": [
     "vfrey",
     "video",
@@ -18,12 +15,9 @@
     "captions",
     "voiceover",
     "social-media",
-    "rendering"
+    "rendering",
+    "research"
   ],
-  "tags": [
-    "video",
-    "creative",
-    "workflow"
-  ],
+  "logo": "assets/logo.svg",
   "skills": "./skills/"
 }

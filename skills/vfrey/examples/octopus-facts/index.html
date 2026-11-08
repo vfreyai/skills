@@ -39,7 +39,7 @@
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0">
-      <div class="panel" id="intro"><div class="head">3 facts about octopuses</div></div>
+      <div class="panel" id="intro"><div class="head" id="head-title">3 facts about octopuses</div></div>
       <div class="panel" id="f1" data-bg="#d84315"><div class="big">1</div><div class="word">three hearts</div></div>
       <div class="panel" id="f2" data-bg="#00838f"><div class="big">2</div><div class="word">blue blood</div></div>
       <div class="panel" id="f3" data-bg="#6a1b9a"><div class="big">3</div><div class="word">nine brains</div></div>
@@ -67,6 +67,8 @@
           tl.fromTo("#" + id + " .word", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, t + 0.15);
         });
       });
+      // Read the title, never type it: in a language version (--languages vi) this is that language's title.
+      document.getElementById("head-title").textContent = vfrey.script.title;
       tl.fromTo("#intro .head", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.1);
       // The octopus sways all the way through (a finite loop: the video is a known length).
       tl.to("#octo", { rotation: 6, y: -18, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: Math.max(0, Math.floor(end / 1.2) - 1) }, 0);
