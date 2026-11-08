@@ -1,6 +1,6 @@
 # Pictures & clips (`--engine pictures`)
 
-Read this only when the person gives you their own photos or footage, or asks for a photo story, a slideshow or a "video from my pictures" (or asks you to make the pictures for one). Offer Pictures & clips ("Made by your agent") when your agent has its own image or video tool, or when the person asks for pictures or clips; otherwise use the series' engine (from `series kit`) or the default. Everything here is one video; the main steps are in `SKILL.md`.
+Read this only when the person gives you their own photos or footage, or asks for a photo story, a slideshow or a "video from my pictures" (or asks you to make the pictures for one). Offer Pictures & clips (engine `pictures`; it is not "Made by your agent", which is engine `agent` and draws the whole picture itself) when your agent has its own image or video tool, or when the person asks for pictures or clips; otherwise use the series' engine (from `series kit`) or the default. Everything here is one video; the main steps are in `SKILL.md`.
 
 You make the pictures. vfrey turns them into the finished video: motion, timing to the voice, captions, the AI-GENERATED label, covers, subtitles and the quality checks. The engine is Pictures & clips (`pictures`; the id `vfrey-media` is the same engine and still works). It is free, runs on this machine with ffmpeg alone (no Chrome), and costs no credits.
 

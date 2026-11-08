@@ -4,15 +4,31 @@
     "name": "vfrey",
     "url": "https://vfrey.ai"
   },
+  "description": "The vfrey video skill, versioned and updated as one plugin.",
   "plugins": [
     {
       "name": "vfrey",
       "source": "./",
-      "description": "Make short videos by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+      "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
       "version": "1.0.0-beta.2",
+      "author": {
+        "name": "vfrey",
+        "url": "https://vfrey.ai"
+      },
       "homepage": "https://vfrey.ai",
-      "license": "MIT"
+      "repository": "https://github.com/vfreyai/skills",
+      "license": "MIT",
+      "category": "media",
+      "tags": [
+        "vfrey",
+        "video",
+        "shorts",
+        "captions",
+        "voiceover",
+        "social-media",
+        "rendering",
+        "research"
+      ]
     }
-  ],
-  "description": "The vfrey video skill, versioned and updated as one plugin."
+  ]
 }

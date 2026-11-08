@@ -1,4 +1,4 @@
-// "What's the difference?" for Remotion: the same scene as framey/index.html, written as a React component.
+// "What's the difference?" for Remotion: the same scene as render/index.html, written as a React component.
 // vfrey provides the voice (it plays it for you), the timing (useTiming), the frame (useFrame) and the captions (<Captions/>).
 // Layout is relative: u is one 1080th of the shorter side, so every number below is "N units" and the scene keeps its
 // proportions at 9:16 whatever the pixel size. It is a portrait arrangement; for a wide or square frame plan a new one
