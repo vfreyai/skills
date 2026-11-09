@@ -1,6 +1,6 @@
 ---
 name: vfrey
-description: Make short vertical videos (YouTube Shorts, TikTok, Reels) and research creators, trends and competitors on social media with the vfrey command line. Use for video requests such as "make a video about X", a short, a script, scenes, captions, a voiceover, a render, changes to a vfrey video, "show me my videos" or the dashboard, and posting to YouTube, TikTok or Instagram. Use for research when the person wants to find, analyse or compare creators, KOLs or influencers, see what is trending, study competitors or one creator, or measure a topic, brand or sale on TikTok, Instagram, YouTube or Reddit, with views, engagement and links. Not for: writing your own scrapers, bots or other general code; editing footage in another editor; general ffmpeg work.
+description: "Make short vertical videos (YouTube Shorts, TikTok, Reels) and research creators, trends and competitors on social media with the vfrey command line. Use for video requests such as \"make a video about X\", a short, a script, scenes, captions, a voiceover, a render, changes to a vfrey video, \"show me my videos\" or the dashboard, and posting to YouTube, TikTok or Instagram. Use for research when the person wants to find, analyse or compare creators, KOLs or influencers, see what is trending, study competitors or one creator, or measure a topic, brand or sale on TikTok, Instagram, YouTube or Reddit, with views, engagement and links. Not for: writing your own scrapers, bots or other general code; editing footage in another editor; general ffmpeg work."
 ---
 
 # vfrey
