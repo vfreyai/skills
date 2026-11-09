@@ -12,7 +12,7 @@ Do not let the first theme that comes to mind fill the whole plan.
 
 Two channels (say a TikTok channel and an Instagram one) are two things to set up, not one. Do not put them in the same project with a shared `vfrey.json`: its engine, shape, voice and style would be shared too, and the second channel gets the first one's defaults.
 
-1. **One channel is one project** (`npm create vfrey@beta <dir>`, one folder per channel). If the person wants a single folder anyway, then **one series per channel**, each with its own engine, shape and style: `npx vfrey desk series create --id <channel> --account <id> --niche "<theme>" --engine <id> --aspect 4:5 --fps 24`. Create the series for each channel before the first video, and pass `--series <id>` when you make its videos.
+1. **One channel is one project** (`npm create vfrey@latest <dir>`, one folder per channel). If the person wants a single folder anyway, then **one series per channel**, each with its own engine, shape and style: `npx vfrey desk series create --id <channel> --account <id> --niche "<theme>" --engine <id> --aspect 4:5 --fps 24`. Create the series for each channel before the first video, and pass `--series <id>` when you make its videos.
 2. Set per channel in the desk (the series' Engine and Video shape, or `desk series update`): the engine (`vfrey-render` unless the channel is the person's own photos and footage: then `pictures`) and the shape; they win over run flags, and `series kit` prints them first. Write down in its `AGENTS.md` or notes: the caption position and the style line that keeps its look.
 3. Check with `npx vfrey engine list` that each channel's engine is ready, and look at one video from each before making the rest.
 

@@ -35,7 +35,7 @@ The agent prices the search first and waits for your yes before it spends any cr
 - Node 22.13 or newer
 - ffmpeg on your PATH
 
-The skill runs the vfrey command line for you (`npx @vfrey/vfrey@beta` the first time). Check the machine any time with `npx @vfrey/vfrey@beta doctor`.
+The skill runs the vfrey command line for you (`npx @vfrey/vfrey` the first time). Check the machine any time with `npx @vfrey/vfrey doctor`.
 
 ## What is free
 
