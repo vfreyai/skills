@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-low-poly
 description: "Use when the chosen video style is Low-poly 3D (vfrey-style-low-poly), or the person asks for a low-poly, faceted, toy-like, diorama or 'paper-craft 3D' look. Teaches how to model, light, compose, animate and score that look in a vfrey three.js scene, for any topic, on top of the Real 3D style's setup (vfrey-style-real-3d): flat-shaded triangles with one colour each, a floating island, soft pastel light, diagrams drawn in the 3D world, a caption plate around vfrey's caption band and a generated sound bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

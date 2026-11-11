@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-one-line
 description: "Use when the chosen video style is One-line minimal (vfrey-style-one-line), or the person asks for a single-line, continuous-line, minimal, quiet, gallery-print or 'one pen stroke' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one unbroken ink line on warm paper that draws an object then travels on to become the next, a single accent dot at its tip, full-frame layout around the caption band, the connector line as the only transition and a generated music bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

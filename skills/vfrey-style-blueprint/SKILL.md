@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-blueprint
 description: "Use when the chosen video style is Blueprint (vfrey-style-blueprint), or the person asks for a blueprint, technical drawing, engineering drawing, drafting sheet or 'how it's built' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: a white-on-blue drafted sheet drawn line by line, a viewBox camera, colour-coded force arrows, a title block, drafting tools as transitions, a note strip at vfrey's caption band and a generated drafting sound bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-pixel-art
 description: "Use when the chosen video style is Pixel art (vfrey-style-pixel-art), or the person asks for a pixel art, 8-bit, 16-bit, retro game, arcade or chiptune look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one real low-resolution canvas, a strict palette, text sprites, stepped animation, parallax, pixel-font captions on a plate in the caption band, pixel wipes and a generated chiptune bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

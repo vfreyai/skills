@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-map-documentary
 description: "Use when the chosen video style is Map documentary (vfrey-style-map-documentary), or the person asks for an atlas, old-map, travel documentary, route or 'camera flying over a map' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic that happens at places: a hand-inked navy and parchment atlas under a tilted perspective camera, a route that draws itself with a plane, a flat map that folds into a globe, lower thirds and a generated orchestral bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

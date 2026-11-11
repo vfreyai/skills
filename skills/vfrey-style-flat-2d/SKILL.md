@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-flat-2d
 description: "Use when the chosen video style is 2D flat (vfrey-style-flat-2d), or the person asks for a flat, vector, cartoon-explainer, infographic or 'clean animated characters and charts' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: palette, code-drawn characters and props, live charts, full-frame layout around the caption band, shape-wipe transitions and a generated music bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

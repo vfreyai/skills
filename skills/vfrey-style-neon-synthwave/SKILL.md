@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-neon-synthwave
 description: "Use when the chosen video style is Neon synthwave (vfrey-style-neon-synthwave), or the person asks for an 80s retro-future, neon, synthwave, vaporwave, VHS or 'glowing line art' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: glowing light-tube line art on a deep purple night, a striped sun, a drifting perspective grid, chrome lettering, VHS glitch cuts, full-frame layout around the caption band and a generated synth bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-vintage-newspaper
 description: "Use when the chosen video style is Vintage newspaper (vfrey-style-vintage-newspaper), or the person asks for an old newspaper, letterpress, engraving, broadsheet, 'extra edition' or 19th-century print look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: a yellowed front page with stamped-in headlines, line-hatch engravings that move inside their frames, one spot red, page turns, a printed caption strip, full-frame layout around the caption band and a generated waltz bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

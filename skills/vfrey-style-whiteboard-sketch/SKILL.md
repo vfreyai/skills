@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-whiteboard-sketch
 description: "Use when the chosen video style is Whiteboard sketch (vfrey-style-whiteboard-sketch), or the person asks for a whiteboard, marker, hand-drawn, doodle, sketch-note or 'drawn live' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: stroke-by-stroke marker drawing, a single-stroke hand-lettering kit, doodle people and charts, a sticky-note caption plate, page flicks and eraser wipes, and a generated marker-and-marimba bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 2.0.0
 license: Proprietary
 metadata:

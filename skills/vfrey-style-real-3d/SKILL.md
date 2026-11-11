@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-real-3d
 description: "Use when the chosen video style is Real 3D (vfrey-style-real-3d), or the person asks for real 3D, a 3D camera flying through space, planets, 'cinematic 3D', WebGL or three.js. Teaches how to build, light, compose, animate and score a true 3D scene inside a vfrey HTML scene, for any topic: bundling three.js into the scene folder, a render loop driven by the vfrey timeline, shader-made surfaces, bloom, a shot-based camera, full-frame layout around the caption band and a generated sound bed. Read its limits first: it needs a one-time package install and a machine with a graphics chip."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 2.0.0
 license: Proprietary
 metadata:

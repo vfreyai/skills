@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-terminal
 description: "Use when the chosen video style is Terminal / ASCII (vfrey-style-terminal), or the person asks for a hacker-terminal, ASCII, retro CRT, command-line or green-screen look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one canvas of monospace cells, typed commands, block-letter numbers, tmux-style panes, CRT glow and scanlines, a voice pane at vfrey's caption band, and a cue sheet shared with the generated sound."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

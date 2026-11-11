@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-comic-halftone
 description: "Use when the chosen video style is Comic halftone (vfrey-style-comic-halftone), or the person asks for a comic book, pop art, halftone, speed-lines or 'panels that smash in' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: ink-outlined panels, halftone dots, off-register print colour, speed lines, impact bursts, hand-lettered sound effects, full-frame layout around the caption band and a generated punchy music bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
