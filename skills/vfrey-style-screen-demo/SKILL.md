@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-screen-demo
 description: "Use when the chosen video style is Screen demo (vfrey-style-screen-demo), or the person asks for a software walkthrough, product demo, app tutorial, how-to or 'screen recording' look. Teaches how to build, compose, animate and score that look in a vfrey HTML scene, for any topic: an invented app window, a gliding cursor with click ripples, camera zooms keyed to the voice, spotlight, loupe, callouts and toasts, a caption plate at vfrey's caption band and a generated sound bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

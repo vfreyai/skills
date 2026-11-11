@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-noir
 description: "Use when the chosen video style is Silhouette noir (vfrey-style-noir), or the person asks for a noir, dark, moody, eerie, cinematic, silhouette, foggy, 'true crime' or 'unsolved mystery' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: near-black layered silhouettes, one amber light, beams, fog, rain and grain, typed evidence lines, full-frame layout around the caption band and a generated atmosphere bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

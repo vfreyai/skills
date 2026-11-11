@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-kinetic-type
 description: "Use when the chosen video style is Kinetic type (vfrey-style-kinetic-type), or the person asks for a kinetic typography, title-sequence, words-fill-the-screen or lyric-video look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: giant serif words that slam, stretch, rotate, stack and fill with marble in time with the voice, three colours, two typefaces, vfrey's own captions switched off and a generated drone and hit bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 2.0.0
 license: Proprietary
 metadata:

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-isometric
 description: "Use when the chosen video style is Isometric miniature world (vfrey-style-isometric), or the person asks for an isometric, 2.5D, diorama, tiny model world, 'little 3D map' or 'follow it along the route' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one projection for SVG blocks, soft shadows, a glowing marker travelling a route, a camera gliding between dioramas, full-frame layout around the caption band and a generated music bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

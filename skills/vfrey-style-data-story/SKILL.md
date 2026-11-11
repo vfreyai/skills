@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-data-story
 description: "Use when the chosen video style is Data story (vfrey-style-data-story), or the person asks for a data-journalism, infographic, 'the world in numbers' or 'charts and maps that build' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: warm paper ground, one red accent, dot-matrix maps and charts, dots that regroup into bars, big mono counters, leader-line labels, a scoreboard, full-frame layout around the caption band and a generated data-desk bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 2.0.0
 license: Proprietary
 metadata:

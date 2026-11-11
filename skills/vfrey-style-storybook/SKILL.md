@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-storybook
 description: "Use when the chosen video style is Storybook watercolour (vfrey-style-storybook), or the person asks for a picture-book, hand-painted, watercolour, fable, bedtime-story or fairy-tale look. Teaches how to paint, compose, animate and score that look in a vfrey HTML scene, for any topic: SVG wash and ink filters, paper grain, page-turn transitions, a torn paper caption strip around vfrey's caption band, and a generated lullaby bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

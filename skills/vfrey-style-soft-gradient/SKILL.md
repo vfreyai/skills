@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-soft-gradient
 description: "Use when the chosen video style is Soft gradient (vfrey-style-soft-gradient), or the person asks for a calm frosted-glass, mesh-gradient, glossy-icon or wellness-app look. Teaches how to build, compose, animate and score that look in a vfrey HTML scene, for any topic: drifting pastel colour fields that change with the story, frosted glass cards over bokeh, glossy gradient icons, spring entrances, captions on a glass plate around vfrey's caption band and a generated pad."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:

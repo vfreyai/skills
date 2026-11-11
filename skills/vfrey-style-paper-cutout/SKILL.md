@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-paper-cutout
 description: "Use when the chosen video style is Paper cut-out (vfrey-style-paper-cutout), or the person asks for a paper, collage, cut-out, scrapbook, craft, stop-motion, storybook or 'ransom note letters' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: layered cut and torn paper with shadows between layers, parallax, jointed stop-motion puppets, cut-out letter titles, full-frame layout around the caption band, paper transitions and a generated music bed."
-allowed-tools: Bash Read Write
+allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
