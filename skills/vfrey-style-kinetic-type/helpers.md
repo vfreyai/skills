@@ -139,7 +139,7 @@ for (let i = 1; i < keys.length; i++) wipe(AT[keys[i]], ACCENT[keys[i]], GROUND[
 const cx = 540, cy = 930, R0 = 1250, rEnd = 90, turns = 5.5, k = (R0 - rEnd) / (turns * 2 * Math.PI), pts = [];
 for (let th = 0; th <= turns * 2 * Math.PI; th += .06){ const r = R0 - k * th; pts.push((cx + r * Math.cos(th - 1.2)).toFixed(1) + " " + (cy + r * Math.sin(th - 1.2)).toFixed(1)); }
 const spiral = document.createElement("div"); spiral.style.cssText = "position:absolute;inset:0;opacity:0";
-spiral.innerHTML = `<svg viewBox="0 0 1080 1920" width="1080" height="1920" style="position:absolute;inset:0"><defs><path id="sp" d="M ${pts.join(" L ")}"/></defs><g id="spiralG"><text font-family="Playfair Display" font-style="italic" font-weight="900" font-size="82" fill="${RED}"><textPath href="#sp" startOffset="0" id="sptp">${"a phrase · another · ".repeat(14)}</textPath></text></g></svg>`;
+spiral.innerHTML = `<svg viewBox="0 0 1080 1920" width="1080" height="1920" style="position:absolute;inset:0"><defs><path id="sp" d="M ${pts.join(" L ")}"/></defs><g id="spiralG"><text font-family="Playfair Display" font-style="italic" font-weight="900" font-size="82" fill="${RED}"><textPath href="#sp" startOffset="0" id="sptp">${"a phrase, another, ".repeat(14)}</textPath></text></g></svg>`;
 $("#cB").appendChild(spiral);
 const s0 = AT.B, s1 = AT.C - .5;      // spin and pull in while it is on screen; scale to 0 when the next idea lands
 tl.fromTo(spiral, { opacity: 0 }, { opacity: 1, duration: .3 }, s0 + .02);
