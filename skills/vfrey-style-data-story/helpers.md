@@ -121,7 +121,7 @@ Start a morph about 0.25 s before the sentence it belongs to. Nothing cuts: the 
 
 1. Write each shape as a `[x, y]` list. For a map use `[lon, lat]` in degrees, traced by hand from a cited source at 1 to 3 degree accuracy, about 8 to 60 points a shape. For a country, a region or a floor plan use the same idea with your own units.
 2. `DD.dotFill(shapes, holes, step)` fills the shapes with a dot grid; `DD.geoDots(shapes, holes, 1.7)` does it for a globe. Build them once at load (about 5,000 dots is fine). `DD.outline(ctx, shape, toXY, true)` strokes the plain outline.
-3. People or item dots placed in "populated" spots are schematic: label them. `<div class="lab mono" id="legend">1 DOT = 100 MILLION PEOPLE · POSITIONS SCHEMATIC</div>` stays on while the dots show, and an outline you simplified gets "OUTLINE SIMPLIFIED" in the footer.
+3. People or item dots placed in "populated" spots are schematic: label them. `<div class="lab mono" id="legend">1 DOT = 100 MILLION PEOPLE, POSITIONS SCHEMATIC</div>` stays on while the dots show, and an outline you simplified gets "OUTLINE SIMPLIFIED" in the footer.
 4. Dots on land show where land is, not density. Never colour them as if they were data.
 
 A true circle on a sphere: `DD.destPoint(centre, km, bearing)` for bearing 0 to 360 in 3 degree steps, projected and stroked. Its area share on a sphere is `DD.capAreaShare(km)`: print the number it returns, rounded as the source rounds.

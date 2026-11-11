@@ -133,7 +133,7 @@ for (let i = 1; i < keys.length; i++) wipe(AT[keys[i]], ACCENT[keys[i]], GROUND[
   rows.forEach((o, i) => tl.fromTo(o.d, { x: o.x + (i % 2 ? 1 : -1) * 1300, opacity: 1 }, { x: o.x, opacity: 1, duration: .34, ease: "power4.out" }, t0 + .12 + i * .05));
   shake(sh, t0 + .3, 22);
   rows.forEach((o, i) => tl.to(o.d, { x: o.x + (i % 2 ? 26 : -26), duration: Math.max(.5, e - t0 - .5), ease: "sine.inOut" }, t0 + .5));
-  const bar = box(c, 0, 1636, 1080, 134, INK), bt = W(c, "SOURCE  ·  PLACEHOLDER LINE", "M", { w: 900, x: 540, y: 1703, c: BONE });
+  const bar = box(c, 0, 1636, 1080, 134, INK), bt = W(c, "SOURCE, PLACEHOLDER LINE", "M", { w: 900, x: 540, y: 1703, c: BONE });
   grow(bar, t0 + 1, .35); tl.fromTo(bt.d, { opacity: 0 }, { opacity: 1, duration: .2 }, t0 + 1.2);
   push(c, t0, e, 1, 1.05, "50% 50%");
 })();

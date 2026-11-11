@@ -50,7 +50,7 @@
     <div class="cell" style="left:24px;top:8px;width:560px;height:176px"></div><div class="lbl" style="left:36px;top:16px">TITLE</div>
     <div class="tt" style="left:36px;top:46px;font-size:38px;letter-spacing:.04em">PLACEHOLDER TITLE</div>
     <div class="tt" style="left:36px;top:96px;font-size:25px;letter-spacing:.1em;color:#bdeeff">PLACEHOLDER SUBTITLE</div>
-    <div class="tt" style="left:36px;top:142px;font-size:16px;letter-spacing:.14em;color:#8fdcff">NOT TO SCALE · SCHEMATIC</div>
+    <div class="tt" style="left:36px;top:142px;font-size:16px;letter-spacing:.14em;color:#8fdcff">NOT TO SCALE, SCHEMATIC</div>
     <div class="cell" style="left:584px;top:8px;width:472px;height:176px"></div><div class="lbl" style="left:596px;top:16px">FORCE KEY</div>
     <div id="legend" style="position:absolute;left:584px;top:44px">
       <div class="lg" id="lgW" style="top:0"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#6dffb0" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#6dffb0"/></svg>WEIGHT</div>
@@ -90,7 +90,7 @@ const FX0 = -40, FX1 = 2000, FY0 = -90, FY1 = 1500;
 let fr = `<rect id="frame1" class="o2 dr" pathLength="1" x="${FX0}" y="${FY0}" width="${FX1 - FX0}" height="${FY1 - FY0}"/><rect class="c" x="${FX0 + 26}" y="${FY0 + 26}" width="${FX1 - FX0 - 52}" height="${FY1 - FY0 - 52}"/>`;
 "ABCDEF".split("").forEach((c, i) => { const x = FX0 + (i + .5) * (FX1 - FX0) / 6; fr += `<text class="t t1" x="${x}" y="${FY0 + 20}" text-anchor="middle" style="stroke:none;fill:#8fdcff">${c}</text>`; });
 [1, 2, 3, 4].forEach((c, i) => { const y = FY0 + (i + .5) * (FY1 - FY0) / 4; fr += `<text class="t t1" x="${FX0 + 12}" y="${y + 8}" style="stroke:none;fill:#8fdcff">${c}</text>`; });
-fr += `<text class="t" x="${FX0 + 90}" y="70" style="font-size:calc(var(--k)*64px);stroke:none;letter-spacing:.04em">PLACEHOLDER TITLE</text><text class="t" x="${FX0 + 94}" y="120" style="font-size:calc(var(--k)*26px);stroke:none;fill:#8fdcff">SECTION VIEW · FIG. 01</text>`;
+fr += `<text class="t" x="${FX0 + 90}" y="70" style="font-size:calc(var(--k)*64px);stroke:none;letter-spacing:.04em">PLACEHOLDER TITLE</text><text class="t" x="${FX0 + 94}" y="120" style="font-size:calc(var(--k)*26px);stroke:none;fill:#8fdcff">SECTION VIEW, FIG. 01</text>`;
 add(fr);
 
 /* ---------- the part: wall (hatched), bracket (outline), weight; world coordinates, y down ---------- */
