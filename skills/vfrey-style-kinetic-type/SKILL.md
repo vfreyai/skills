@@ -2,7 +2,7 @@
 name: vfrey-style-kinetic-type
 description: "Use when the chosen video style is Kinetic type (vfrey-style-kinetic-type), or the person asks for a kinetic typography, title-sequence, words-fill-the-screen or lyric-video look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: giant serif words that slam, stretch, rotate, stack and fill with marble in time with the voice, three colours, two typefaces, vfrey's own captions switched off and a generated drone and hit bed."
 allowed-tools: Bash Read Write
-version: 1.0.0
+version: 2.0.0
 license: Proprietary
 metadata:
   product: vfrey
@@ -13,86 +13,209 @@ metadata:
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+<!-- style-bible: v2 -->
 
 # Video style: Kinetic type
 
-The words are the picture: giant serif lettering in ink, bone and one hot red slams, stretches, rotates and stacks to the beat of the voice, on flat colour grounds with a little marble. No illustration at all; every frame has to work as a poster.
+Start from `starter.html` next to this file: copy it to `scenes/<idea>/index.html`, replace its placeholder words, render one frame, run `measure-type.cjs`, then build the shots. Code to copy is in `helpers.md`; the type-measuring script is `measure-type.cjs`; the sound script is `make-bed.py`. This file teaches a look, never a topic: apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`). The vfrey skill's `scenes/craft.md` still holds for everything not said here. Use it for ideas that live in the sentence (a quote, a principle, an opinion, a speech, a book's argument; six to ten words a shot). Not for anything that needs a picture of a thing, a chart, a map, a product or a face.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Code to copy is in `helpers.md` next to this file; the type-measuring script is `measure-type.cjs` next to this file; the sound script is `make-bed.py` next to this file.
+## 1. The look in three sentences, and the signature traits
 
-## When to use it, when not
+The words are the picture: giant condensed serif lettering in ink, bone and one hot red slams, stretches, rotates and stacks to the beat of the voice on flat colour grounds. There is no illustration at all; every frame must work as a poster, like the opening titles of a film. A little marble inside the biggest letters is the only texture, and vfrey's own captions are switched off.
 
-- Use it for ideas that live in the sentence: a quote, a principle, advice, a poem, an opinion, a speech, a book's argument. Short, strong lines work best.
-- Not for anything that needs a picture of a thing, a chart, a map, a product or a face, and not for dense facts or long lists: giant words carry six to ten words a shot, not twenty.
+Signature traits (each one checkable on a frame):
+1. Exactly three colours: ink `#0e0d0c`, bone `#ece6d8`, red `#e8391d`. Nothing else is on screen except a marble made from them.
+2. One giant word per shot, 60 to 100% of the frame width, stretched vertically up to about 3x (condensed look), against one small mono line.
+3. Playfair Display 900, upright caps for slams; 900 italic lowercase for soft words; nothing else in the headline.
+4. Flat colour grounds, one per shot, alternating ink, bone, red so no two cuts in a row look alike. No gradients, no shadows, no images.
+5. Words stacked in a block of 3 to 5 rows, each row fitted to the same width and a different height, that fills the frame from top safe edge to bottom.
+6. Outline copies (hollow letters, 3 to 5 px stroke) used as echoes above, below or behind a solid word.
+7. Marble fill (veins) inside at most one or two huge words per shot, never on small type.
+8. A small JetBrains Mono caps tag (tracked wide) with a counter (`01`, `02`) or a source, top of the frame or on a solid plate.
+9. Solid colour blocks (plates, bands, bars) behind lines of type; rectangles only, square corners.
+10. Slanted double-slab wipes between shots (10 degrees); a slam with a jolt of the whole shot on every landing word.
+11. No caption band: the lettering carries the words (`"captions": "off"`).
+12. Faint paper grain over everything (multiply, opacity .10).
 
-## Plan before coding
+## 2. Palette
 
-1. Split the script into 6 to 9 ideas, one shot each. Mark the one word or phrase that carries each idea; that is the giant word.
-2. For each shot pick a move: a stack of 3 to 5 words fitted to one width, a long word rotated 90 degrees, a wall of one word repeated, an outline echo, a question mark or numeral as a shape, a spiral of a repeated phrase, or a tunnel of words in depth (for fast speech).
-3. Give each shot a ground (ink, bone or red) and alternate them so no two cuts in a row look alike.
-4. Words on screen are the script's words. A source, name or date goes in a small mono tag, and only if you can cite it. Numerals are fine; never invent a statistic or a quote.
-5. Script pace: the free Kokoro voice also pauses at commas and colons. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; use each pause for a second motion (rings, marble drift, a slow rotate). A deeper voice suits the look; the voice is the person's setting, so suggest it rather than switch it.
-6. In the script set `"captions": "off"` (see the next section).
+| Role | Hex | Use |
+| --- | --- | --- |
+| Ink | `#0e0d0c` | ground, solid type, plates and bands |
+| Bone | `#ece6d8` | ground, solid type, outline strokes |
+| Red | `#e8391d` | ground, one accent row or word per shot, blocks, rings |
+| Marble red | base `#e8391d`, vein `#5a0f06`, highlight `#ff8a6a` | huge words only |
+| Marble ink | base `#14110f`, vein `#e8391d`, highlight `#6b6459` | huge words on bone or red |
+| Marble bone | base `#ece6d8`, vein `#2a2420`, highlight `#e8391d` | huge words on ink |
 
-## Palette and type
+- Ratios per frame: the ground is 35 to 100% of the frame; type is 40 to 70%; the third colour (the one that is neither ground nor main type) is at most 25%. Red as ground means type is ink or bone only.
+- Type on a ground is always one of the other two colours (bone on ink, ink on bone, ink or bone on red; red on ink or bone). Red type on a red ground never.
+- If `brand.json` has an accent it replaces the red everywhere, still only one accent.
+- Never: gradients on grounds (they band), drop shadows, glows, a fourth colour, pure `#000` or `#fff`, translucency over type other than the ghost echoes at .25 to .8 opacity.
 
-- Three colours only: ink `#0e0d0c`, bone `#ece6d8`, red `#e8391d`. Grounds are flat ink, bone or red; type is another of the three. No gradients on grounds (they band). If the brand has an accent (`brand.json`), it replaces the red; still only one.
-- Two typefaces, both already in `vfrey/fonts`: Playfair Display 900 (upright caps for slams, 900 italic lowercase for soft or emotional words) and JetBrains Mono 500, uppercase, tracked .14em, for tags, counters and sources. Add `font-variant-numeric: lining-nums` to caps (Playfair's default numerals are oldstyle).
-- Marble is the only texture: a seeded canvas clipped to a word with `background-clip:text`, drifting sideways while the word shows (`helpers.md`). Three kinds: red with dark veins, ink with red veins, bone with ink veins. Keep it off small words.
-- Scale contrast in every shot: one giant word (60 to 100% of the frame width, stretched) against one small mono line.
+## 3. Shapes and line
 
-## Drawing approach
+- Outline type: `-webkit-text-stroke` 4 to 5 px at 1080 wide (3 px for small echoes), `color: transparent`. Outline copies repeat the solid word at the same width and height and step by one row (about 265 to 300 px).
+- Blocks: plates are rectangles with square corners, 8 to 14 px rules or 130 to 370 px tall bands, flat fill. A coloured plate sits tight behind one line (padding 20 to 40 px). Red ring behind a giant glyph: `border-radius:50%` border 3 to 4 px, scaling out.
+- Edge treatment: none. Letters are crisp vector; no blur, no grain on letters themselves.
+- Texture recipe, marble (seeded canvas, built once, `background-clip:text`): 384 px canvas, value-noise fbm 5 octaves at scale `1/70`, veins `pow(1 - |sin((x/N*2.2 + y/N*1.3 + n*3.2) * pi)|, 7)`, a second finer vein set `pow(..., 12)` at `x/N*3.1 - y/N*.8 + n*5.5` blended at 0.55 as highlight. Background drift 5% to 95% sideways while the word shows. Built by `marble(base, vein, hi, seed)` in the starter.
+- Grain recipe: a 270x480 canvas of random grey 150 to 255 scaled to the frame, `mix-blend-mode: multiply`, opacity .10, drawn once with a seeded random.
+- Light: there is none. No shadows, no highlight except the marble's. Depth only comes from scale, overlap and the tunnel's perspective.
 
-- Each shot is `div.shot > div.cam`, with words made by `W()`: a `div.wd` GSAP moves around an absolutely placed `span.in`, at `line-height:.71` so `y` is the visual centre of the caps.
-- Fit type from a measured table, never at run time (fonts load after the scene script runs). Run `node .agents/skills/vfrey-style-kinetic-type/measure-type.cjs scenes/<idea>` after the first render or preview and again whenever a string changes; it writes `scenes/<idea>/meas.js`, which the scene loads with `<script src="meas.js">`. Strings that reach `W()` from a list go in a `/* meas U: A | B */` comment.
-- `W()` sets the font size from a target width, then stretches to a target cap height with `scale(1,sy)`. Stretch up to about 3x is the look; beyond that split the word (TOR / MENT) or rotate it. Italic lowercase stretches further than caps.
-- Other shapes: rings behind a giant glyph, a plate under a mono line, a split screen of two colour blocks, outline copies above and below a solid word, a spiral on an SVG `<textPath>`. A static multiply grain canvas (opacity .10, 270x480 scaled up) gives paper feel at no bitrate cost.
+## 4. Characters and objects
 
-## Full frame around the caption band
+Letters are the characters. Construct them like this:
+- Every word is `div.wd` (GSAP moves x, y, scale, rotation) around an absolute `span.in` with `line-height:.71` and `transform: translate(-50%,-50%) scale(1, sy)`, so `y` is the visual centre of the caps.
+- Cap height is `0.708 * font-size` (Playfair) or `0.73 * font-size` (mono). `sy = targetCapHeight / capHeight`. Font size comes from `targetWidth / measuredWidth * 100`.
+- Stretch limits: upright caps up to 3x; italic lowercase up to 2.1x; beyond that split the word (TOR / MENT) or rotate it 90 degrees.
+- Letter-spacing: `-.02em` caps, `-.025em` italic, `.14em` mono. Lining numerals on caps.
 
-This style turns vfrey's captions off by design: the lettering already says the words, and a second line over it looks cheap. In the script set `"captions": "off"` (`skills/vfrey-product/captions.md`); the scene still renders, `vfrey.captions` is not called, and the `.srt` and `.vtt` files are still written beside the MP4 for uploading. Without that field vfrey would draw its band (`--vf-caption-at`, `--vf-caption-h`, about 70% down a 9:16 frame) over the type.
+Stock moves (the props of this style), each a few lines in the starter or `helpers.md`:
+1. Stack: 3 to 5 words fitted to 900 px wide, heights 330 / 420 / 400 px, y centres 330, 760, 1180 (and 1600 for the tag).
+2. Wall: five identical rows 940 x 268 px at y = 245 + 300 i, alternating in from the sides; one row in the accent.
+3. Rotated word: `rot -90`, width 1760, `sy` 1.5, three copies at x 300 / 590 / 870 (ink fill, bone outline, ink outline).
+4. Outline echo: 2 to 4 hollow copies above and below a solid centre row.
+5. Numeral or glyph as a shape: `2000`, `?`, `%` at 940 wide and 500 to 760 tall, marble fill, band under it.
+6. Spiral: a repeated phrase on an SVG `<textPath>` along an inward spiral, font 82 px italic red, rotating 240 degrees.
+7. Tunnel: words at `z = -600 k` in a `perspective:1000px` world; the camera flies through.
+8. Split screen: two colour blocks (top red, bottom bone) scaling in, one word on each.
 
-- Subjects are large: the giant words span the frame's width and a third to a half of its height, and rows run from the top safe edge to the bottom edge. Nothing is pulled up to leave a gap for a band.
-- The scene's own type continues to the bottom edge: the last row, plate or mono tag sits in the lower third, where the band would be (`--vf-caption-at`, `vfrey.captionBox`). It stays readable and inside `--vf-safe-left` and `--vf-safe-right`; the line you most want read goes there.
-- Captions sit on a plate if the person turns them back on: a solid ink or bone block behind them in the band, never over a giant word or a focal shape, the same position all through. Leave flat ground or a colour plate in that zone for it to land on.
-- Keep the bottom-right corner clear for the `AI-GENERATED` label: nothing below about 94% of the height and right of about 63% of the width. Past the right 13% of the frame, keep small text out of the lower half (platform buttons).
-- Frames with more than half flat colour for over 0.7 s need a ghost, an outline echo or a colour block growing under the next word.
+## 5. Typography
 
-## Motion rules
+- Giant words: Playfair Display 900 caps, fitted width 880 to 940 px (full-width) or 430 px (a short word beside a plate), cap height 235 to 540 px; colour bone, ink or red (or marble).
+- Soft words: Playfair Display 900 italic lowercase, width 880 to 1760, `sy` 1.1 to 2.1.
+- Labels, tags, counters, sources: JetBrains Mono 500, caps, tracked .14em, `fs` 36 to 62 px (counters `01` at 54), wide mono lines fitted to 900 px. Colour: the ground's opposite.
+- Numbers: Playfair caps with `lining-nums`, giant, marble if one per shot.
+- Both faces are in `vfrey/fonts`; local fallbacks `Georgia` and `Menlo` are only for a measure table that fails.
+- Caption plate: none (captions off). If the person turns captions on: a solid ink or bone block 1000 x 190 px at y 1336 to 1526, centred, padding 40 px, one or two lines, the spoken word on a red chip; never over a giant word.
 
-- Cut on the voice: a word lands 0.04 s before it is spoken (`slam`: scale from 1.9 to 2.6 down to 1, 0.26 to 0.35 s `expo.out`, with `shake` of the whole shot). A shot starts at the first word of its idea minus 0.1 s.
-- Every shot also gets `push` (scale 1 to 1.05 to 1.08 over its length). Titles land dead still; the world around them moves.
-- Enter with `power4.out` from off-frame; exit by whipping up with `power3.in` (`y: "-=2300"`, in px; `yPercent` does nothing on a zero-height wrapper). Reveal with a clip-path mask (`rise`) or a colour flood (`inset(100% 0 0 0)` to `inset(0)`, or a growing `circle()`).
-- One word a beat in fast speech (0.15 s words): stack or tunnel so the picture keeps up. In pauses, give the picture a second motion.
-- In the tunnel, opacity is a pure function of depth written by one updater; never also tween opacity on those layers.
+## 6. Composition
 
-## Transitions
+There is no caption band (`"captions": "off"`), but `--vf-caption-at` still marks the lower zone; the giant words stay large and run to the bottom edge of the frame.
 
-One kind, with a cause: two slanted slabs (`skewX(-10deg)`, 150% wide, an accent colour then the incoming ground) sweep across in 0.14 to 0.16 s and exit in 0.26 s; the swap happens while the first covers the frame. Inside a shot, grounds change by clip-path flood and by whipping the old words off. Never crossfade.
+- Safe area: x 60 to 1020, y 150 to 1750 for type; the bottom-right corner (x > 686, y > 1800) stays clear of the `AI-GENERATED` label; small text stays out of the right 13% in the lower half.
+- Grid: type rows sit on a 5-row grid at y = 245 + 300 i (rows 268 px high with 32 px gaps) or a 3-row grid at y 330 / 760 / 1180. Full-width words span x 70 to 1010.
+- Subject scale: the giant word is a third to a half of the frame height (640 to 960 px) and 80 to 100% of its width.
+- Layers: ground flat; type in the middle; a grain over all. No foreground/background beyond the tunnel and the outline echoes behind a solid word (echo opacity .25 to .8).
+- Depth cue: only scale, overlap and the 3D tunnel (perspective 1000 px, origin 50% 46%).
+- Frames more than half flat colour for over 0.7 s need a ghost, an outline echo or a colour block growing under the next word.
 
-## Sound
+Named shot types:
 
-vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes a bed for this look: a low D-minor drone, a quiet pad with an echo and a breath of air, with a `slam` (a deep thud, a click and a burst) for each word that lands, a `whoosh` for each wipe and a `tick` for each small tag. It needs `python3` and `ffmpeg` (vfrey already needs ffmpeg), downloads nothing and always writes the same file for the same input.
+```
+STACK            WALL            NUMERAL          ROTATED ECHO     TAG+PLATE
++----------+     +----------+    +----------+     +----------+     +----------+
+|WE  [tag] |     |REALITY   |    | 01 TAG   |     | |  |  |  |     | SMALL    |
+|SUFFER    |     |REALITY   |    | ======== |     | |  |  |  |     |          |
+|MORE      |     |REALITY*  |    |  2000    |     | s  s  s  |     |[PLATE   ]|
+|OFTEN     |     |REALITY   |    |  (marble)|     | |  |  |  |     | MORE     |
+| small    |     |REALITY   |    |[ BAND   ]|     | |  |  |  |     |SMALL TAG |
++----------+     +----------+    +----------+     +----------+     +----------+
+```
+
+and a spiral/tunnel shot for fast speech or a "falling into it" idea.
+
+## 7. Motion
+
+- Feel: smooth, snappy, no stepping. Everything is a GSAP tween on the one `vfrey.timeline()`.
+- Entrances: slam = `fromTo` scale 1.9 to 2.6 (opacity 0) to 1, 260 to 350 ms `expo.out`, paired with `shake` of the whole shot (`y: 14 to 24` to 0, 320 ms `elastic.out(1,.5)`). Slide in from off-frame `power4.out` 340 to 400 ms. Mask reveal `rise`: clip-path `inset(0 0 100% 0)` to `inset(-10% -5% -20% -5%)`, y 60 to 0, 300 to 550 ms `power4.out`. Small tag: fade up 40 px, 250 ms `power3.out`.
+- Emphasis: marble drift 5% to 95% over the word's life (`ease: none`); skewX -8 over the shot (`sine.inOut`); rows drift +-26 px against each other.
+- Exits: whip up `y: "-=2300"` 300 ms `power3.in` with stagger .02 to .04; or a colour flood `inset(100% 0 0 0)` to `inset(0)` 260 to 300 ms `power3.inOut`.
+- Holds: a word holds for its spoken duration (0.3 to 1.2 s) and must have a second motion (push or drift) during pauses.
+- Camera: `push` on every shot: scale 1 to 1.05 or 1.08 over the shot, `power1.inOut`, origin near the key word. Titles land dead still; the world moves around them. Tunnel camera: `#world` z moves to `600 k` at each word's start (`none` under 0.45 s, `sine.inOut` longer).
+- Cut on the voice: a word lands 0.04 s before it is spoken; a shot starts at its first word minus 0.1 s.
+- Forbidden: a fade (opacity-only) as the main entrance, a linear tween on anything but marble drift, bounce on type except the shake, zoom-out camera moves, rotation of small tags.
+
+## 8. Transitions
+
+Allowed, with code in `helpers.md` and the starter:
+1. Slab wipe (the default): two slabs (`skewX(-10deg)`, 150% wide, left -160%), accent then incoming ground; they move to `xPercent 90` in 140 and 160 ms (`power3.in`), swap behind them, exit to 190 in 260 and 280 ms (`power3.out`), then reset with `tl.set` 0.5 s later.
+2. Colour flood inside a shot: clip-path `inset(100% 0 0 0)` to `inset(0)` in 300 ms, or a growing `circle(0% at 50% 42%)` to `circle(150%)`.
+3. Whip: the old words fly up with `power3.in` while the next ground is already behind.
+4. Band grow: a plate scales from one side (`scaleX 0 to 1`, 350 ms `power4.out`).
+Never crossfade, never a zoom blur, never a page flip.
+
+## 9. Sound
+
+vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed: a low D-minor drone (73.4, 73.9, 110, 146.8 Hz, lowpass 420 Hz, tremolo .2 Hz), a quiet pad (146.8 / 174.6 / 220 / 293.7 Hz with an echo), pink-noise air, about 70 bpm feel (nothing metrical). Accents: a `slam` (55 Hz thud 0.9 s, 140 Hz click, brown-noise burst) on each landing word, a `whoosh` (band-passed noise starting 0.3 s early) on each wipe, a `tick` (1760 Hz) on each mono tag. Mix: bed volume -12, duck under the voice; result about -14 LUFS, true peak under -1 dBTP. `make-bed.py` next to this file writes it with `python3` and `ffmpeg` only and no downloads.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene cuts on), then from the project folder: `python3 .agents/skills/vfrey-style-kinetic-type/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
-3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey kinetic type style, ffmpeg)", "volume": -12, "duck": true}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
+2. Write `scenes/<idea>/cues.json` (format at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-kinetic-type/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey kinetic type style, ffmpeg)", "volume": -12, "duck": true}` and render again with `--rerender`.
 
-One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.
+One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render. No `python3` on the machine: leave `music` out, say so, install nothing.
 
-## Checks before you call it done
+## 10. Shot plan template (32 to 40 s, 6 to 9 shots)
 
-1. Render, then make a 12-frame contact sheet and look at it: `ffmpeg -v error -y -i "videos/<file>.mp4" -vf "fps=12/<seconds>,scale=270:480,tile=6x2" -frames:v 1 -update 1 contact.jpg`. Also check stills at the slam times (`npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`).
-2. Look at it the size of a phone: does every tile read as a poster, with one giant word and one small line? Is any word cropped by the frame, or a stretched word more than about 3x?
-3. Is the script `"captions": "off"` and the `.srt` written? Is any text in the bottom-right corner or past the safe edges?
-4. Is any frame more than half flat colour for over 0.7 s? Is any wipe slab left on screen later in the film?
-5. Is every word on screen in the script, and every source or date one you can cite? A `frames.text-overlap` warning on stretched stacked words is expected (their boxes overlap, the glyphs do not).
+| Time | Beat | Shot type | Ground | Moves |
+| --- | --- | --- | --- | --- |
+| 0 to 6 s | Hook: the claim in 4 words | STACK | ink | slam each word, tag fades up, whip up + red flood |
+| 6 s to 11 s | Who or where it comes from | ROTATED ECHO then WALL | red then bone | three echoes, wall rows alternate |
+| 11 to 17 s | The turn: a number or date | NUMERAL | bone | marble numeral slams, band grows, italic echo |
+| 17 to 24 s | Three parts of the idea | TAG+PLATE x3 | ink, red, bone | `01 / 02 / 03` counters, outline rows, floods |
+| 24 to 30 s | Question or spiral for the problem | SPIRAL or TUNNEL | ink | spiral collapses to a glyph |
+| 30 to 36 s | Payoff in 2 to 4 words | STACK | red or bone | big slam, longest hold, source tag |
+| last 2 s | Hold | any | last ground | push only |
+
+Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; use each pause for a second motion. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; about 3 words a second at lineGap 0.3. Set `"captions": "off"`. Words on screen are the script's words; a source, name or date goes in a mono tag only if you can cite it; never invent a quote or statistic.
+
+## 11. Reference frames
+
+- `ref-1.jpg`: STACK on ink. Copy the three-row block fitted to one width, bone / red / bone, and the red plate with the mono tag.
+- `ref-2.jpg`: WALL on bone. Copy five identical rows, the one red row, and the red source bar at the bottom edge.
+- `ref-3.jpg`: outline echo on ink. Copy the solid row over a hollow row (5 px stroke) and the `01` counter with its mono line.
+- `ref-4.jpg`: marble and plate. Copy the red marble words, the red plate behind the white word and the mono line tracked wide beneath.
+
+## 12. Reference implementation
+
+`starter.html` is a working three-shot scene (stack, numeral with marble and band, wall) with the slab wipes and grain, built from the showcase film. Copy it to `scenes/<idea>/index.html`, replace the placeholder strings (`FIRST`, `SECOND`, `THIRD`, `SMALL TAG`, `2000`, `YEARS AGO`, `WALL`, `echo`, the source line) with the script's words, add shots by copying a block, and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`. After the first render, run `node .agents/skills/vfrey-style-kinetic-type/measure-type.cjs scenes/<idea>` (and again whenever a string changes); strings that reach `W()` from a list go in a `/* meas U: A | B */` comment. The starter reads `vfrey.timing.words` through `ws(i)`; it clamps indices, but cue each shot to the real word numbers.
+
+## 13. Do and Don't, and the final checklist
+
+Do:
+1. Do fit every giant word from the measured table, never at run time.
+2. Do alternate grounds (ink, bone, red) so no two cuts in a row look alike.
+3. Do pair every giant word with one small mono line.
+4. Do slam a word 0.04 s before it is spoken and jolt the whole shot.
+5. Do give every shot a push-in and a second motion in pauses.
+6. Do keep the last row or tag in the lower third, where a caption band would be.
+7. Do use outline copies as echoes behind or beside solid words.
+8. Do use marble on at most one or two huge words per shot.
+9. Do cut with the slanted slabs, set back with `tl.set` afterwards.
+10. Do keep the bottom-right corner clear for the label.
+11. Do split words past 3x stretch or rotate them.
+
+Don't:
+1. Don't add illustrations, icons, images or photos.
+2. Don't use a fourth colour, gradients on grounds, shadows or glows.
+3. Don't crossfade between shots.
+4. Don't put marble on small words.
+5. Don't measure fonts in the scene (they load after the build).
+6. Don't stretch upright caps past 3x.
+7. Don't turn on vfrey's captions over giant words.
+8. Don't tween opacity on 3D tunnel layers that an `onUpdate` also writes.
+9. Don't leave a wipe slab on screen after its use.
+10. Don't use a mono line bigger than a fifth of the giant word's height.
+11. Don't invent quotes, dates or statistics.
+
+Final checklist: render, make a 12-frame contact sheet (`ffmpeg -v error -y -i "videos/<file>.mp4" -vf "fps=12/<seconds>,scale=270:480,tile=6x2" -frames:v 1 -update 1 contact.jpg`), look at it phone-sized, and tick each line:
+- [ ] Only ink, bone, red (and marble made of them) in every tile.
+- [ ] Each tile has one giant word at 60 to 100% width and one small mono line.
+- [ ] Grounds alternate; no two cuts in a row on the same ground.
+- [ ] Giant words are condensed serif caps or italic lowercase, stretched at most 3x.
+- [ ] No tile is more than half flat colour for over 0.7 s.
+- [ ] At least one stack, one outline echo, one marble word and one block or band across the film.
+- [ ] No illustration, no caption band, no text in the bottom-right corner.
+- [ ] Mono tags are caps, tracked wide, with a counter or a source.
+- [ ] No word is cropped by the frame; nothing past the safe edges.
+- [ ] Every word on screen is in the script; every source or date can be cited; `"captions": "off"` and the `.srt` is written.
+- [ ] Every number on screen matches the number the voice says (digits, units and rounding); read the contact sheet against the script.
 
 ## Pitfalls
 
-- Measuring fonts in the scene: the build is synchronous and fonts load late. Use the offline table, and rerun `measure-type.cjs` after any text change; a missing string logs `no meas`.
-- Upright caps stretched past 3x turn to caricature. Split the word or rotate it.
+- Measuring fonts in the scene: use the offline table and rerun `measure-type.cjs` after any text change; a missing string logs `no meas`.
 - Slab wipe: with `left:-160%; width:150%`, full cover needs `xPercent` 90 and the exit goes to 190. Set it back with `tl.set` after.
-- GSAP opacity tweens and an `onUpdate` that writes `style.opacity` fight; give 3D layers only the updater (also called from `vfrey.onFrame`, since a render does not fire `onUpdate`), and keep rotated layers about 80% of the frame width so they are not cropped.
-- A shot with no `shake`, `push` or second motion in a pause feels dead; the voice's pauses are real and cannot be trimmed.
-- A `captions.style` in the script does nothing when captions are off, and vfrey's default template ignores the setting; this style is always a scene.
+- `yPercent` does nothing on a zero-height wrapper; tween `y:"-=N"` in px.
+- GSAP opacity tweens and an `onUpdate` that writes `style.opacity` fight; give 3D layers only the updater (also called from `vfrey.onFrame`) and keep rotated layers about 80% of the frame width.
+- A `frames.text-overlap` warning on stretched stacked words is expected (their boxes overlap, the glyphs do not).
+- A `captions.style` in the script does nothing when captions are off; this style is always a scene.

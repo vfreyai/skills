@@ -1,0 +1,118 @@
+<!doctype html>
+<!-- starter.html for vfrey-style-data-story: a dot-matrix globe, one circle, 80 unit dots that regroup into a bar, mono counters. Copy to scenes/<idea>/index.html with datadesk.js and land.js; replace every PLACEHOLDER, INPUTS and cue. -->
+<html lang="en"><head><meta charset="UTF-8" /><link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script><script src="datadesk.js"></script><script src="land.js"></script>
+<style>
+  :root { --paper:#F2EEE4; --ink:#15171C; --accent:#E4432D; --mute:#6B6556; --rule:#CFC8B6; }
+  html, body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--paper); }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; color:var(--ink); font-family:"Google Sans Flex","Liberation Sans",Arial,sans-serif; }
+  #stage { position:absolute; left:0; top:0; width:1080px; height:1920px; transform-origin:0 0; }
+  .mono { font-family:"JetBrains Mono","Liberation Mono",monospace; font-weight:500; }   /* weight 500 only: faux bold smears */
+  #top { position:absolute; left:60px; top:104px; width:960px; font-size:28px; letter-spacing:.08em; display:flex; justify-content:space-between; }
+  #rail { position:absolute; left:60px; top:154px; width:960px; height:8px; display:flex; gap:10px; }
+  #rail div { flex:1; background:var(--rule); position:relative; } #rail i { position:absolute; left:0; top:0; bottom:0; width:0; background:var(--ink); }
+  #hdr { position:absolute; left:60px; top:206px; width:960px; text-wrap:balance; font-size:47px; line-height:1.1; font-weight:700; }
+  #hdrRule { position:absolute; left:60px; top:314px; width:960px; height:4px; background:var(--ink); }
+  #hero { position:absolute; left:0; top:322px; width:1080px; overflow:hidden; }       /* height is set in JS from the caption band */
+  .lab { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; transform-origin:0 0; }
+  .tag { background:var(--paper); border-left:7px solid var(--accent); padding:5px 14px 6px 12px; font-size:34px; line-height:1.15; }
+  .tag.big { font-size:58px; color:var(--accent); } .k { font-size:30px; letter-spacing:.05em; color:var(--mute); }
+  .cell { position:absolute; width:320px; height:214px; border-top:5px solid var(--ink); }
+  .cell .k { position:absolute; left:0; top:16px; font-size:28px; }
+  .cell .v { position:absolute; left:0; top:78px; font-size:84px; line-height:1; letter-spacing:-.04em; white-space:nowrap; }
+  .cell .v small { font-size:36px; letter-spacing:0; color:var(--mute); margin-left:6px; } .cell .v.acc { color:var(--accent); }
+  #src { position:absolute; left:60px; width:610px; font-size:23px; line-height:1.3; color:var(--mute); }   /* the AI-GENERATED label owns the bottom-right */
+  #capplate { position:absolute; left:40px; width:1000px; background:var(--ink); opacity:0; }
+  #captions { position:absolute; left:72px; width:936px; display:flex; align-items:center; justify-content:center; }
+  #captions.vf-captions { justify-content:center !important; }   /* vfrey sets the block to the bottom of its box; centre it on the plate */
+</style>
+<div id="root" data-composition-id="main" data-start="0"><div id="stage">
+  <div id="top" class="mono"><span>KICKER</span><span>TOPIC</span></div>
+  <div id="rail"><div><i></i></div><div><i></i></div><div><i></i></div><div><i></i></div></div>
+  <div id="hdr"></div><div id="hdrRule"></div>
+  <div id="hero"><canvas id="cv" width="1080" height="900"></canvas>
+    <div class="lab mono" id="tag1"><div class="tag">PLACEHOLDER TAG<br><span style="color:#6B6556;font-size:30px">small note</span></div></div>
+    <div class="lab mono" id="legend">1 DOT = 1 UNIT OF PLACEHOLDER · POSITIONS SCHEMATIC</div>
+    <div class="lab mono" id="lbBar"><div class="k">LABEL OF THE BAR</div><div style="font-size:54px;margin-top:6px;letter-spacing:-.02em"><span style="color:var(--accent)" id="vBar">0</span> of <span id="vTot">100</span></div></div>
+  </div>
+  <div id="capplate"></div><div id="captions"></div>
+  <div id="cells"></div><div id="src" class="mono"></div>
+</div></div>
+
+<script>
+(() => {
+const tl = vfrey.timeline(), $ = (id) => document.getElementById(id), DD = window.DD;
+const WD = vfrey.timing.words, DUR = vfrey.timing.durationSec, LN = vfrey.timing.lines;
+const lineAt = (i) => LN[Math.min(i, LN.length - 1)].start;                   // cue a chapter to the start of a script line (or find a word by text, see helpers.md)
+const sc = vfrey.frame.width / 1080; $("stage").style.transform = `scale(${sc})`;
+$("hdr").textContent = vfrey.script.title;                                    // never typed
+// INPUTS: every number the film shows, with its source. Derived values come from these.
+const INPUTS = { total: { v: 100, src: "<publisher, table, year>" }, part: { v: 42, src: "<publisher, table, year>" } };
+const share = INPUTS.part.v / INPUTS.total.v;
+const CAP_TOP = vfrey.captionBox.top / sc, CAP_H = vfrey.captionBox.height / sc, HERO_TOP = 322;
+const bottom = vfrey.captionBox.position === "bottom";
+const HERO_H = Math.round(bottom ? CAP_TOP - 30 - HERO_TOP : 988), CELL_TOP = Math.round(bottom ? CAP_TOP + CAP_H + 30 : 1566);
+$("hero").style.height = HERO_H + "px"; $("cv").height = HERO_H;
+$("src").style.top = Math.min(1822, CELL_TOP + 256) + "px"; $("src").textContent = "SOURCES: " + Object.values(INPUTS).map((i) => i.src).join("; ").toUpperCase();
+for (const id of ["capplate", "captions"]) { $(id).style.top = CAP_TOP + "px"; $(id).style.height = CAP_H + "px"; }
+$("top").innerHTML = "<span>THE WORLD IN NUMBERS</span><span>TOPIC</span>";
+$("cells").innerHTML = ["TOTAL", "INSIDE", "SHARE"].map((k, n) => `<div class="cell" style="left:${60 + n * 320}px;top:${CELL_TOP}px"><div class="k mono">${k}</div><div class="v mono${n === 1 ? " acc" : ""}" id="v${n}">-</div></div>`).join("");
+
+// dot-matrix land (from land.js, hand-simplified polygons) and 80 schematic "unit" dots placed on land dots
+const shapes = Object.values(LAND_DATA.land), holes = Object.values(LAND_DATA.water);
+const land = DD.geoDots(shapes, holes, 1.7);
+const N = 80, units = Array.from({ length: N }, (_, i) => { const g = land[(i * 61 + 17) % land.length]; return { i, g, cat: i < Math.round(N * share) ? 0 : 1 }; });
+const CENTRE = DD.geo(15, 112), COL = { paper: "#F2EEE4", sphere: "#E7E1D1", grid: "#D3CCB9", grey: DD.hexRgb("#A9A392"), tint: DD.hexRgb("#EE9F89"), accent: "#E4432D", ink: "#23262D" };
+const S = { lon0: -25, lat0: 18, R: 430, cx: 540, cy: HERO_H / 2, rKm: 0, L: 1, arr: 0, a1: 0, aLeg: 0, aBar: 0, v0: 0, v1: 0, v2: 0, on0: 0, on1: 0, on2: 0, prog: 0 };
+const ctx = $("cv").getContext("2d"), CW = 1080, CH = HERO_H;
+const to = (p, t, d, ease) => tl.to(S, Object.assign({ duration: d, ease: ease || "power2.inOut" }, p), t);
+function setLab(id, x, y, op, centre) { const el = $(id); el.style.opacity = op.toFixed(3); if (op > 0.001) el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)` + (centre ? " translate(-50%,0)" : ""); }
+
+function draw() {
+  ctx.clearRect(0, 0, CW, CH);
+  const cm = DD.camera(S), R = S.R;
+  ctx.fillStyle = COL.sphere; ctx.beginPath(); ctx.arc(cm.cx, cm.cy, R, 0, 6.2832); ctx.fill();
+  DD.graticule(ctx, cm, COL.grid, 1.5);
+  const NB = 7, B = Array.from({ length: NB }, () => []), r0 = Math.max(1.5, R * 1.7 * DD.D2R * 0.36);
+  for (const d of land) { const q = DD.project(d, cm); if (q[2] <= 0.02) continue;
+    const b = S.rKm > 1 ? Math.round(DD.clamp((S.rKm - DD.distKm(d, CENTRE)) / 150 + 0.5) * (NB - 1)) : 0; B[b].push(q[0], q[1], r0 * (0.4 + 0.6 * q[2])); }
+  for (let b = 0; b < NB; b++) { const a = B[b]; if (!a.length) continue; ctx.fillStyle = DD.rgb(DD.mixRgb(COL.grey, COL.tint, b / (NB - 1))); ctx.beginPath();
+    for (let j = 0; j < a.length; j += 3) { ctx.moveTo(a[j] + a[j + 2], a[j + 1]); ctx.arc(a[j], a[j + 1], a[j + 2], 0, 6.2832); } ctx.fill(); }
+  ctx.strokeStyle = "rgba(21,23,28,.35)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cm.cx, cm.cy, R, 0, 6.2832); ctx.stroke();
+  if (S.rKm > 1) { ctx.beginPath(); let pen = false; for (let t = 0; t <= 360; t += 3) { const q = DD.project(DD.destPoint(CENTRE, S.rKm, t), cm); if (q[2] > 0) { if (!pen) { ctx.moveTo(q[0], q[1]); pen = true; } else ctx.lineTo(q[0], q[1]); } else pen = false; }
+    ctx.fillStyle = "rgba(228,67,45,.10)"; ctx.fill(); ctx.strokeStyle = COL.accent; ctx.lineWidth = 6; ctx.stroke(); }
+  // the unit dots: S.L runs 1 (on the globe) to 2 (a bar of dots, 4 rows x 20 columns, pitch 46)
+  const lay = [(d) => { const q = DD.project(d.g, cm); return { x: q[0], y: q[1], r: DD.clamp(R * 0.0225, 6, 14), a: q[2] > 0.04 ? 1 : 0 }; },
+               (d) => { const p = DD.gridPos(d.i, 103, 190, 4, 46); return { x: p[0], y: p[1], r: 18, a: 1 }; }];
+  if (S.arr > 0.001) for (const d of units) { const k = DD.clamp(Math.floor(S.L), 1, 1), st = DD.regroup(d.i, lay[0](d), lay[1](d), S.L - k);
+    st.a *= DD.clamp(S.arr * 3 - DD.dotDelay(d.i)); DD.dot(ctx, st, d.cat ? COL.ink : COL.accent, COL.paper); }
+  // one annotation: a leader line from an anchor to a tag
+  { const q = DD.project(CENTRE, cm); if (S.a1 > 0.01) { DD.leader(ctx, [[q[0], q[1]], [q[0] - 150, q[1] + 230]], DD.clamp(S.a1 * 1.5), "#15171C", 3);
+      ctx.fillStyle = "#15171C"; ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, 6.2832); ctx.fill(); setLab("tag1", q[0] - 150, q[1] + 200, DD.clamp(S.a1 * 1.6 - .6)); } else setLab("tag1", 0, 0, 0); }
+  setLab("legend", 40, CH - 56, S.aLeg); setLab("lbBar", 60, 24, S.aBar);
+  $("vBar").textContent = Math.round(S.v1); $("vTot").textContent = INPUTS.total.v;
+  [[0, S.v0, S.on0, 0], [1, S.v1, S.on1, 0], [2, S.v2, S.on2, 1]].forEach(([n, v, on, pct]) => { $("v" + n).textContent = on > 0.01 ? (pct ? Math.round(v) + "%" : Math.round(v)) : "-"; $("v" + n).style.opacity = (0.25 + 0.75 * on).toFixed(2); });
+  document.querySelectorAll("#rail i").forEach((el, k, all) => { const a = k * DUR / all.length, b = (k + 1) * DUR / all.length; el.style.width = (DD.clamp((S.prog - a) / (b - a)) * 100).toFixed(1) + "%"; });
+}
+tl.eventCallback("onUpdate", draw); vfrey.onFrame(draw); to({ prog: DUR }, 0, DUR, "none");
+
+// chapters, cued to script lines. Nothing cuts: the same globe and dots persist and change role.
+to({ lon0: CENTRE.lon, lat0: CENTRE.lat }, 0, lineAt(1) + 1, "power2.inOut");                           // 1 spin the globe to the subject
+to({ on0: 1 }, lineAt(0) + .3, .3, "none"); to({ v0: INPUTS.total.v }, lineAt(0) + .3, 1.3, "power2.out");
+to({ rKm: 4000, a1: 1 }, lineAt(1) - .1, 1.6, "power2.inOut");                // 2 a circle grows, a leader and a tag annotate it
+to({ R: 640 }, lineAt(1) - .1, 1.5, "power3.inOut");
+to({ aLeg: 1, arr: 1 }, lineAt(2) - .1, 1.2, "none");                         // 3 the unit dots pour onto the map
+to({ on1: 1 }, lineAt(2) + .2, .3, "none"); to({ v1: INPUTS.part.v }, lineAt(2) + .2, 1.3, "power2.out");
+to({ a1: 0, aLeg: 0, R: 170, cy: HERO_H - 150, L: 2, aBar: 1 }, lineAt(3) - .25, 1.7, "power2.inOut");   // 4 the dots regroup into a bar, the globe shrinks to the corner
+to({ on2: 1 }, lineAt(3) + .5, .3, "none"); to({ v2: share * 100 }, lineAt(3) + .5, 1.2, "power2.out");
+
+// captions on the plate (same style in the script: "color")
+const groups = vfrey.captions("#captions", { style: "color", size: 62, color: "#F2EEE4", highlight: "#FF7358", maxWords: 4 });
+tl.set("#capplate", { opacity: 0 }, 0);
+groups.forEach((g, i) => { const prevEnd = i ? groups[i - 1].end : -9, nextStart = i < groups.length - 1 ? groups[i + 1].start : 99;
+  if (g.start - prevEnd > 0.45) tl.to("#capplate", { opacity: 1, duration: .14, ease: "power2.out" }, Math.max(0, g.start - .08));
+  if (nextStart - g.end > 0.45) tl.to("#capplate", { opacity: 0, duration: .16, ease: "power2.in" }, g.end + .12); });
+draw();
+})();
+</script>
+</body></html>

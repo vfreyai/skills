@@ -2,7 +2,7 @@
 name: vfrey-style-data-story
 description: "Use when the chosen video style is Data story (vfrey-style-data-story), or the person asks for a data-journalism, infographic, 'the world in numbers' or 'charts and maps that build' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: warm paper ground, one red accent, dot-matrix maps and charts, dots that regroup into bars, big mono counters, leader-line labels, a scoreboard, full-frame layout around the caption band and a generated data-desk bed."
 allowed-tools: Bash Read Write
-version: 1.0.0
+version: 2.0.0
 license: Proprietary
 metadata:
   product: vfrey
@@ -13,14 +13,13 @@ metadata:
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+<!-- style-bible: v2 -->
 
 # Video style: Data story
 
-A warm paper ground, ink text and one red accent, with dot-matrix pictures that never cut: the same dots form a map, then regroup into a bar, then into rows. Big monospaced counters, thin rules and labels joined to the picture by leader lines make it read like a newspaper data desk.
+Start from `starter.html` next to this file (with `datadesk.js` and `land.js`): copy the three files into `scenes/<idea>/`, replace its placeholders and cues, and render a frame. Code to copy is also in `helpers.md` and `datadesk.js`; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Code to copy is in `helpers.md` and `datadesk.js` next to this file; the music script is `make-bed.py` next to this file.
-
-## When to use it, when not
+## Limits: when to use it, when not
 
 - Use it when the point is "here is the scale of a thing": shares, counts, rankings, before and after, a place and its numbers.
 - Not for stories with no numbers, moods, characters or how-tos. A subject with only one figure has nothing to regroup: pick another style.
@@ -31,61 +30,189 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 2. Compute, never type: every number the scene shows (counters, bar lengths, dot counts, percentages) is calculated in the scene from those inputs. A figure you derive (a share, a total) is derived in code, and rounded the way its source rounds.
 3. Mark what is not exact. A map drawn from simplified outlines, or dots placed in plausible spots, is schematic: say so on screen (a legend such as `1 DOT = <unit> · POSITIONS SCHEMATIC`) so the picture never implies precision it lacks. Print the sources in the footer.
 4. Split the script into 3 or 4 chapters (one per line), each a camera move, a build or a morph of the same dots. Pick the hook picture (the whole thing drawn at once), the count, the comparison and the catch.
-5. Script pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Write 4 to 6 lines (about 90 words for 37 seconds) and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch.
+5. Script pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Write 4 to 6 lines for about 37 seconds and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
 
-## Palette and type
+## 1. The look in three sentences, and the signature traits
 
-- Paper `#F2EEE4` ground, ink `#15171C`, one accent `#E4432D` (tint `#EE9F89` for lit areas, light `#FF7358` for the spoken word on the plate), mute `#6B6556` for labels, rule `#CFC8B6`, dot grey `#A9A392`, dark dot `#23262D`. Never a second accent, never a gradient ground. A brand accent (`brand.json`) replaces the red.
-- Type: Google Sans Flex 700 for the headline and captions; JetBrains Mono 500 for every label, counter and annotation. Nothing else, and mono stays at weight 500.
-- Sizes on the 1080 x 1920 stage: headline 47, label caps 28 to 34 with 0.05em tracking, annotation tags 34, counters 84, hero tag 58. Nothing under 28 except the source footer (23). `text-wrap: balance` on the headline, which is `vfrey.script.title`, never typed.
+A warm paper ground, ink text and one red accent, with dot-matrix pictures that never cut: the same dots form a map, regroup into a bar, then into rows. Big monospaced counters, thin rules and labels joined to the picture by leader lines make it read like a newspaper data desk. Every number is sourced and printed in a footer.
 
-## Drawing approach
+Signature traits (each checkable on a frame):
+1. Paper ground `#F2EEE4`, never white, never a gradient.
+2. Exactly one accent, vermilion `#E4432D`, used for the thing being counted; everything else is ink or grey.
+3. A hero picture made of dots (land dots on a graticule globe, or unit dots in a grid) on a pale sphere or none.
+4. A top rail: mono kicker, four-segment progress rail, a two-line bold headline and a 4 px ink rule.
+5. Mono numerals (JetBrains Mono 500) for every counter, label and annotation.
+6. A tag joined to an anchor dot by a thin ink leader line, with a 7 px red left border.
+7. A caption plate: a solid ink rectangle with paper text, the current word in light red, same box all film.
+8. A scoreboard of three cells with 5 px ink top rules; grey dashes until each number is spoken.
+9. A source footer at the bottom left in small mono; the label corner at the bottom right stays clear.
+10. A legend line that says what one dot is and that positions are schematic.
+11. Dots that regroup into bars and rows with a flowing, staggered swarm (never a block slide).
+12. No cuts: one picture persists and changes role; chapters are camera moves, builds and morphs.
 
-- Everything visible is a pure function of one plain object `S`. GSAP tweens numbers on `S`; the timeline's own `onUpdate` and `vfrey.onFrame` (a render seeks with events suppressed, so `onFrame` is the one that matters) repaint a canvas and writes the DOM labels. Seeking is then exact and charts can morph.
-- Top rail: a mono kicker, a progress rail of one segment per chapter filled by time, a 2-line headline and a 4 px ink rule.
-- Hero canvas: the map or chart, filling the width (subjects 70 to 100% of it). Maps are dot matrices (dots on a grid wherever a point is inside a simplified outline), on a pale sphere or flat ground, with a graticule. See `helpers.md` for making your own outline data.
-- People or unit dots: a fixed number with a category each. One layout function per chapter (stock, map, bar, rows); a number `S.L` moves every dot from one layout to the next, each with its own delay and a sideways bulge, so the swarm flows. A bar is a block of dots.
-- Annotations: a leader line draws on from a small ink dot to a tag (paper plate, red left border). Hero tags are red mono on a 88% paper plate so they stay readable over dots.
-- Scoreboard: three cells under the plate with a thick ink top rule, a mono label and a mono value. They start as grey dashes and fill with counters as each number is spoken.
+## 2. Palette
 
-## Full frame around the caption band
+| Role | Hex | Use |
+| --- | --- | --- |
+| Paper (ground) | `#F2EEE4` | whole background, tag backgrounds |
+| Ink | `#15171C` | headline, rules, leader lines, caption plate |
+| Accent | `#E4432D` | counted dots, circle, key numbers, tag border |
+| Accent tint | `#EE9F89` | lit land inside the circle |
+| Accent light | `#FF7358` | spoken word on the plate |
+| Mute | `#6B6556` | labels, sub-notes, footer (4.9:1 on paper) |
+| Rule | `#CFC8B6` | rail track, graticule `#D3CCB9` |
+| Sphere | `#E7E1D1` | globe disc |
+| Dot grey | `#A9A392` | land dots; area dots `#C9C2B0` |
+| Dark dot | `#23262D` | "everyone else" dots |
 
-vfrey draws the captions in a band (`--vf-caption-at`, `--vf-caption-h`; centred near 70% of a 9:16 frame when the position is bottom). Compose the whole frame around it, reading `vfrey.captionBox` (see `helpers.md`) instead of typing pixel numbers:
+- Ratios: paper 55 to 70%; ink under 15% (plate and type); accent under 8%; grey dots 10 to 25%.
+- A brand accent replaces the red.
+- Never: a second accent, a gradient ground, pure white or black, shadows, 3D bars, pie charts, drop shadows on dots.
 
-- Top rail and headline above the hero; the hero is large and ends a little above the band.
-- Captions sit on a plate: a solid ink rectangle with paper text and the spoken word in light red, at most 4 words, the same box all film. The plate fades out in silences longer than about 0.45 s. It is never over the map, a dot or a label.
-- Below the band the frame keeps working to the bottom edge: the scoreboard cells repeat the key numbers, then the source footer. No empty paper strip.
-- Bottom-right corner clear for the `AI-GENERATED` label: the footer is at most 610 wide on the left.
-- If the position is `top` or `middle`, move the plate there and shift the hero and scoreboard to keep it clear. Numbers here are for 9:16.
+## 3. Shapes and line
 
-## Motion rules
+- Strokes at 1080x1920: graticule 1.5 px (every 30 degrees); sphere rim 2 px at 35% ink; leader lines 3 px ink; the accent circle 6 px (3.5 px when the globe is small); headline rule 4 px; scoreboard top rule 5 px; rail 8 px.
+- Corners: square everywhere (tags, plate, cells); dots are circles; the legend marker is a 22 px circle.
+- Dots: land dots `r0 = R * 1.7 deg * 0.36`, scaled `0.4 + 0.6 * depth`; unit dots r 18 (bars, pitch 46) or 6 to 14 on the globe, each with a paper ring `max(2, 0.2 r)` so dots on dots stay separate.
+- Edge treatment: crisp canvas vectors, no blur; lit land inside a circle uses 7 colour buckets from grey to tint with a 150 km soft edge.
+- Texture: none (paper is flat). Light and shadow: none; the globe is lit only by the tint inside the circle.
+- Recipe for the dot-matrix world: hand-simplified `[lon, lat]` polygons (about 45 shapes), `DD.geoDots(shapes, holes, 1.7)` gives rows every 1.7 degrees with `round(360 cos(lat) / 1.7)` dots per row; orthographic projection `x = cos(lat) sin(lon - lon0)`; visible when depth > 0.
 
-- Nothing idles: every beat has a camera move (a spin, a push-in), a build or a morph. The same dots and globe persist and change role.
-- Ease by role: spins and camera `power2.inOut` or `power3.inOut`, labels `power3.out`, exits `power2.in`, counters `power2.out`, pours and regroups `none` (the stagger is in each dot's delay).
-- Counters count while the number is spoken, starting 0.05 s before the word. Start a morph 0.25 s before the sentence it illustrates. Find words by text, never by index.
-- The subject is on screen within 0.3 s of the film starting. The last picture holds its labels to the end.
+## 4. Characters and objects
 
-## Transitions
+There are no characters; the cast is dots, rules, tags and counters. Construct them like this:
+- Unit dot: a filled circle r 18 in accent or dark, ring in paper; 80 dots with `cat` (0 = counted, 1 = rest); one dot = a round unit (1, 10, 100 million) printed in the legend.
+- Bar of dots: 4 rows x 20 columns, pitch 46 px (`DD.gridPos(i, 103, y0, 4, 46)`); a solid bar `DD.bar(ctx, x, baseY, w, value, perPx, col)` is allowed when dots are not people.
+- Tag: paper background, 7 px accent left border, padding 5 x 14 px, mono 34 px, a mute 28 to 30 px second line.
+- Hero tag: accent mono 56 to 58 px on an 88% paper plate.
+- Counter cell: label (mono 28, mute) over a value (mono 84, ink or accent) with a small unit (36 px, mute).
+- Stock objects: 1. dot globe, 2. accent circle (geodesic ring), 3. radius line with end dot, 4. leader line with anchor dot, 5. unit-dot bar, 6. unit-dot rows (one per category), 7. dashed ghost circle (a previous value), 8. progress rail, 9. scoreboard cell, 10. legend line.
 
-None. This style never cuts: a chapter change is a morph of the same dots (globe to bar to rows to globe), a camera push or a spin, with labels fading out 0.3 s before it and in 0.4 s after. A leader line retracts with its label.
+## 5. Typography
 
-## Sound
+- Headline: Google Sans Flex 700, 47 px, line-height 1.1, `text-wrap: balance`, ink, two lines max, `vfrey.script.title`; at y 206 to 310.
+- Kicker and topic: JetBrains Mono 500, 28 px, tracked .08em, caps; rail labels 22 px, tracked .06em, mute.
+- Labels: mono 500, 28 to 34 px, tracked .05em, caps; annotation tags 34 px; hero tags 56 to 58 px; counters 84 px with -0.04em tracking; footer 23 px, max 610 px wide.
+- Nothing under 28 px except the footer (23). Mono stays at weight 500 (faux bold smears). Local fallbacks: `Liberation Sans`, `Liberation Mono`.
+- Caption plate: solid ink rectangle x 40 to 1040, y 1336 to 1528 (height 192), paper text 62 px Google Sans Flex 700, centred, max 4 words and 25 characters per group, the spoken word `#FF7358`; fades out in silences longer than 0.45 s.
 
-vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes a calm data-desk bed (96 bpm: a sub pad, a plucked arpeggio, quiet ticks) plus accents: `whoosh` and `whoosh-down` for camera moves and morphs, `blip` when a shape or number lands, `count` (rising blips) under a pour of dots or a filling bar, `ticks` under a counting number. It needs only `python3` (standard library, no downloads) and always writes the same file for the same input.
+## 6. Composition
 
-1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 .agents/skills/vfrey-style-data-story/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
-3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey Data story style)", "volume": -14, "duck": true}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
+Captions sit on a plate, never over a subject; vfrey draws them in a band (`--vf-caption-at`, `--vf-caption-h`) and the dot picture runs large, to the bottom edge of the frame around it.
 
-One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change, because the times move. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.
+- Safe area: x 60 to 1020; bottom-right (x > 686, y > 1806) clear for the label.
+- Frame grid (1080x1920): rail y 100 to 180; headline y 205 to 318; hero canvas y 322 to 1310 (1080 x 988); caption plate y 1336 to 1528; scoreboard y 1566 to 1780 (three 320 px cells at x 60, 380, 700); footer y 1822+.
+- Subject scale: the globe or chart is 70 to 100% of the hero width (R 430 to 640 px); a shrunken corner globe R 160.
+- Layers: sphere and graticule; land dots; circle and fills; unit dots; leader lines; labels (DOM) on top.
+- Depth cues: dot size by depth on the globe, nothing else; the picture is flat information design.
 
-## Checks before you call it done
+Shot types:
 
-1. Render, then make a 12-frame contact sheet and look at it: `ffmpeg -v error -y -i "videos/<file>.mp4" -vf "fps=12/<seconds>,scale=270:480,tile=6x2" -frames:v 1 -update 1 contact.jpg`. An even sample can land inside a morph; also check stills at the beat times (`npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`).
-2. Every number on screen or spoken: can you name its source? Does the scene compute it from the inputs table? Is each schematic map, dot or position labelled as schematic on screen, and the sources in the footer?
-3. In every tile: a large hero picture, captions on the plate and clear of the picture, scoreboard and footer reaching the bottom edge, one accent colour only, nothing in the bottom-right corner but the label.
-4. Does any label overlap dots, a rule or another label, or hang off an edge? Wide labels are centred on their anchor; check the right edge at the widest string.
-5. Read the run's checks. `frames.text-overlap` compares glyph boxes: leave 20 px or more between a label and its big value.
+```
+GLOBE + CIRCLE        ZOOM + LEADER         DOTS ON MAP          BAR OF DOTS           ROWS
++------------+        +------------+        +------------+       +------------+        +------------+
+| rail / hdr |        | rail / hdr |        | rail / hdr |       | rail / hdr |        | rail / hdr |
+|   .-''-.   |        |  _-----_   |        | o . o . o  |       | LABEL  n   |        | CHINA  o o |
+|  (  o   )  |        | /  (o)---|tag       | .o.o o .o  |       | oooooooooo |        | INDIA  o o |
+|   '-..-'   |        | \_______/  |        | legend     |       | oooooooooo |        | REST   o o |
+|[ caption  ]|        |[ caption  ]|        |[ caption  ]|       |[ caption  ]|        |[ caption  ]|
+| a   b   c  |        | a   b   c  |        | a   b   c  |       | a   b   c  |        | a   b   c  |
++------------+        +------------+        +------------+       +------------+        +------------+
+```
+
+## 7. Motion
+
+- Feel: smooth and continuous; every beat has a camera move, a build or a morph; nothing idles; nothing cuts.
+- Easing: spins and camera `power2.inOut` or `power3.inOut`; labels `power3.out`; exits `power2.in`; counters `power2.out`; pours `none` (the stagger lives in the per-dot delay `(i * 0.618) % 1`).
+- Durations: spin 1.2 to 2 s; push-in 1.5 s (R 430 to 640, cy +6, `power3.inOut`); shrink to corner 1.7 s (R to 160); circle grow 1.6 s; label fade 0.3 s; leader draw 0.5 to 0.7 s; counter 1.2 to 1.3 s.
+- Counters start 0.05 s before the number is spoken; dot regroups start 0.25 s before the sentence they belong to.
+- Regroup recipe: `f = eio(clamp((F - delay * 0.5) / 0.5))` and a sideways bulge `min(150, len * 0.2) * sin(pi f)`, alternating sign by index.
+- Camera: spin (`lon0`), push-in (`R`), shrink-to-corner; leave 20 px between the lowest chart row and a small globe.
+- Secondary and ambient: the progress rail fills with time; labels follow the picture; a slow `lon0` drift of 2 to 4 degrees while holding.
+- Forbidden: cuts, fades between pictures, bounce or elastic easing, shaking, spinning faster than 40 degrees per second, 3D tilts, particle sparkle.
+
+## 8. Transitions
+
+There are no cuts. The allowed transitions:
+1. Role change (default): the same dots move from one layout to the next (`S.L` 1 to 2 to 3), 1.2 to 1.7 s.
+2. Camera morph: globe spin, push-in or shrink-to-corner while labels fade out (0.3 s) and in.
+3. Fill and unfill: a circle's tint fills land dots over 1.6 s; a ghost dashed circle (`setLineDash [16, 12]`, mute) marks the old value.
+Forbidden: fades to another picture, wipes, slides, zoom blurs, a page flip.
+
+## 9. Sound
+
+vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed: 96 bpm, a sine pad per chord (A minor, F, C, G) with a soft plucked 8th-note arpeggio (decaying sines) and quiet noise ticks on the beat, a calm data-desk feel. Accents at cues: filtered-noise whooshes at each camera move or morph, a low blip when the main shape completes, rising blip runs under counters and pours, tick bursts under a counting number. Peak-normalise to 0.9, fade in 0.4 s and out 2 s; volume -14, duck on, about -14 LUFS. `make-bed.py` next to this file writes it with `python3` and `ffmpeg` only.
+
+1. Make the video once without music, so `vfrey/timing.json` holds the real voice times.
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 .agents/skills/vfrey-style-data-story/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey data story style, ffmpeg)", "volume": -14, "duck": true}` and render again with `--rerender`.
+
+No `python3` on the machine: leave `music` out, say so, install nothing.
+
+## 10. Shot plan template (32 to 38 s)
+
+Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 3 words a second.
+
+| Time | Chapter | Shot type | Camera and build | Scoreboard |
+| --- | --- | --- | --- | --- |
+| 0 to 5 s | Hook: the whole picture | GLOBE + CIRCLE | globe spins in, tint circle grows, hero tag | dashes |
+| 5 to 14 s | The count | ZOOM + LEADER | push-in R 430 to 640, leader and tag, counters start | first value |
+| 14 to 22 s | Who is inside | DOTS ON MAP | unit dots pour, legend on | second value |
+| 22 to 30 s | The comparison | BAR OF DOTS then ROWS | dots regroup, globe shrinks to the corner | share fills |
+| 30 to 36 s | The catch or payoff | GLOBE + CIRCLE (new size) | ghost old circle, hero tag with the new share | all three |
+| last 2 s | Hold | any | slow drift | all values |
+
+## 11. Reference frames
+
+- `ref-1.jpg`: the opening globe. Copy the rail, headline and rule, the pale sphere with grey dots, the red circle and the empty scoreboard dashes.
+- `ref-2.jpg`: zoom with a radius label. Copy the tint fill inside the circle, the red radius line with its 58 px tag and the ink caption plate.
+- `ref-3.jpg`: unit dots on the map. Copy the red and dark dots with paper rings, the legend line and the counter cells filling.
+- `ref-4.jpg`: dots regrouped into a bar. Copy the 4 x 20 grid at pitch 46, the mono label and value above it and the corner globe.
+
+## 12. Reference implementation
+
+`starter.html` is a working scene: a dot-matrix globe built from `land.js`, a geodesic circle that grows, one leader-line tag, 80 unit dots that pour onto the map and regroup into a bar, three scoreboard counters, a four-segment rail and captions on the ink plate. Copy it, `datadesk.js` and `land.js` into `scenes/<idea>/`, rename it `index.html`, replace `INPUTS` (value and source for every number), the kicker and topic, the tag text, the labels, the circle's centre (`CENTRE`) and radius, and cue each chapter to a script line or word (`lineAt(i)`, or `at("word")` from `helpers.md`). Check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 6 out.png`.
+
+## 13. Do and Don't, and the final checklist
+
+Do:
+1. Do list every number with its source before coding, and compute displayed values in the scene.
+2. Do keep exactly one accent colour.
+3. Do print sources in the footer and say when positions are schematic.
+4. Do keep the same dots across chapters and let them regroup.
+5. Do start counters 0.05 s before the number is spoken.
+6. Do keep mono at weight 500 and every label at 28 px or more.
+7. Do leave 20 px between a label and its big value.
+8. Do leave the bottom-right corner clear.
+9. Do centre wide labels on their anchor (`translate(-50%,0)`).
+10. Do retime words to the true speech segments if the voice is off (see pitfalls).
+11. Do use a timeline-level `onUpdate` plus `vfrey.onFrame`.
+
+Don't:
+1. Don't use a second accent, gradients, shadows or 3D.
+2. Don't colour land dots as if they were data (they show where land is).
+3. Don't cut between pictures.
+4. Don't type a number the scene can compute.
+5. Don't claim precision a simplified outline does not have.
+6. Don't use pie charts or 3D bars.
+7. Don't put text under 28 px (except the footer at 23).
+8. Don't use faux-bold mono.
+9. Don't let a label hang off the frame edge.
+10. Don't use a clock tween's `onUpdate`.
+11. Don't leave a beat with no motion.
+
+Final checklist on the 12-frame contact sheet (`ffmpeg -v error -y -i "videos/<file>.mp4" -vf "fps=12/<seconds>,scale=270:480,tile=6x2" -frames:v 1 -update 1 contact.jpg`):
+- [ ] Paper ground in every tile; no white, no gradient.
+- [ ] Exactly one accent colour across the film.
+- [ ] Rail, two-line headline and 4 px rule in every tile.
+- [ ] A dot picture (globe, dots, bar or rows) fills 70 to 100% of the hero width.
+- [ ] The same dots appear in successive tiles in new roles (no cuts).
+- [ ] At least one leader-line tag with a red left border.
+- [ ] Caption plate in the same box, ink with paper text, current word light red.
+- [ ] Scoreboard of three cells fills in as numbers are spoken.
+- [ ] Legend and source footer present; bottom-right corner clear.
+- [ ] Every printed number is true, sourced and rounded as the source rounds.
+- [ ] Every number on screen matches the number the voice says (digits, units and rounding); read the contact sheet against the script.
 
 ## Pitfalls
 

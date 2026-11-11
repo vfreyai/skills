@@ -1,0 +1,151 @@
+<!doctype html>
+<!-- STARTER (vfrey-style-blueprint). One big SVG sheet, a camera that moves by animating the viewBox, every stroke and text sized with --k (world units per
+     screen pixel) so it stays crisp at any zoom, draw-on by stroke-dashoffset, flowing force arrows, a legend that lights up, a caption strip and a title
+     block, a T-square transition. The example part is a wall bracket holding a weight: replace the drawing (world coordinates), the labels and the keys. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#0b3380; }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; font-family:"JetBrains Mono", monospace; color:#f2fbff; background:#0b3380; }
+  #sheet { position:absolute; left:0; top:0; width:1080px; height:1336px; overflow:hidden; }
+  #w { position:absolute; left:0; top:0; width:1080px; height:1336px; --k:1.4; --ph:0; }
+  .o { fill:none; stroke:#f2fbff; stroke-width:calc(var(--k)*3.4px); stroke-linejoin:round; stroke-linecap:round; }
+  .o2 { fill:none; stroke:#f2fbff; stroke-width:calc(var(--k)*2px); stroke-linejoin:round; stroke-linecap:round; }
+  .c { fill:none; stroke:#8fdcff; stroke-width:calc(var(--k)*1.4px); opacity:.6; }
+  .dm { fill:none; stroke:#bdeeff; stroke-width:calc(var(--k)*1.8px); }
+  .dr { stroke-dasharray:1 1; stroke-dashoffset:1; }
+  .ctr { fill:none; stroke:#8fdcff; stroke-width:calc(var(--k)*1.5px); stroke-dasharray:calc(var(--k)*26px) calc(var(--k)*6px) calc(var(--k)*5px) calc(var(--k)*6px); opacity:.7; }
+  .hf { fill:url(#hat); stroke:#f2fbff; stroke-width:calc(var(--k)*3px); stroke-linejoin:round; }
+  .fa { fill:none; stroke-width:calc(var(--k)*4.5px); stroke-linecap:butt; stroke-dasharray:calc(var(--k)*20px) calc(var(--k)*13px); stroke-dashoffset:calc(var(--k)*var(--ph)*-1px); }
+  .t { font-family:"JetBrains Mono", monospace; fill:#f2fbff; paint-order:stroke; stroke:#0f3d96; stroke-width:calc(var(--k)*6px); stroke-linejoin:round; letter-spacing:.05em; text-transform:uppercase; }
+  .t1 { font-size:calc(var(--k)*23px); } .t2 { font-size:calc(var(--k)*31px); } .t3 { font-size:calc(var(--k)*46px); }
+  #tools { position:absolute; left:0; top:0; width:1080px; height:1336px; overflow:hidden; pointer-events:none; z-index:20; }
+  #strip { position:absolute; left:0; top:1336px; width:1080px; height:272px; background:linear-gradient(#082866,#071f55); z-index:30; }
+  #strip .frm { position:absolute; left:26px; right:26px; top:22px; bottom:20px; border:3px solid #f2fbff; }
+  #strip .frm2 { position:absolute; left:38px; right:38px; top:34px; bottom:32px; border:1px solid #8fdcff; }
+  #strip .tag { position:absolute; left:48px; top:8px; background:#071f55; padding:0 12px; font-size:20px; letter-spacing:.2em; color:#8fdcff; }
+  #captions { position:absolute; left:60px; right:60px; top:1350px; height:240px; z-index:40; display:flex; align-items:center; justify-content:center; }
+  #captions .vf-w { text-transform:uppercase; font-family:"JetBrains Mono", monospace; letter-spacing:.02em; }
+  #tb { position:absolute; left:0; top:1608px; width:1080px; height:312px; background:#0a2c72; z-index:30; }
+  #tb .bg { position:absolute; inset:0; background-image:linear-gradient(rgba(143,220,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(143,220,255,.12) 1px,transparent 1px); background-size:20px 20px; }
+  .cell { position:absolute; border:2px solid #cfeeff; box-sizing:border-box; }
+  .lbl { position:absolute; font-size:15px; letter-spacing:.2em; color:#8fdcff; }
+  .tt { position:absolute; white-space:nowrap; }
+  .lg { position:absolute; left:12px; display:flex; align-items:center; font-size:21px; letter-spacing:.08em; opacity:.3; white-space:nowrap; }
+  .lg svg { margin-right:12px; flex:none; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="sheet"><svg id="w" width="1080" height="1336" viewBox="0 0 1080 1336"></svg></div>
+  <div id="tools"></div>
+  <div id="strip"><div class="frm"></div><div class="frm2"></div><div class="tag">NOTE</div></div>
+  <div id="captions"></div>
+  <div id="tb">
+    <div class="bg"></div>
+    <div class="cell" style="left:24px;top:8px;width:560px;height:176px"></div><div class="lbl" style="left:36px;top:16px">TITLE</div>
+    <div class="tt" style="left:36px;top:46px;font-size:38px;letter-spacing:.04em">PLACEHOLDER TITLE</div>
+    <div class="tt" style="left:36px;top:96px;font-size:25px;letter-spacing:.1em;color:#bdeeff">PLACEHOLDER SUBTITLE</div>
+    <div class="tt" style="left:36px;top:142px;font-size:16px;letter-spacing:.14em;color:#8fdcff">NOT TO SCALE · SCHEMATIC</div>
+    <div class="cell" style="left:584px;top:8px;width:472px;height:176px"></div><div class="lbl" style="left:596px;top:16px">FORCE KEY</div>
+    <div id="legend" style="position:absolute;left:584px;top:44px">
+      <div class="lg" id="lgW" style="top:0"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#6dffb0" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#6dffb0"/></svg>WEIGHT</div>
+      <div class="lg" id="lgT" style="top:33px"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#ffd84a" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#ffd84a"/></svg>TENSION</div>
+      <div class="lg" id="lgC" style="top:66px"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#ff6fae" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#ff6fae"/></svg>COMPRESSION</div>
+    </div>
+    <div class="cell" style="left:24px;top:184px;width:200px;height:56px"></div><div class="lbl" style="left:34px;top:192px">SHEET</div><div class="tt" style="left:34px;top:212px;font-size:19px">1 OF 1</div>
+    <div class="cell" style="left:224px;top:184px;width:360px;height:56px"></div><div class="lbl" style="left:234px;top:192px">DRAWING NO.</div><div class="tt" style="left:234px;top:212px;font-size:19px">00-XX-001</div>
+    <div class="cell" style="left:584px;top:184px;width:220px;height:56px"></div><div class="lbl" style="left:594px;top:192px">UNITS</div><div class="tt" style="left:594px;top:212px;font-size:19px">MM</div>
+  </div>
+</div>
+<script>
+const T = vfrey.timing, tl = vfrey.timeline(), D = T.durationSec, wordsAll = T.words;
+const W = (re, line, nth = 0) => { const m = wordsAll.filter(w => (line == null || w.line === line) && re.test(w.text)); return (m[nth] || m[0] || wordsAll[0]).start; };   // word start by regex
+const svg = document.getElementById("w");
+const COL = { W: "#6dffb0", T: "#ffd84a", C: "#ff6fae" };   // ONE colour per quantity, fixed for the whole film
+const dPath = a => "M" + a.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
+
+/* ---------- the sheet: gradient, minor and major grid, fold creases, hatch pattern, arrow markers ---------- */
+const Z = { x0: -1500, y0: -1500, w: 6000, h: 5000 };
+svg.innerHTML = `<defs>
+ <radialGradient id="bgr" cx="50%" cy="46%" r="75%"><stop offset="0" stop-color="#1a58c4"/><stop offset=".6" stop-color="#1245a6"/><stop offset="1" stop-color="#0a2f78"/></radialGradient>
+ <pattern id="gm" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#9fe2ff" stroke-opacity=".13" stroke-width="1.2"/></pattern>
+ <pattern id="gM" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M100 0H0V100" fill="none" stroke="#bdeeff" stroke-opacity=".28" stroke-width="1.8"/></pattern>
+ <pattern id="hat" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="14" stroke="#cfeeff" stroke-width="2.2" stroke-opacity=".75"/></pattern>
+ ${Object.entries(COL).map(([k, c]) => `<marker id="m${k}" viewBox="0 0 5 5" refX="3.4" refY="2.5" markerWidth="5" markerHeight="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L5,2.5 L0,5 z" fill="${c}"/></marker>`).join("")}
+ <marker id="mD" viewBox="0 0 6 6" refX="0" refY="3" markerWidth="6" markerHeight="6" orient="auto-start-reverse" markerUnits="strokeWidth"><path d="M6,0.6 L0,3 L6,5.4" fill="none" stroke="#bdeeff" stroke-width=".9"/></marker></defs>
+ <rect x="${Z.x0}" y="${Z.y0}" width="${Z.w}" height="${Z.h}" fill="url(#bgr)"/>
+ <rect x="${Z.x0}" y="${Z.y0}" width="${Z.w}" height="${Z.h}" fill="url(#gm)"/><rect x="${Z.x0}" y="${Z.y0}" width="${Z.w}" height="${Z.h}" fill="url(#gM)"/>
+ <g opacity=".5"><line x1="800" y1="${Z.y0}" x2="800" y2="3500" stroke="#04184a" stroke-opacity=".35" stroke-width="5"/><line x1="806" y1="${Z.y0}" x2="806" y2="3500" stroke="#bdeeff" stroke-opacity=".2" stroke-width="2"/></g>
+ <g id="world"></g>`;
+const world = svg.querySelector("#world");
+const add = (html) => { world.insertAdjacentHTML("beforeend", html); };
+
+/* ---------- sheet frame with zone letters (frame 0 already shows border, zones, title and construction marks) ---------- */
+const FX0 = -40, FX1 = 2000, FY0 = -90, FY1 = 1500;
+let fr = `<rect id="frame1" class="o2 dr" pathLength="1" x="${FX0}" y="${FY0}" width="${FX1 - FX0}" height="${FY1 - FY0}"/><rect class="c" x="${FX0 + 26}" y="${FY0 + 26}" width="${FX1 - FX0 - 52}" height="${FY1 - FY0 - 52}"/>`;
+"ABCDEF".split("").forEach((c, i) => { const x = FX0 + (i + .5) * (FX1 - FX0) / 6; fr += `<text class="t t1" x="${x}" y="${FY0 + 20}" text-anchor="middle" style="stroke:none;fill:#8fdcff">${c}</text>`; });
+[1, 2, 3, 4].forEach((c, i) => { const y = FY0 + (i + .5) * (FY1 - FY0) / 4; fr += `<text class="t t1" x="${FX0 + 12}" y="${y + 8}" style="stroke:none;fill:#8fdcff">${c}</text>`; });
+fr += `<text class="t" x="${FX0 + 90}" y="70" style="font-size:calc(var(--k)*64px);stroke:none;letter-spacing:.04em">PLACEHOLDER TITLE</text><text class="t" x="${FX0 + 94}" y="120" style="font-size:calc(var(--k)*26px);stroke:none;fill:#8fdcff">SECTION VIEW · FIG. 01</text>`;
+add(fr);
+
+/* ---------- the part: wall (hatched), bracket (outline), weight; world coordinates, y down ---------- */
+const WALLX = 260, BY = 560, BEAMX = 1340;
+add(`<path id="wall" class="hf dr" pathLength="1" d="M${WALLX},120 L${WALLX},1180 L60,1180 L60,120 Z"/>`);
+/* construction lines first: axes, centre line, a tangent, a chord */
+add(`<g id="cons"><line class="c dr" pathLength="1" x1="60" y1="${BY}" x2="1700" y2="${BY}"/><line class="c dr" pathLength="1" x1="${BEAMX}" y1="200" x2="${BEAMX}" y2="1100"/><line class="c dr" pathLength="1" x1="${WALLX}" y1="${BY + 330}" x2="${BEAMX}" y2="${BY}"/></g>`);
+add(`<path id="beam" class="o dr" pathLength="1" d="M${WALLX},${BY - 40} L${BEAMX},${BY - 40} L${BEAMX},${BY + 40} L${WALLX},${BY + 40}"/>`);
+add(`<path id="brace" class="o dr" pathLength="1" d="M${WALLX},${BY + 330} L${BEAMX - 140},${BY + 40}"/>`);
+add(`<g id="weight"><path class="o dr" pathLength="1" d="M${BEAMX},${BY + 40} L${BEAMX},${BY + 150}"/><rect class="hf dr" pathLength="1" x="${BEAMX - 110}" y="${BY + 150}" width="220" height="190"/><text class="t t2" x="${BEAMX}" y="${BY + 262}" text-anchor="middle" style="stroke:none">LOAD</text></g>`);
+/* dimension line with extension lines and tick arrows */
+add(`<g id="dims" opacity="0"><line class="dm" x1="${WALLX}" y1="${BY - 60}" x2="${WALLX}" y2="${BY - 220}"/><line class="dm" x1="${BEAMX}" y1="${BY - 60}" x2="${BEAMX}" y2="${BY - 220}"/>
+  <line class="dm" x1="${WALLX}" y1="${BY - 180}" x2="${BEAMX}" y2="${BY - 180}" marker-start="url(#mD)" marker-end="url(#mD)" style="stroke-width:calc(var(--k)*1.8px)"/><text class="t t2" x="${(WALLX + BEAMX) / 2}" y="${BY - 205}" text-anchor="middle">1080 [PLACEHOLDER]</text></g>`);
+/* detail callout: dashed circle, lettered bubble */
+add(`<g id="det" opacity="0"><circle class="ctr" cx="${WALLX}" cy="${BY}" r="120"/><line class="c" x1="${WALLX + 85}" y1="${BY - 85}" x2="${WALLX + 250}" y2="${BY - 300}"/><circle class="o2" cx="${WALLX + 275}" cy="${BY - 330}" r="38"/><text class="t t2" x="${WALLX + 275}" y="${BY - 318}" text-anchor="middle" style="stroke:none">A</text><text class="t t1" x="${WALLX + 330}" y="${BY - 322}">DETAIL A</text></g>`);
+/* force arrows: dashed strokes that FLOW (dashoffset from --ph), one colour per quantity */
+const arrow = (id, k, d) => `<path id="${id}" class="fa" d="${d}" stroke="${COL[k]}" marker-end="url(#m${k})" opacity="0"/>`;
+add(`<g id="forces">${arrow("fW", "W", `M${BEAMX} ${BY + 360} L${BEAMX} ${BY + 560}`)}${arrow("fT", "T", `M${BEAMX - 100} ${BY + 10} L${WALLX + 80} ${BY + 10}`)}${arrow("fC", "C", `M${BEAMX - 140} ${BY + 40} L${WALLX + 60} ${BY + 320}`)}</g>`);
+add(`<g id="labels"><text id="lbA" class="t t2" x="${BEAMX - 120}" y="${BY - 70}" text-anchor="end" opacity="0">BEAM</text><text id="lbB" class="t t2" x="${WALLX + 360}" y="${BY + 250}" opacity="0">BRACE</text><text id="lbC" class="t t2" x="${BEAMX + 150}" y="${BY + 620}" text-anchor="end" opacity="0">WEIGHT</text></g>`);
+/* pencil scribble: seeded zigzag drawn with the same draw-on */
+{ let d = "M1480 160"; for (let i = 0; i < 14; i++) d += ` L${1480 + (i % 2 ? 150 : 0)} ${160 + i * 12}`; add(`<path id="scr" class="c dr" pathLength="1" d="${d}" style="opacity:.8"/>`); }
+
+/* ---------- camera = viewBox from a proxy {x,y,w}; --k = world units per screen pixel ---------- */
+const cam = { x: 0, y: 0, w: 1500 };
+function setCam() { const h = cam.w * 1336 / 1080; svg.setAttribute("viewBox", `${cam.x.toFixed(1)} ${cam.y.toFixed(1)} ${cam.w.toFixed(1)} ${h.toFixed(1)}`); svg.style.setProperty("--k", (cam.w / 1080).toFixed(4)); }
+const KEYS = [   // [time, {x,y,w}]  one idea per station: wide establishing, the joint, the load path, wide again
+  [0.0, { x: -40, y: -90, w: 2060 }],
+  [2.8, { x: -40, y: -90, w: 2060 }],
+  [4.0, { x: -20, y: 240, w: 1200 }],
+  [7.0, { x: 360, y: 260, w: 1500 }],
+  [10.0, { x: -40, y: -90, w: 2060 }],
+];
+cam.x = KEYS[0][1].x; cam.y = KEYS[0][1].y; cam.w = KEYS[0][1].w; setCam();
+for (let i = 1; i < KEYS.length; i++) { const [t0] = KEYS[i - 1], [t1, k] = KEYS[i]; if (t1 - t0 < 1.0) continue;
+  tl.fromTo(cam, { x: KEYS[i - 1][1].x, y: KEYS[i - 1][1].y, w: KEYS[i - 1][1].w }, { x: k.x, y: k.y, w: k.w, duration: Math.min(1.4, t1 - t0 - .1), ease: "power3.inOut", immediateRender: false, onUpdate: setCam }, t1 - Math.min(1.4, t1 - t0 - .1));
+  tl.fromTo(cam, { w: k.w }, { w: k.w * 1.03, duration: Math.max(.5, t1 - t0 - 1.5), ease: "sine.inOut", immediateRender: false, onUpdate: setCam }, t1 + .05); }   // slow drift: never static
+tl.eventCallback("onUpdate", setCam);
+vfrey.onFrame(() => { setCam(); svg.style.setProperty("--ph", (tl.time() * 90).toFixed(2)); });   // what a render runs; --ph is one global linear phase that flows every dashed arrow
+
+/* ---------- draw-on order: frame, construction lines, outlines, hatch fade, labels ---------- */
+const draw = (sel, t, d = .9) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d, ease: "power1.inOut", immediateRender: false }, t);
+draw("#frame1", .05, 1.2); draw("#cons .c", .5, .9); draw("#scr", .9, .7);
+tl.set("#wall", { fillOpacity: 0 }, 0); draw("#wall", 2.6, .8); tl.to("#wall", { fillOpacity: 1, duration: .5 }, 3.2);   // fill fades in AFTER the outline
+draw("#beam", 3.0, 1.0); draw("#brace", 3.6, .9); draw("#weight .dr", 4.4, .9);
+tl.fromTo("#dims", { opacity: 0 }, { opacity: 1, duration: .5, immediateRender: false }, 5.4);
+tl.fromTo("#det", { opacity: 0 }, { opacity: 1, duration: .5, immediateRender: false }, 5.8);
+["lbA", "lbB", "lbC"].forEach((id, i) => tl.fromTo("#" + id, { opacity: 0 }, { opacity: 1, duration: .4, immediateRender: false }, 4.6 + i * .5));
+/* forces: each lights its legend row on first use, arrows fade in then flow forever */
+[["fW", "lgW", 6.6], ["fT", "lgT", 7.6], ["fC", "lgC", 8.6]].forEach(([a, g, t]) => { tl.fromTo("#" + a, { opacity: 0 }, { opacity: 1, duration: .4, immediateRender: false }, t); tl.fromTo("#" + g, { opacity: .3 }, { opacity: 1, duration: .4, immediateRender: false }, t); });
+
+/* ---------- transition: a T-square sweeps top to bottom over a camera move (cut underneath while it covers the screen) ---------- */
+document.getElementById("tools").innerHTML = `<svg width="1080" height="1336" viewBox="0 0 1080 1336"><g id="tsq" transform="translate(0,-160)"><rect x="0" y="0" width="1080" height="26" fill="#cfeeff" fill-opacity=".92" stroke="#0f3d96" stroke-width="3"/>${Array.from({ length: 54 }, (_, i) => `<line x1="${i * 20}" y1="26" x2="${i * 20}" y2="${i % 5 ? 36 : 52}" stroke="#0f3d96" stroke-width="2"/>`).join("")}<rect x="-6" y="-20" width="110" height="96" fill="#9fe2ff" stroke="#0f3d96" stroke-width="3"/></g></svg>`;
+tl.fromTo("#tsq", { y: -160 }, { y: 1480, duration: 1.1, ease: "power2.inOut", immediateRender: false }, 3.7);
+
+vfrey.captions("#captions", { style: "color", font: '"JetBrains Mono"', size: 58, color: "#f2fbff", highlight: "#ffd84a", maxWords: 3 });
+</script>
+</body>
+</html>

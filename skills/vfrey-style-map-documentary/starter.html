@@ -1,0 +1,164 @@
+<!doctype html>
+<!-- STARTER (vfrey-style-map-documentary). A hand-inked atlas: a Mercator plane under a perspective camera, one route that draws itself
+     with a plane and its shadow, a lower third, HUD, caption plate. Replace PLACE A / PLACE B (lon, lat), the kicker/line texts and the
+     camera states. Everything visible is a pure function of the state SS (tweened by GSAP) and tl.time(). No external assets. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  :root { --ink:#06101c; --gold:#efc063; --cream:#f6ead0; --red:#ff5a36; }
+  html, body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--ink); }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--ink); font-family:"Google Sans Flex","Liberation Sans",Arial,sans-serif; color:var(--cream); }
+  #stage { position:absolute; left:0; top:0; width:1080px; height:1920px; transform-origin:0 0; overflow:hidden; }
+  #planeWrap { position:absolute; left:0; top:0; width:1080px; height:1920px; overflow:hidden; z-index:0; isolation:isolate; }
+  #stage > *:not(#planeWrap) { z-index:5; will-change:transform; }
+  #plane { position:absolute; left:0; top:0; width:1px; height:1px; transform-origin:0 0; }
+  #labels { position:absolute; left:0; top:0; }
+  .mono { font-family:"JetBrains Mono","Liberation Mono",monospace; font-weight:500; }
+  .lab { position:absolute; left:0; top:0; white-space:nowrap; opacity:0; transform-origin:50% 100%; }
+  .city { font-family:"Playfair Display",Georgia,serif; font-style:italic; font-weight:700; font-size:54px; color:var(--cream); text-align:center;
+          text-shadow:0 0 6px #06101c,0 0 14px #06101c,2px 2px 0 #06101c,-2px -2px 0 #06101c,2px -2px 0 #06101c,-2px 2px 0 #06101c; }
+  .city small { display:block; font-family:"JetBrains Mono",monospace; font-style:normal; font-weight:500; font-size:22px; letter-spacing:.08em; color:var(--gold); margin-top:2px; }
+  .chip { font-weight:700; font-size:34px; padding:8px 18px 9px 16px; background:rgba(6,16,28,.9); color:var(--cream); border-left:7px solid var(--red); }
+  .chip b { color:var(--gold); font-weight:800; }
+  .hud { position:absolute; left:60px; font-size:22px; letter-spacing:.12em; text-shadow:0 0 8px #06101c,0 0 2px #06101c; }
+  #vig { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 72% 62% at 50% 44%, rgba(2,6,14,0) 52%, rgba(2,6,14,.5) 100%); }
+  #vigT { position:absolute; left:0; top:0; width:1080px; height:360px; pointer-events:none; background:linear-gradient(rgba(3,8,18,.78), rgba(3,8,18,0)); }
+  #vigB { position:absolute; left:0; top:1500px; width:1080px; height:420px; pointer-events:none; background:linear-gradient(rgba(3,8,18,0), rgba(3,8,18,.38)); }
+  #grainSvg { position:absolute; left:0; top:0; width:1080px; height:1920px; opacity:.13; pointer-events:none; mix-blend-mode:overlay; }
+  .lt { position:absolute; left:48px; top:1128px; width:780px; opacity:0; pointer-events:none; }
+  .lt .bar { position:absolute; left:0; top:0; bottom:0; width:8px; background:var(--gold); transform-origin:0 0; }
+  .lt .box { margin-left:8px; padding:12px 24px 14px 22px; background:linear-gradient(90deg, rgba(6,16,28,.93), rgba(6,16,28,.8)); }
+  .lt .k { font-weight:700; font-size:22px; letter-spacing:.2em; color:var(--gold); }
+  .lt .v { font-family:"Playfair Display",serif; font-weight:700; font-size:46px; line-height:1.12; color:var(--cream); margin-top:2px; }
+  .lt .v i { color:var(--gold); font-weight:500; }
+  #plate { position:absolute; left:40px; width:1000px; background:rgba(6,16,28,.9); border-top:3px solid var(--gold); border-bottom:3px solid var(--gold); box-sizing:border-box; }
+  #captions { position:absolute; left:72px; width:936px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+  .cg { display:none; text-align:center; font-size:62px; line-height:1.14; font-weight:700; color:#f6ead0; }
+  .cg.on { display:block; } .cg span { display:inline-block; margin:0 9px; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+ <div id="stage">
+  <div id="planeWrap"><div id="plane"><svg id="planeSvg" width="1" height="1" style="overflow:visible"></svg></div></div>
+  <div id="labels"></div>
+  <div id="vigT"></div><div id="vigB"></div><div id="vig"></div>
+  <div class="hud mono" style="top:214px;font-size:25px;color:var(--gold)">SIMPLIFIED MAP</div>
+  <div class="hud mono" style="top:252px;font-size:21px;color:rgba(246,234,208,.8)">HAND-DRAWN COASTLINES</div>
+  <div class="hud mono" id="hudC" style="top:288px;font-size:22px;color:rgba(246,234,208,.75)"></div>
+  <svg class="hud" id="compass" width="170" height="170" style="left:850px;top:200px"></svg>
+  <div id="lt1" class="lt"><div class="bar"></div><div class="box"><div class="k">KICKER IN CAPITALS</div><div class="v">PLACE A <i>to</i> PLACE B</div></div></div>
+  <div id="lt2" class="lt"><div class="bar"></div><div class="box"><div class="k">SECOND KICKER</div><div class="v">One line, <i>one number</i></div></div></div>
+  <svg id="grainSvg"><filter id="gf"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#gf)"/></svg>
+  <div id="plate"></div>
+  <div id="captions"></div>
+ </div>
+</div>
+<script>
+const LAND = {"land":{"northAmerica":[[-168,65.6],[-166.5,68.3],[-148,70.3],[-135,69],[-120,69.5],[-108,68],[-95,71.5],[-86,68],[-81,67],[-88,64],[-94.5,58.7],[-88,56.5],[-82,55],[-79.5,51.3],[-77,56.5],[-78,62.3],[-70,61],[-68,58.3],[-64.5,60.3],[-60,55.5],[-55.7,52],[-60,50.2],[-68.5,49],[-67,49],[-64.3,48.5],[-64.5,46.2],[-60,46],[-64,44.5],[-66,44.8],[-69,44],[-70,41.8],[-74,40.6],[-75.2,38.5],[-75.5,35.3],[-79,33.2],[-81.3,30],[-80,26.5],[-81.8,26],[-82.8,29.2],[-85.5,29.7],[-89,30.2],[-91,29.3],[-95,29],[-97.5,26],[-97.3,21],[-94.5,18.2],[-90.7,19.5],[-88,21.6],[-87.5,19],[-88.6,15.9],[-83.2,15],[-83.7,10.9],[-81,8.8],[-77.5,8.7],[-78.5,8.5],[-81.5,7.8],[-85,10],[-87.5,13],[-91.5,14],[-95,16.2],[-99.5,16.7],[-105,19.5],[-106.5,23.3],[-109.5,26.7],[-112.2,29],[-114.7,31.7],[-112.8,28],[-110.3,24.2],[-110,22.9],[-112.3,26.2],[-114.2,28.7],[-117.1,32.5],[-120.6,34.6],[-122.5,37.8],[-124.3,43],[-124.7,48.4],[-125,50],[-128,52.5],[-131.5,56],[-136.5,58.3],[-143.5,60],[-149,60],[-150.5,61.2],[-156,57.5],[-162,55],[-161,56],[-157,58.8],[-162,59.9],[-166,62],[-161,63.5],[-165,64.5]],"greenland":[[-73,78.2],[-68,80.3],[-60,82],[-45,82.5],[-30,83.4],[-20,81.5],[-18,79],[-20,75],[-22,72],[-22,70.2],[-26,68.5],[-32,68],[-38,65.6],[-41,63],[-43,60],[-45,59.9],[-48,61],[-51,64],[-53.5,67],[-54,70],[-56,73],[-60,75.8],[-67,76],[-72,77.5]],"southAmerica":[[-77.5,8.7],[-72,12.2],[-68,12],[-61.8,10.7],[-57,6],[-51.5,4.4],[-50,0],[-44.5,-2.8],[-37,-5],[-35,-9.5],[-39,-14.5],[-41,-22],[-47,-24.5],[-49.5,-29.5],[-53.5,-34.3],[-58.3,-34],[-58,-38.3],[-62.3,-41],[-63.7,-42.5],[-67.5,-46.3],[-68.8,-50.5],[-65.5,-54.8],[-72,-54],[-75.5,-48],[-73.5,-41.5],[-71.5,-33],[-70.4,-24],[-72.5,-17],[-77.5,-11.5],[-81.2,-5],[-80.8,-1],[-78.8,1.5],[-77.5,6.5]],"africa":[[-17,14.7],[-17,21],[-9.8,30],[-6,35.8],[3,36.8],[11,33.8],[20,31],[25,31.8],[32.5,30],[35.5,23.5],[38.5,18],[43,12],[47,11.2],[50.5,9],[44,1.5],[39.3,-5],[40.6,-14],[34.9,-20],[32.8,-26],[30,-31.5],[22,-34.2],[17.8,-31],[14.3,-22],[13.5,-12],[9,-1],[7,4.4],[1,5.8],[-5,5.1],[-10.5,6.5],[-15,10.8]],"eurasia":[[-9,37],[-8.8,41.5],[-8,43.7],[-1.8,43.4],[-2.5,47.3],[-1.5,48.7],[0.2,49.6],[4,51.9],[7,53.6],[8.3,55.5],[10.5,57.7],[10.9,54.3],[14.2,53.9],[19.8,54.4],[21.2,57],[23.5,59],[30,60],[25,60.2],[21.3,61],[25,65],[22,65.5],[17.3,61.5],[16.6,57.5],[14.3,55.5],[12.8,56.5],[10.5,59.2],[5.7,58.8],[7,62.8],[13,66.5],[19,69.8],[27,71.1],[33,69.4],[41,66.7],[34,66.5],[37.5,64],[40,65.8],[44,68.3],[53,68.5],[60.5,69.7],[67.5,71],[73,72.5],[80,73.5],[87,75],[104,77.7],[113,75.8],[120,73],[129,73.2],[136,71.6],[150,71.6],[160,69.7],[170,70],[180,68.9],[190,66.1],[181,65.4],[179.5,62.5],[170.5,60],[163.3,59],[163.3,56.2],[160,53.2],[156.8,51],[155.8,56.8],[160,60.5],[160,61.7],[154.5,59.5],[146,59.3],[140,57.8],[140.5,53.2],[140.5,50],[138.5,46.5],[133,42.8],[130,42],[127.5,39.8],[129.4,37],[127.5,34.7],[126.5,36.5],[125,38],[124.3,40],[121.5,38.9],[118,39.2],[119,37.2],[122.5,37.2],[119.3,35],[121.8,31.5],[121.5,28.3],[118.5,24.8],[114.3,22.4],[110.3,20.4],[107.5,21.5],[105.8,18.8],[109.2,13.5],[107,10.5],[105,10.2],[102.5,12.2],[100,13.4],[99.8,9.3],[102.5,5.8],[104.2,1.4],[101.3,3],[98.3,8.2],[98,13.5],[95.5,15.9],[94,19.7],[91,22.6],[87,21.3],[85,19.5],[80.3,15.5],[79.8,10.3],[77.5,8.1],[74.8,13],[72.8,19],[70.3,20.9],[68.5,23.5],[64.5,25.3],[57.5,25.6],[54,26.6],[50,30],[48,29.3],[50.2,26.3],[54,24.1],[56.6,24.5],[59.8,22.4],[57.7,19],[52.2,15.7],[45,12.8],[42.8,15.2],[40.8,19.5],[37.4,24.3],[35,28],[34.2,27.8],[32.3,31.2],[35,32.8],[36,36.6],[32,36.2],[28.2,36.7],[26.3,38.5],[26.2,40.1],[24,40.8],[22.8,40.4],[24,38],[21.5,37.3],[19.5,40.3],[17,43],[13.6,45.6],[12.5,44],[16.1,41.9],[17,40.4],[16,38.0],[14.5,40.7],[10.5,42.9],[8.8,44.4],[5,43.4],[3.2,41.9],[-0.3,39.4],[-0.7,37.6],[-4.5,36.6],[-6.4,36.8]],"britain":[[-5.5,50.1],[-3.5,50.4],[1.3,51.2],[1.7,52.7],[0.2,53.4],[-1.2,54.6],[-2,55.9],[-2,57.6],[-3.2,58.6],[-5,58.6],[-6,57.3],[-5,55],[-3.1,53.5],[-4.6,53.2],[-5.2,51.8],[-3.2,51.4],[-4.5,51]],"honshu":[[130.5,31.2],[131.8,31.6],[132,33.6],[134,33.3],[135.8,33.5],[137,34.6],[138.8,34.7],[139.8,35],[140.9,35.7],[141,38.3],[142,39.6],[141.5,41.4],[140,40.6],[139.8,39],[138.5,37.4],[137.3,37.5],[136.6,36.8],[136,35.7],[133,35.5],[131,34.4],[129.7,33],[130.2,32.2]],"australia":[[114,-22],[114.2,-26],[115.7,-32],[115,-34.3],[118,-35],[123.5,-34],[126,-32.3],[131,-31.5],[135.5,-34.8],[137.8,-32.6],[138.2,-35.5],[140.5,-38],[144.5,-38.3],[146.3,-39],[150,-37.5],[151.3,-33.8],[153,-30],[153.2,-25],[151,-23.5],[148.5,-20],[146.3,-19],[145.5,-15],[143.5,-14.2],[142.5,-10.8],[141.6,-15.5],[140.8,-17.5],[138,-16.5],[135.5,-15],[136.8,-12.2],[132.5,-11.5],[130.5,-12.5],[129.5,-15],[127,-14],[124.5,-16.2],[122.2,-18],[119,-20],[116.5,-20.7]],"madagascar":[[49.3,-12],[50.4,-15.5],[49,-19],[47.5,-24.8],[45,-25.5],[43.5,-22.5],[44.3,-19.5],[44.5,-16.2],[47,-14.8]],"newGuinea":[[131,-0.8],[134,-0.8],[135.5,-3.3],[138,-1.6],[141,-2.6],[145,-4.3],[147.5,-6],[148,-8],[150.5,-10.5],[147.5,-10],[145,-7.8],[143,-9],[141,-9.1],[138,-7],[135,-4.5],[133,-4],[132,-2.8]],"borneo":[[109,1.5],[111.5,2.5],[113,3.5],[115.5,5.5],[117,7],[119,5.2],[118,2],[117.5,-0.5],[116,-3.7],[114.5,-4],[111.5,-3.2],[110,-1.5],[109,0.3]],"sumatra":[[95.3,5.5],[97.5,5.2],[100.5,2.2],[103.8,-1],[106,-3],[105.8,-5.8],[104.5,-5.8],[102,-3.8],[100,-1],[98.5,1.5],[96,4]],"iceland":[[-24,65.5],[-22,66.4],[-18,66.2],[-15,66.3],[-13.7,65],[-16,63.9],[-19,63.4],[-22.5,63.9]]},"water":{"blackSea":[[28,41.5],[30.7,46.4],[33.5,44.6],[36.6,45.3],[37.5,45.5],[41.5,41.7],[35,42],[29.5,41.2]],"caspian":[[47.5,45.5],[52.5,46.8],[51.2,44.6],[52.8,41.8],[53.8,38],[51,36.8],[49,39.5],[47.8,43]],"greatLakes":[[-92,46.8],[-85,47.8],[-81,45.8],[-82,43.2],[-76.5,43.6],[-79.5,43.9],[-83.5,43.5],[-86.3,43.5],[-87.8,44.5],[-90,46.7]]},"ranges":[[[-152,63],[-144,62],[-137,60.5],[-130,56.5],[-125,53],[-118,50],[-114,46.5],[-110,43.5],[-106.5,39],[-105.5,34]],[[-122,48],[-121.5,44],[-120,39.5],[-118.3,36]],[[-162,68],[-152,68.3],[-143,68.6]],[[-107,29],[-104.5,24],[-101,19.5],[-97,17.5]],[[-84,34.5],[-80,37.5],[-76,41],[-71.5,44.5]],[[-73.5,7],[-77.5,-1],[-76.5,-9],[-71.5,-15.5],[-68,-21],[-69.5,-30],[-70.5,-37],[-72.5,-46],[-72.5,-51]],[[73,36.5],[78,33],[83,29.5],[88,28],[95,28.5]],[[70,41],[78,42],[87,43.5]],[[84,50],[90,48.5],[96,46]],[[59.5,67],[59,60],[58.5,52]],[[6,45],[10,46.6],[15,47.3]],[[39,44],[43,43],[47.5,41.5]],[[7,60.5],[13,65.5],[19,69]],[[157.5,52.5],[160,56.5],[164,61]],[[128,67],[133,65],[139,62]],[[116,56.5],[124,56],[132,56.5]],[[142,60.5],[150,62.5],[162,65.5],[172,66.5]],[[136,35],[138,36.5],[140.5,39.5]],[[146.5,-37],[150.5,-31],[148.5,-24],[145.5,-18]],[[-8,31],[-2,33.5],[6,35.5]],[[37.5,13.5],[39.5,9],[38,6]],[[27.5,-31.5],[30,-28]],[[100,37],[104,33],[102,28]],[[46,37.5],[50,33],[55,29.5]],[[137,-4],[142,-5.2],[146,-6.8]]]};
+const tl = vfrey.timeline();
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const D2R = Math.PI / 180, S = 8, RM = S * 180 / Math.PI, PERSP = 1700, CY = 700;   // S = px per degree, CY = focus line (action above the plate)
+const clamp01 = (x) => Math.max(0, Math.min(1, x)), lerp = (a, b, t) => a + (b - a) * t;
+const eio = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+/* ---- places: [lon, lat, name, sub] (edit) ---- */
+const A = [-0.1, 51.5, "PLACE A", "51.5 N  0.1 W"], B = [103.8, 1.3, "PLACE B", "1.3 N  103.8 E"];
+
+/* ---- Mercator (Pacific-centred: rings with mean lon < -12 shift +360) ---- */
+const mx = (lon) => (lon < -12 ? lon + 360 : lon) * S;
+const my = (lat) => -RM * Math.log(Math.tan(Math.PI / 4 + lat * D2R / 2));
+const ring = (r) => { const mean = r.reduce((s, p) => s + p[0], 0) / r.length; const sh = mean < -12 ? 360 : 0; return r.map(([lo, la]) => [(lo + sh) * S, my(la)]); };
+const path = (pts, close) => "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join("L") + (close ? "Z" : "");
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; };
+
+/* ---- the atlas: sea, graticule, land stack ---- */
+const svg = $("planeSvg");
+const defs = el("defs", {}, svg);
+const seaG = el("radialGradient", { id: "sea", cx: "50%", cy: "50%", r: "70%" }, defs);
+el("stop", { offset: "0", "stop-color": "#123459" }, seaG); el("stop", { offset: "1", "stop-color": "#0a1d36" }, seaG);
+const paper = el("filter", { id: "paper", x: "0", y: "0", width: "100%", height: "100%" }, defs);   // parchment texture: turbulence lit by a distant light
+paper.innerHTML = '<feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="4" seed="3" result="n"/><feDiffuseLighting in="n" lighting-color="#dcc89c" surfaceScale="1.6" result="l"><feDistantLight azimuth="235" elevation="62"/></feDiffuseLighting><feComposite in="l" in2="SourceGraphic" operator="in"/>';
+const sea = el("rect", { x: -400, y: my(84), width: 360 * S + 800, height: my(-75) - my(84), fill: "url(#sea)" }, svg);
+const grat = el("g", { stroke: "#efc063", "stroke-opacity": ".22", "stroke-width": "1.4", fill: "none" }, svg);
+for (let lo = -20; lo <= 340; lo += 20) el("path", { d: `M${lo * S} ${my(80)}L${lo * S} ${my(-70)}` }, grat);
+for (let la = -60; la <= 80; la += 20) el("path", { d: `M${-20 * S} ${my(la)}L${340 * S} ${my(la)}` }, grat);
+const tint = { northAmerica: "#a9b57e", southAmerica: "#a9b57e", africa: "#d9a85f", eurasia: "#c98a62", australia: "#d9a85f", greenland: "#b9c9cf", iceland: "#b9c9cf" };
+const land = el("g", {}, svg);
+const rings = Object.entries(LAND.land).map(([k, r]) => [k, path(ring(r), true)]);
+rings.forEach(([k, d]) => { el("path", { d, fill: "none", stroke: "#3f8fd0", "stroke-opacity": ".16", "stroke-width": "34", "stroke-linejoin": "round" }, land); });   // shallow-water halo
+rings.forEach(([k, d]) => { el("path", { d, fill: "none", stroke: "#3f8fd0", "stroke-opacity": ".28", "stroke-width": "14", "stroke-linejoin": "round" }, land); });
+rings.forEach(([k, d]) => { el("path", { d, transform: "translate(7 9)", fill: "#000", "fill-opacity": ".45" }, land); });                                         // drop shadow
+rings.forEach(([k, d]) => { el("path", { d, fill: "#dcc89c", filter: "url(#paper)" }, land); });                                                                      // paper
+rings.forEach(([k, d]) => { el("path", { d, fill: tint[k] || "#c98a62", "fill-opacity": ".3" }, land); });                                                           // region tint
+const clipDefs = el("g", {}, defs);
+rings.forEach(([k, d], i) => { const cp = el("clipPath", { id: "c" + i }, clipDefs); el("path", { d }, cp); el("path", { d, fill: "none", stroke: "#3d2e18", "stroke-opacity": ".35", "stroke-width": "40", "clip-path": `url(#c${i})` }, land); });  // inner shade
+Object.values(LAND.water).forEach((r) => el("path", { d: path(ring(r), true), fill: "#0d2440", stroke: "#3d2e18", "stroke-width": "2" }, land));                    // lakes in sea colour
+LAND.ranges.forEach((r) => { const d = path(ring(r), false); el("path", { d, transform: "translate(3 4)", fill: "none", stroke: "#2a1d0c", "stroke-opacity": ".5", "stroke-width": "9", "stroke-dasharray": "1.2 3.4" }, land); el("path", { d, fill: "none", stroke: "#6b4a26", "stroke-width": "9", "stroke-dasharray": "1.2 3.4" }, land); });   // hachured mountains
+rings.forEach(([k, d]) => { el("path", { d, fill: "none", stroke: "#3d2e18", "stroke-width": "2.6", "stroke-linejoin": "round" }, land); });                           // coast ink
+/* lettering lies ON the map so it tilts with the plane */
+const lettr = el("g", { "font-family": "Playfair Display,serif", "text-anchor": "middle" }, svg);
+[["ATLANTIC", -35, 25, 1], ["INDIAN", 80, -18, 1], ["PACIFIC", 200, 5, 1]].forEach(([t, lo, la]) => { const e = el("text", { x: mx(lo), y: my(la), "font-style": "italic", "font-size": 54, "letter-spacing": 18, fill: "#f6ead0", "fill-opacity": ".46" }, lettr); e.textContent = t; });
+[["AFRICA", 20, 5], ["ASIA", 95, 48], ["EUROPE", 15, 52], ["AUSTRALIA", 134, -25]].forEach(([t, lo, la]) => { const e = el("text", { x: mx(lo), y: my(la), "font-size": 38, "letter-spacing": 10, fill: "#3d2e18", "fill-opacity": ".66", "font-weight": "700" }, lettr); e.textContent = t; });
+
+/* ---- route: great circle by slerp, drawn as three strokes, with a plane and its shadow ---- */
+const toV = (lo, la) => [Math.cos(la * D2R) * Math.cos(lo * D2R), Math.cos(la * D2R) * Math.sin(lo * D2R), Math.sin(la * D2R)];
+const va = toV(A[0], A[1]), vb = toV(B[0], B[1]);
+const om = Math.acos(va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2]);
+const NPT = 90, route = [];
+for (let i = 0; i <= NPT; i++) { const f = i / NPT, a = Math.sin((1 - f) * om) / Math.sin(om), b = Math.sin(f * om) / Math.sin(om);
+  const v = [a * va[0] + b * vb[0], a * va[1] + b * vb[1], a * va[2] + b * vb[2]]; route.push([mx(Math.atan2(v[1], v[0]) / D2R), my(Math.asin(v[2]) / D2R)]); }
+const rG = el("path", { fill: "none", stroke: "#ff5a36", "stroke-opacity": ".32", "stroke-width": 22, "stroke-linecap": "round" }, svg);
+const rR = el("path", { fill: "none", stroke: "#ff5a36", "stroke-width": 7, "stroke-linecap": "round" }, svg);
+const rC = el("path", { fill: "none", stroke: "#ffe3d8", "stroke-width": 2.4, "stroke-linecap": "round" }, svg);
+const PLANE = "M0 -50L7 -18L48 6L48 16L7 6L5 34L20 44L20 50L0 44L-20 50L-20 44L-5 34L-7 6L-48 16L-48 6L-7 -18Z";   // 100-unit top-down airliner
+const pSh = el("path", { d: PLANE, fill: "#000", "fill-opacity": ".4" }, svg), pBody = el("path", { d: PLANE, fill: "#f6ead0", stroke: "#06101c", "stroke-width": 2 }, svg);
+const markers = [A, B].map((p) => { const g = el("g", {}, svg); const x = mx(p[0]), y = my(p[1]);
+  const r1 = el("ellipse", { cx: x, cy: y, fill: "none", stroke: "#ff5a36", "stroke-width": 3 }, g), r2 = el("ellipse", { cx: x, cy: y, fill: "none", stroke: "#ff5a36", "stroke-width": 3 }, g);
+  el("circle", { cx: x, cy: y, r: 8, fill: "#ff5a36", stroke: "#f6ead0", "stroke-width": 3 }, g); return [r1, r2, x, y]; });
+
+/* ---- state, camera projection (mirrored in CSS and JS), labels with their own height z ---- */
+const SS = { fx: mx(A[0]), fy: my(A[1]), k: 1.7, a: 34, u: 0 };      // focus x/y (plane px), zoom, tilt degrees, route progress 0..1
+function camProj(x, y, z) { const a = SS.a * D2R, ca = Math.cos(a), sa = Math.sin(a); const px = (x - SS.fx) * SS.k, py = (y - SS.fy) * SS.k, pz = z * SS.k, y2 = py * ca - pz * sa, z2 = py * sa + pz * ca, sc = PERSP / (PERSP - z2); return [540 + px * sc, CY + y2 * sc, sc]; }
+const labels = [A, B].map((p, i) => { const d = document.createElement("div"); d.className = "lab city"; d.innerHTML = `${p[2]}<small>${p[3]}</small>`; $("labels").appendChild(d); return d; });
+function draw() {
+  const t = tl.time();
+  $("plane").style.transform = `translate(540px,${CY}px) perspective(${PERSP}px) rotateX(${SS.a}deg) scale(${SS.k}) translate(${-SS.fx}px,${-SS.fy}px)`;
+  const n = SS.u * NPT, i = Math.min(NPT - 1, Math.floor(n)), f = n - i, pts = route.slice(0, i + 1);
+  if (SS.u > 0) pts.push([lerp(route[i][0], route[i + 1][0], f), lerp(route[i][1], route[i + 1][1], f)]);
+  const d = SS.u > 0 ? path(pts, false) : "M0 0"; rG.setAttribute("d", d); rR.setAttribute("d", d); rC.setAttribute("d", d);
+  const tip = pts[pts.length - 1], prev = pts[Math.max(0, pts.length - 4)], ang = Math.atan2(tip[1] - prev[1], tip[0] - prev[0]) / D2R + 90, vis = SS.u > 0.001 && SS.u < 0.999 ? 1 : 0;
+  pBody.setAttribute("transform", `translate(${tip[0]} ${tip[1]}) rotate(${ang}) scale(.55)`); pBody.setAttribute("opacity", vis);   // plane in the air...
+  pSh.setAttribute("transform", `translate(${tip[0] + 8} ${tip[1] + 6}) rotate(${ang}) scale(.55 ${.55 * Math.cos(SS.a * D2R)})`); pSh.setAttribute("opacity", vis);  // ...shadow on the ground
+  markers.forEach(([r1, r2, x, y], j) => { const ph = (t * .8 + j * .5) % 1; [[r1, ph], [r2, (ph + .5) % 1]].forEach(([r, p]) => { const rx = 14 + p * 46; r.setAttribute("rx", rx); r.setAttribute("ry", rx * Math.cos(SS.a * D2R)); r.setAttribute("opacity", 1 - p); }); });
+  [A, B].forEach((p, j) => { const [sx, sy] = camProj(mx(p[0]), my(p[1]), 60); labels[j].style.transform = `translate(${sx}px,${sy}px) translate(-50%,-100%) scale(${Math.max(.6, Math.min(1.1, camProj(0, 0, 0)[2] * 1.0))})`; });
+  $("hudC").textContent = `${(-(SS.fy) > 0 ? "" : "")}${(Math.atan(Math.sinh(-SS.fy / RM)) / D2R).toFixed(1)} N   ${(SS.fx / S).toFixed(1)} E`;
+  const cs = $("compass"); if (!cs.firstChild) cs.innerHTML = '<circle cx="85" cy="85" r="60" fill="none" stroke="#efc063" stroke-width="2"/><path d="M85 15L95 85L85 155L75 85Z" fill="#efc063" fill-opacity=".7"/><path d="M15 85L85 75L155 85L85 95Z" fill="#efc063" fill-opacity=".35"/><text x="85" y="12" fill="#f6ead0" font-size="20" text-anchor="middle" font-family="Playfair Display,serif" font-weight="700">N</text>';
+}
+tl.eventCallback("onUpdate", draw);
+vfrey.onFrame(draw);   // what a render runs: onUpdate does not fire when the renderer seeks
+tl.to(SS, { duration: vfrey.timing.durationSec, ease: "none", onUpdate: draw }, 0);   // keeps draw() running every frame
+
+/* ---- camera moves: power3.inOut for long glides, sine.inOut for follows. Tilt 26 to 44, k 0.7 to 1.9 ---- */
+const mid = [(mx(A[0]) + mx(B[0])) / 2, (my(A[1]) + my(B[1])) / 2];
+tl.fromTo(SS, { fx: mx(A[0]), fy: my(A[1]), k: 1.7, a: 34 }, { fx: mx(A[0]) + 30, fy: my(A[1]), k: 1.9, a: 36, duration: 1.6, ease: "sine.inOut", immediateRender: true }, 0);
+tl.to(SS, { u: 1, duration: 4.2, ease: "sine.inOut" }, 1.4);                                         // the route draws itself
+tl.to(SS, { fx: mid[0], fy: mid[1], k: 0.95, a: 40, duration: 4.4, ease: "power3.inOut" }, 1.4);    // the camera follows, then pulls out
+tl.to(SS, { k: 0.78, a: 30, duration: 2.6, ease: "power3.inOut" }, 6.4);                              // wide hold
+labels.forEach((l, i) => tl.fromTo(l, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .5, ease: "power2.out", immediateRender: false }, 0.5 + i * 3.8));
+/* lower thirds sit at y 1128, always above the plate, one per beat */
+function lowerThird(id, t0, t1) { const e = $(id); tl.set(e, { opacity: 0 }, 0); tl.fromTo(e, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5, ease: "power3.out", immediateRender: false }, t0); tl.fromTo(e.querySelector(".bar"), { scaleY: 0 }, { scaleY: 1, duration: .5, ease: "power3.out", immediateRender: false }, t0); tl.to(e, { opacity: 0, x: -30, duration: .4, ease: "power2.in" }, t1); }
+lowerThird("lt1", 0.8, 4.6); lowerThird("lt2", 6.4, 11.0);
+
+/* ---- caption plate (same place all film): the plate is at the caption band, vfrey draws the words ---- */
+{ const cb = vfrey.captionBox, top = cb.top + cb.height - 200; const p = $("plate").style; p.top = top + "px"; p.height = "192px"; const c = $("captions").style; c.top = top + "px"; c.height = "192px"; }
+vfrey.captions("#captions", { style: "box", color: "#f6ead0", highlight: "#efc063", maxWords: 4 });
+draw();
+</script>
+</body>
+</html>

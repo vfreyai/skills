@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8" />
+<script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f4f2ea}
+#root{position:relative;width:1080px;height:1920px;overflow:hidden;background:#f4f2ea}
+#cam{position:absolute;left:0;top:0;width:1080px;height:1920px}
+svg.layer,#frame,#caps{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible}
+#frame{z-index:95;pointer-events:none}#caps{z-index:100}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0"><div id="cam"></div>
+<svg id="frame" viewBox="0 0 1080 1920"></svg><svg id="caps" viewBox="0 0 1080 1920"></svg></div>
+<script>const tl = vfrey.timeline();</script>
+<script src="sketch.js"></script>
+<script>
+/* starter for vfrey-style-whiteboard-sketch: replace the placeholder art, labels and cues; keep the structure */
+const TW = vfrey.timing.words, DUR = vfrey.timing.durationSec;   // words: find one by text with the anchor snippet in helpers.md
+
+const CAPS = vfrey.timing.captions || { mode: "on" };              // { mode, position?, style? }
+const VB = 1920 / vfrey.frame.height;                                // frame pixels to viewBox units
+const CAP_H = vfrey.captionBox.height * VB, CAP_TOP = vfrey.captionBox.top * VB;
+const NOTE_H = Math.min(200, CAP_H), NOTE_Y = CAP_TOP + (CAP_H - NOTE_H) / 2;   // the note, centred in the band
+const TOP_BAND = vfrey.captionBox.position === "top";
+const ART_TOP = TOP_BAND ? NOTE_Y + NOTE_H + 40 : 110;               // main drawing zone
+const ART_BOTTOM = TOP_BAND ? 1700 : NOTE_Y - 20;
+const STRIP_TOP = TOP_BAND ? 110 : NOTE_Y + NOTE_H + 40;             // the second zone: timelines, legends, a hero word
+const STRIP_BOTTOM = TOP_BAND ? NOTE_Y - 20 : 1720;                  // nothing below y 1720: the tray, and the camera push
+
+const frameSvg = $("#frame");
+(() => {
+  const marker = (x, y, rot, col) => `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-6" y="-2" width="250" height="40" rx="14" fill="#f2f3f7" stroke="#8b8f9a" stroke-width="2"/><rect x="170" y="-2" width="74" height="40" rx="12" fill="${col}"/><rect x="82" y="-2" width="48" height="40" fill="${col}" opacity=".9"/><path d="M-6 6 L-34 17 L-34 21 L-6 32Z" fill="#dfe1e8" stroke="#8b8f9a" stroke-width="2"/><path d="M-34 17 L-46 19 L-34 21Z" fill="${col}"/><rect x="0" y="4" width="238" height="8" rx="4" fill="#fff" opacity=".6"/></g>`;
+  frameSvg.innerHTML = `<defs><linearGradient id="trayG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9ccd3"/><stop offset="0.35" stop-color="#e7e9ee"/><stop offset="0.7" stop-color="#aeb2bb"/><stop offset="1" stop-color="#8d919b"/></linearGradient></defs>
+  <rect x="0" y="1788" width="1080" height="132" fill="url(#trayG)"/><rect x="0" y="1788" width="1080" height="10" fill="#6f737d"/><rect x="0" y="1798" width="1080" height="5" fill="#f4f5f8" opacity=".8"/>
+  <rect x="0" y="1880" width="1080" height="40" fill="#74777f" opacity=".5"/>
+  ${marker(150, 1820, -2, INK)}${marker(430, 1840, 1.5, BLUE)}
+  <rect x="0" y="0" width="18" height="1790" fill="#b4b7bf"/><rect x="1062" y="0" width="18" height="1790" fill="#b4b7bf"/><rect x="0" y="0" width="1080" height="14" fill="#c3c6cd"/>
+  <polygon points="200,0 420,0 140,1790 -80,1790" fill="#fff" opacity=".07" filter="url(#blur14)"/>`;
+})();
+
+const capSvg = $("#caps");
+if (CAPS.mode !== "off") {
+  const ny = NOTE_Y, nh = NOTE_H;
+  capSvg.innerHTML = `<defs><filter id="shadow" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".28"/></filter></defs>
+  <g transform="rotate(-0.8 540 ${ny + nh / 2})" filter="url(#shadow)"><path d="M62 ${ny} L1018 ${ny - 4} L1022 ${ny + nh - 6} L980 ${ny + nh + 6} L66 ${ny + nh} Z" fill="${PLATE}"/><path d="M1022 ${ny + nh - 6} L980 ${ny + nh + 6} L984 ${ny + nh - 36} Z" fill="#e6d37f"/>
+  <rect x="120" y="${ny - 20}" width="150" height="38" fill="#cfc9b4" opacity=".6" transform="rotate(-4 195 ${ny - 1})"/><rect x="830" y="${ny - 22}" width="150" height="38" fill="#cfc9b4" opacity=".6" transform="rotate(3 905 ${ny - 3})"/></g>`;
+  const words = TW.map((w) => ({ t: w.text.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/[^A-Z0-9?'.,!%=:/()+-]/g, ""), s: w.start, e: w.end, raw: w.text })), groups = []; let cur = [], ch = 0;
+  const flush = () => { if (cur.length) groups.push(cur); cur = []; ch = 0; };
+  words.forEach((w) => { if (cur.length && (cur.length >= 3 || ch + w.t.length > 15)) flush(); cur.push(w); ch += w.t.length + 1; if (/[.,?!]$/.test(w.raw)) flush(); });
+  flush();
+  groups.forEach((gw, gi) => {
+    let h = 78; const measure = (hh) => gw.reduce((a, w) => a + TWID(w.t, hh), 0) + 36 * hh / 100 * (gw.length - 1);
+    if (measure(h) > 860) h = h * 860 / measure(h);
+    const total = measure(h); let x = 540 - total / 2; const g = el("g", { opacity: 0 }, capSvg); const base = ny + nh / 2 + h * 0.5;
+    gw.forEach((w) => {
+      const T_ = TXT(w.t, x, base, h, { amp: 0.7 }); x += T_.width + 36 * h / 100;
+      T_.strokes.forEach((p, si) => {
+        const len = plen(p), path = el("path", { d: "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L"), fill: "none", stroke: INK, "stroke-width": Math.max(6, h * 0.1), "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-dasharray": `${len + 4} ${len + 4}` }, g);
+        path.style.strokeDashoffset = len + 4; tl.to(path, { strokeDashoffset: 0, duration: 0.16 + len / 2400, ease: "power1.out" }, Math.max(0, w.s - 0.04 + si * 0.035));
+      });
+    });
+    const gs = gw[0].s - 0.06, nextS = groups[gi + 1] ? groups[gi + 1][0].s - 0.06 : 1e9, ge = Math.min(gw[gw.length - 1].e + 0.35, nextS);
+    tl.set(g, { opacity: 1 }, Math.max(0, gs)); tl.set(g, { opacity: 0 }, ge);
+  });
+}
+
+const eraSvg = el("svg", { viewBox: "0 0 1080 1920", width: W, height: H, class: "layer" }, $("#cam")); eraSvg.style.zIndex = 70;
+const eraG = el("g", { opacity: 0 }, eraSvg);
+el("rect", { x: -160, y: -64, width: 320, height: 128, rx: 18, fill: "#ebe8de", stroke: "#5f636d", "stroke-width": 3 }, eraG);
+el("rect", { x: -160, y: 14, width: 320, height: 50, rx: 16, fill: "#2f333d" }, eraG);
+el("rect", { x: -150, y: -52, width: 300, height: 16, rx: 8, fill: "#fff", opacity: 0.7 }, eraG);
+[[-110, BLUE], [-30, RED], [60, INK]].forEach(([x, c]) => el("rect", { x, y: 38, width: 56, height: 14, rx: 5, fill: c, opacity: 0.45 }, eraG));
+function show(L, t) { gsap.set(L.svg, { display: "none" }); tl.set(L.svg, { display: "block" }, Math.max(0, t)); }
+function hide(L, t) { tl.set(L.svg, { display: "none" }, t); }
+function wipe(L, t0, dur) {          // L = the OLD layer; dur 0.6 to 0.8
+  const p = { v: 0 }, s = 140;
+  tl.set(eraG, { opacity: 1 }, t0); tl.set(eraG, { opacity: 0 }, t0 + dur);
+  const paint = () => {
+    const e = -420 + (W + 840) * p.v, y = 900 + 760 * Math.sin(p.v * Math.PI * 6) * (1 - 0.25 * p.v), x = e + s - 2 * s * y / H;
+    L.svg.style.clipPath = `polygon(${e + s}px 0,${W + 500}px 0,${W + 500}px ${H}px,${e - s}px ${H}px)`;
+    eraG.setAttribute("transform", `translate(${(x + 120).toFixed(1)} ${y.toFixed(1)}) rotate(${(-82 + 20 * Math.sin(p.v * 40)).toFixed(1)} 0 0)`);
+  };
+  tl.to(p, { v: 1, duration: dur, ease: "power1.inOut", onUpdate: paint }, t0);
+  vfrey.onFrame(paint);              // onUpdate does not fire when a render seeks
+  hide(L, t0 + dur + 0.02);
+}
+function flick(L, t0, dur = 0.55) {  // the old page leaves upward; start 0.38 s before the next topic's first word
+  L.svg.style.filter = "drop-shadow(0 34px 38px rgba(0,0,0,.38))"; L.svg.style.transformOrigin = "50% 100%";
+  tl.to(L.svg, { y: -2250, rotation: -5, duration: dur, ease: "power2.in" }, t0); hide(L, t0 + dur + 0.02);
+}
+// layers made with layer("sA", 50), layer("sB", 40), ...:
+// [LB, LC].forEach((L) => gsap.set(L.svg, { display: "none" }));
+// show(LB, tAB - 0.05); flick(LA, tAB);      // tAB = next topic's first word - 0.38
+// show(LC, tBC - 0.05); wipe(LB, tBC, 0.78);
+
+
+// ---- cues: line starts from the real voice timing (find words by text with the anchor snippet in helpers.md if you need one word)
+const LN_ = vfrey.timing.lines, LS = (i) => LN_[Math.min(i, LN_.length - 1)].start;
+const tAB = Math.max(2, LS(2) - 0.38), tBC = Math.max(tAB + 3, LS(4) - 0.38);   // page changes sit in the pauses between lines
+sketchDefs();
+const LA = layer("sA", 50), LB = layer("sB", 40), LC = layer("sC", 30);
+[LB, LC].forEach((L) => gsap.set(L.svg, { display: "none" }));
+
+// ---- scene A: a doodle person at a desk (head, spiky hair, closed lids, a mug, a stack of books) and a title strip. Every shape is outline + hatch.
+const down = (dy) => (it) => ({ ...it, pts: it.pts.map(([x, y]) => [x, y + dy]) });   // move a stroke down: fill the art zone, not just its top
+build(LA, [
+  ...[I(LN(40, 980, 1040, 976), INK, 9), I(LN(70, 980, 70, 1260), INK, 8), I(LN(1010, 980, 1010, 1260), INK, 8),
+  I(ELL(420, 560, 130, 140), INK, 7),                                                     // big round head
+  I(PL([[320, 450], [340, 400], [365, 440], [395, 380], [420, 435], [450, 380], [475, 440], [505, 400], [520, 450]], 1.4), INK, 7),   // spiky hair
+  I(CR([[355, 560], [380, 572], [405, 560]]), INK, 6), I(CR([[435, 560], [460, 572], [485, 560]]), INK, 6),   // droopy lids
+  I(CR([[385, 625], [420, 612], [455, 625]]), INK, 6),
+  I(CR([[240, 980], [270, 800], [420, 740], [570, 800], [600, 980]]), INK, 8),             // shoulders
+  I(RECT(700, 880, 260, 100, 0.01), INK, 7), I(HATCH(RECT_POLY(706, 886, 248, 88), 0.8, 18), RED, 5),   // book 1
+  I(RECT(715, 780, 230, 100, -0.01), INK, 7), I(HATCH(RECT_POLY(721, 786, 218, 88), 0.8, 18), BLUE, 5), // book 2
+  I(RECT(120, 900, 70, 80, 0), INK, 7), I(CR([[190, 920], [225, 930], [190, 960]]), INK, 6),   // a mug
+  I(CR([[140, 880], [150, 850], [140, 820]]), INK, 4), I(CR([[165, 880], [175, 850], [165, 820]]), INK, 4),   // steam
+  ].map(down(220)),
+  ...TI("PLACEHOLDER TITLE", 540, 230, 96, RED, { anchor: "middle", w: 10 }), I(LN(170, 262, 910, 258), RED, 7),
+], 0.1, Math.max(2.2, tAB - 0.5), { speed: 1800 });
+build(LA, [ ...TI("A SMALL NOTE", 300, 1400, 52, BLUE), ...ARROW(560, 1390, 760, 1330, 0.15).map((p) => I(p, INK, 6)), I(ELL(880, 1300, 90, 60), RED, 6) ], 1.4, Math.max(3, tAB - 0.3), { speed: 1800 });
+
+// ---- scene B: a chart (axes, a falling red curve, a blue recovery) and a strip with two labels
+build(LB, [
+  I(LN(150, 1180, 150, 380), INK, 9), I(LN(145, 1176, 960, 1176), INK, 9),
+  ...TI("LABEL Y", 90, 780, 44, BLUE, { rot: -Math.PI / 2, anchor: "middle" }), ...TI("TIME", 540, 1235, 48, BLUE, { anchor: "middle" }),
+  I(CR([[170, 400], [260, 640], [400, 860], [600, 1020], [940, 1130]], 1.6), RED, 11),
+  I(CR([[170, 400], [230, 560], [300, 470], [380, 640], [460, 560], [560, 700], [700, 650], [940, 760]], 1.6), BLUE, 9),
+  I(ELL(240, 520, 90, 150), INK, 6), ...ARROW(430, 460, 330, 520, 0.1).map((p) => I(p, INK, 6)), ...TI("FAST!", 560, 450, 56, INK),
+  ...TI("SLOW", 780, 1070, 48, INK),
+], tAB + 0.3, Math.max(tAB + 3.2, tBC - 0.8), { speed: 1800 });
+build(LB, [ ...TI("BEFORE", 270, 1500, 64, RED, { anchor: "middle" }), ...TI("AFTER", 810, 1500, 64, BLUE, { anchor: "middle" }), I(LN(540, 1440, 540, 1690), INK, 6) ], tAB + 2.4, Math.max(tAB + 3.4, tBC - 0.4), { speed: 1800 });
+
+// ---- scene C: a calendar strip with ticks and one hero word
+const strip0 = []; [0, 1, 2].forEach((k) => { const x = 140 + k * 270; strip0.push(I(RECT(x, 600, 220, 260, 0.01 * (k - 1)), INK, 7), ...TI("DAY " + (1 + k * 3), x + 110, 680, 50, INK, { anchor: "middle" }), I(CR([[x + 70, 770], [x + 100, 800], [x + 160, 730]]), BLUE, 7)); });
+const strip = [...strip0, ...ARROW(370, 730, 410, 730, 0.1).map((p) => I(p, INK, 6)), ...ARROW(640, 730, 680, 730, 0.1).map((p) => I(p, INK, 6))].map(down(300));
+build(LC, strip, tBC + 0.3, Math.max(tBC + 3, DUR - 5), { speed: 1800 });
+build(LC, [...TI("THE POINT", 540, 1560, 150, RED, { anchor: "middle", w: 12 }), I(LN(120, 1600, 960, 1596), RED, 8)], Math.max(tBC + 3.2, DUR - 4.2), Math.max(tBC + 4.5, DUR - 1.5), { speed: 1800 });
+
+// ---- page flick, then an eraser wipe (alternate them)
+show(LB, tAB - 0.05); flick(LA, tAB);
+show(LC, tBC - 0.05); wipe(LB, tBC, 0.78);
+
+const penSvg = el("svg", { viewBox: "0 0 1080 1920", width: W, height: H, class: "layer" }, $("#cam")); penSvg.style.zIndex = 90;
+const penG = el("g", { opacity: 0 }, penSvg);
+const penShadow = el("ellipse", { cx: 10, cy: 8, rx: 22, ry: 6, fill: "#000", opacity: 0.14 }, penG);
+const penRot = el("g", { transform: "rotate(30)" }, penG);
+el("path", { d: "M-4 0 L4 0 L10 -30 L-10 -30 Z", fill: "#2a2a30" }, penRot);
+const penTip = el("path", { d: "M-4 0 L4 0 L5 -9 L-5 -9 Z", fill: INK }, penRot);
+el("path", { d: "M-10 -30 L10 -30 L17 -66 L-17 -66 Z", fill: "#eceef3", stroke: "#8e929e", "stroke-width": 2 }, penRot);
+el("rect", { x: -17, y: -262, width: 34, height: 198, rx: 7, fill: "url(#penBody)", stroke: "#8a8e9a", "stroke-width": 2 }, penRot);
+const penBand = el("rect", { x: -17.5, y: -200, width: 35, height: 64, fill: INK }, penRot);
+el("rect", { x: -9, y: -178, width: 18, height: 20, rx: 3, fill: "#fff", opacity: 0.8 }, penRot);
+const penCap = el("rect", { x: -18, y: -274, width: 36, height: 26, rx: 9, fill: INK }, penRot);
+PS.sort((a, b) => a.t0 - b.t0);
+let _penC = "";
+function penPoint(s, u) { const tgt = u * s.len; let lo = 0, hi = s.cum.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (s.cum[m] <= tgt) lo = m; else hi = m; } const seg = s.cum[hi] - s.cum[lo] || 1, q = (tgt - s.cum[lo]) / seg, a = s.pts[lo], b = s.pts[hi]; return [a[0] + (b[0] - a[0]) * q, a[1] + (b[1] - a[1]) * q]; }
+function penUpdate(t) {
+  let lo = -1, hi = PS.length; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (PS[m].t0 <= t) lo = m; else hi = m; }
+  if (lo < 0) { penG.setAttribute("opacity", 0); return; }
+  const s = PS[lo], end = s.t0 + s.d; let pos, op = 1, lift = 0, col = s.c;
+  if (t <= end) pos = penPoint(s, s.ease(clamp((t - s.t0) / s.d, 0, 1)));
+  else {
+    const nx = PS[lo + 1], gp = nx ? nx.t0 - end : 99, ep = s.pts[s.pts.length - 1];
+    if (nx && gp < 0.9) { let q = (t - end) / gp; q = q * q * (3 - 2 * q); const sp0 = nx.pts[0]; pos = [ep[0] + (sp0[0] - ep[0]) * q, ep[1] + (sp0[1] - ep[1]) * q]; lift = Math.sin(Math.PI * q); if (q > 0.5) col = nx.c; }
+    else if (t - end < 0.4) { pos = ep; op = 1 - (t - end) / 0.4; lift = (t - end) / 0.4; }
+    else { penG.setAttribute("opacity", 0); return; }
+  }
+  if (col !== _penC) { _penC = col; [penTip, penBand, penCap].forEach((e) => e.setAttribute("fill", col)); }
+  penG.setAttribute("transform", `translate(${(pos[0] + 2 - lift * 8).toFixed(1)} ${(pos[1] - lift * 22).toFixed(1)})`);
+  penShadow.setAttribute("opacity", 0.14 * (1 - lift * 0.6)); penG.setAttribute("opacity", op);
+}
+// one proxy tween drives the pen as a pure function of time
+const clk = { t: 0 };
+tl.to(clk, { t: DUR, duration: DUR, ease: "none", onUpdate: () => penUpdate(clk.t) }, 0);   // live preview only
+vfrey.onFrame((t) => penUpdate(t));   // what a render runs: onUpdate does not fire when the film is sought
+
+gsap.set("#cam", { transformOrigin: `540px ${NOTE_Y}px` });
+tl.fromTo("#cam", { scale: 1, x: 0 }, { scale: 1.05, duration: 4.4, ease: "sine.inOut" }, 0);
+tl.to("#cam", { scale: 1.0, duration: 0.6, ease: "sine.inOut" }, 4.4);            // back to 1 at a page change
+tl.to("#cam", { scale: 1.08, x: 40, duration: 3.2, ease: "sine.inOut" }, 6.0);   // push in with a small drift
+
+</script></body></html>

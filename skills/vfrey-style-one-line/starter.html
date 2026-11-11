@@ -1,0 +1,243 @@
+<!doctype html>
+<!-- CONTINUOUS ONE-LINE MINIMAL. One unbroken ink line (a single sampled polyline) draws a head, a clock, a to-do list, a tangle, a pen and finally untangles itself.
+     Everything is a pure function of timeline time (render(t) via a GSAP proxy tween with modifiers). 1080x1920. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  :root { --ink: #1C1A17; --acc: #D8472B; --paper: #F3ECDF; --serif: "Playfair Display", Georgia, "Times New Roman", serif; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: var(--paper); }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  #paper { position: absolute; inset: 0; background:
+      radial-gradient(ellipse 85% 70% at 50% 38%, rgba(255,252,244,.75) 0%, rgba(255,252,244,0) 70%),
+      radial-gradient(ellipse 120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(120,95,55,.16) 100%); }
+  #grain { position: absolute; inset: 0; opacity: .5; mix-blend-mode: multiply; }
+  svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+  svg text { font-family: var(--serif); font-style: italic; font-weight: 400; fill: var(--ink); }
+  #capplate { position: absolute; left: 70px; right: 70px; top: 1318px; height: 232px; background: var(--paper); z-index: 40; border-top: 2px solid rgba(28,26,23,.55); border-bottom: 2px solid rgba(28,26,23,.55); }
+  #captions { position: absolute; left: 90px; right: 90px; top: 1318px; height: 232px; z-index: 50; font-weight: 500; letter-spacing: .005em; }
+  #captions.vf-captions { justify-content: center !important; }
+  .fig { position: absolute; left: 0; right: 0; top: 1706px; text-align: center; font-style: italic; font-size: 44px; z-index: 30; opacity: 0; }
+  #endcard { position: absolute; left: 0; right: 0; top: 1632px; text-align: center; z-index: 31; opacity: 0; }
+  #endcard .big { font-size: 150px; line-height: 1; font-weight: 400; font-style: italic; letter-spacing: -.01em; }
+  #err { position: absolute; left: 10px; top: 10px; z-index: 99; color: #b00; font: 20px monospace; white-space: pre; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="paper"></div>
+  <svg id="grain" viewBox="0 0 1080 1920" preserveAspectRatio="none"><filter id="gf" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 0.55  0 0 0 0 0.45  0 0 0 0 0.3  0 0 0 0.28 0"/></filter><rect width="1080" height="1920" filter="url(#gf)"/></svg>
+  <svg id="art" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+    <g id="world">
+      <path id="ink" d="" fill="none" stroke="#1C1A17" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+      <g id="labels"></g>
+      <circle id="halo" r="30" fill="#D8472B" opacity=".22"/>
+      <circle id="tip" r="15" fill="#D8472B"/>
+    </g>
+  </svg>
+  <svg id="mat" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+    <rect x="46" y="46" width="988" height="1828" fill="none" stroke="#1C1A17" stroke-opacity=".32" stroke-width="2"/>
+    <g id="rail"><line x1="120" y1="1646" x2="960" y2="1646" stroke="#1C1A17" stroke-opacity=".5" stroke-width="2"/>
+    <g id="ticks"></g>
+    <circle id="prog" cx="120" cy="1646" r="9" fill="#D8472B"/></g>
+  </svg>
+  <div id="figs"></div>
+  <div id="endcard"><div class="big">one line.</div></div>
+  <div id="capplate"></div>
+  <div id="captions"></div>
+  <div id="err"></div>
+</div>
+<script>
+"use strict";
+const tl = vfrey.timeline();
+const LN = vfrey.timing.lines, WD = vfrey.timing.words, DUR = vfrey.timing.durationSec;
+const $ = (s) => document.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const eSine = (u) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(u));
+const eCub = (u) => { u = clamp(u); return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const wordT = (line, rx, fallback) => { for (const w of WD) if ((w.line === undefined || w.line === line) && rx.test(norm(w.text))) return w.start; return fallback; };
+const L = (i) => LN[Math.min(i, LN.length - 1)];
+
+/* ------------------------------------------------------------------ geometry: ONE path ------------------------------------------------------------------ */
+const raw = [];            // dense raw points [x,y]
+const marks = {};          // name -> raw index
+const mark = (n) => { marks[n] = raw.length - 1; };
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const last = () => raw[raw.length - 1];
+function addLine(p) { const a = last(), n = Math.max(2, Math.ceil(dist(a, p) / 2)); for (let i = 1; i <= n; i++) raw.push([lerp(a[0], p[0], i / n), lerp(a[1], p[1], i / n)]); }
+function addBez(c1, c2, p3) { const p0 = last(), n = Math.max(8, Math.ceil((dist(p0, c1) + dist(c1, c2) + dist(c2, p3)) / 2));
+  for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; raw.push([u*u*u*p0[0] + 3*u*u*t*c1[0] + 3*u*t*t*c2[0] + t*t*t*p3[0], u*u*u*p0[1] + 3*u*u*t*c1[1] + 3*u*t*t*c2[1] + t*t*t*p3[1]]); } }
+function addCR(pts) { // Catmull-Rom through pts (pts[0] is the current end)
+  const P = pts.slice(); const g = (i) => P[clamp(i, 0, P.length - 1)];
+  for (let i = 0; i < P.length - 1; i++) { const p0 = g(i - 1), p1 = g(i), p2 = g(i + 1), p3 = g(i + 2), n = Math.max(6, Math.ceil(dist(p1, p2) / 2));
+    for (let k = 1; k <= n; k++) { const t = k / n, t2 = t * t, t3 = t2 * t;
+      raw.push([0.5 * ((2*p1[0]) + (-p0[0] + p2[0]) * t + (2*p0[0] - 5*p1[0] + 4*p2[0] - p3[0]) * t2 + (-p0[0] + 3*p1[0] - 3*p2[0] + p3[0]) * t3),
+                0.5 * ((2*p1[1]) + (-p0[1] + p2[1]) * t + (2*p0[1] - 5*p1[1] + 4*p2[1] - p3[1]) * t2 + (-p0[1] + 3*p1[1] - 3*p2[1] + p3[1]) * t3)]); } } }
+function addArc(cx, cy, r, a0, a1) { const n = Math.max(12, Math.ceil(Math.abs(a1 - a0) * r / 2)); for (let i = 1; i <= n; i++) { const a = lerp(a0, a1, i / n); raw.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } }
+function addWave(p, amp, freq, ph) { const a = last(), n = Math.max(4, Math.ceil(dist(a, p) / 2)); const dx = p[0] - a[0], dy = p[1] - a[1], len = Math.hypot(dx, dy) || 1, nx = -dy / len, ny = dx / len;
+  for (let i = 1; i <= n; i++) { const u = i / n, w = Math.sin(u * Math.PI * freq + ph) * amp * Math.min(1, u * 6, (1 - u) * 6); raw.push([lerp(a[0], p[0], u) + nx * w, lerp(a[1], p[1], u) + ny * w]); } }
+const connect = (p3, dirIn, k = 0.42) => { const p0 = last(), d = dist(p0, p3) * k; addBez([p0[0], p0[1] + d], [p3[0] - dirIn[0] * d, p3[1] - dirIn[1] * d], p3); };
+
+/* ---- world layout (centres) ---- */
+/* ---- world layout (centres). Objects sit ~1300 apart so neighbours stay off-screen. STARTER: three objects, swap the drawings for ones that fit the topic. ---- */
+const O_CLK = [40, 1350], O_LST = [-20, 2760], O_FIN = [0, 3900];
+
+/* object 1: a scribble (the problem) then a head that forms around it */
+raw.push([-60, -120]); mark("scrS");
+for (let i = 1; i <= 700; i++) { const u = i / 700, env = 1 - 0.15 * u;
+  raw.push([-55 + env * (104 * Math.sin(2 * Math.PI * 3.4 * u + 0.4) + 34 * Math.sin(2 * Math.PI * 8.1 * u + 1.1)), -105 + env * (92 * Math.cos(2 * Math.PI * 2.7 * u) + 30 * Math.cos(2 * Math.PI * 7.3 * u + 0.6))]); }
+mark("scrE");
+addCR([last(), [-200, -20], [-285, 55], [-318, -90], [-275, -235], [-160, -330], [10, -358], [150, -325], [235, -250], [275, -160], [300, -78], [340, -8], [388, 92], [335, 118], [304, 128], [316, 172], [292, 204], [304, 244], [252, 298], [150, 292], [92, 258], [88, 335], [96, 430]]);
+mark("headE");
+
+/* object 2: a clock. Down the 12 hand to the centre, out along the hour hand, then the rim grows around it */
+connect([O_CLK[0], O_CLK[1] - 300], [0, 1], 0.38); mark("conn1");
+addLine([O_CLK[0], O_CLK[1]]); addLine([O_CLK[0] + 135, O_CLK[1] + 78]);
+mark("clkS");
+addCR([last(), [O_CLK[0] + 220, O_CLK[1] + 70], [O_CLK[0] + 300, O_CLK[1] + 18], [O_CLK[0] + 300, O_CLK[1]]]);
+{ const cx = O_CLK[0], cy = O_CLK[1], R = 300; let a = 0;
+  for (const sa of [Math.PI / 2, Math.PI, Math.PI * 1.5, Math.PI * 2]) { addArc(cx, cy, R, a, sa); a = sa; const px = cx + R * Math.cos(sa), py = cy + R * Math.sin(sa); addLine([cx + (R - 34) * Math.cos(sa), cy + (R - 34) * Math.sin(sa)]); addLine([px, py]); } }
+mark("clkE");
+
+/* object 3: the to-do list (rows connected in one boustrophedon pass) */
+{ const [ox, oy] = O_LST; const X = (x) => ox + x, Y = (y) => oy + y;
+  addBez([last()[0] + 60, last()[1] + 200], [X(400), Y(-700)], [X(285), Y(-352)]); mark("conn2");
+  mark("lstS");
+  addLine([X(-285), Y(-352)]); addLine([X(-285), Y(352)]); addLine([X(285), Y(352)]); addLine([X(285), Y(-352)]); addLine([X(160), Y(-352)]);
+  addBez([X(160), Y(-290)], [X(-60), Y(-250)], [X(-110), Y(-205)]);
+  addLine([X(-170), Y(-205)]); addLine([X(-170), Y(-145)]); addLine([X(-110), Y(-145)]); addLine([X(-110), Y(-205)]);
+  addLine([X(-160), Y(-172)]); addLine([X(-142), Y(-152)]); addLine([X(-92), Y(-222)]);
+  addBez([X(-60), Y(-200)], [X(-40), Y(-176)], [X(-20), Y(-176)]); addWave([X(205), Y(-176)], 5, 14, 0);
+  addBez([X(240), Y(-176)], [X(240), Y(-20)], [X(200), Y(-16)]); addWave([X(-90), Y(-16)], 5, 13, 1);
+  addLine([X(-110), Y(-44)]); addLine([X(-170), Y(-44)]); addLine([X(-170), Y(16)]); addLine([X(-110), Y(16)]); addLine([X(-110), Y(-44)]);
+  addLine([X(-160), Y(-14)]); addLine([X(-142), Y(6)]); addLine([X(-92), Y(-64)]);
+  addBez([X(-80), Y(-30)], [X(-60), Y(60)], [X(-110), Y(130)]);
+  addLine([X(-170), Y(130)]); addLine([X(-170), Y(190)]); addLine([X(-110), Y(190)]); addLine([X(-110), Y(130)]);
+  addBez([X(-90), Y(150)], [X(-70), Y(165)], [X(-50), Y(165)]); addWave([X(70), Y(165)], 5, 8, 0);
+  mark("lstE");
+  addBez([X(120), Y(230)], [X(150), Y(300)], [X(110), Y(352)]); }
+
+/* object 4: the resolution: one calm straight line and a tick, reached by a long connector */
+{ const p = last(); connect([-250, O_FIN[1]], [1, 0], 0.38); mark("conn3"); mark("finS");
+  addLine([300, O_FIN[1]]); addLine([332, O_FIN[1] + 36]); addLine([392, O_FIN[1] - 44]); mark("finE"); }
+
+/* ---- resample the whole path to even 4 px steps, keep the marks ---- */
+const STEP = 4;
+const cum = [0]; for (let i = 1; i < raw.length; i++) cum.push(cum[i - 1] + dist(raw[i], raw[i - 1]));
+const X0 = [], Y0 = []; const mk = {};
+{ let j = 1; const total = cum[cum.length - 1];
+  for (let s = 0; s <= total; s += STEP) { while (j < raw.length - 1 && cum[j] < s) j++; const a = raw[j - 1], b = raw[j], u = (s - cum[j - 1]) / ((cum[j] - cum[j - 1]) || 1); X0.push(lerp(a[0], b[0], u)); Y0.push(lerp(a[1], b[1], u)); }
+  X0.push(raw[raw.length - 1][0]); Y0.push(raw[raw.length - 1][1]);
+  for (const k in marks) mk[k] = Math.round(cum[marks[k]] / STEP); }
+const NPT = X0.length;
+
+/* ------------------------------------------------------------------ timing (all from the real voice) ------------------------------------------------------------------ */
+const T = {};
+const ls = (i) => L(i).start, le = (i) => L(i).end;
+const wLater = wordT(1, /^\w+$/, ls(1) + 3);
+T.scrEnd = Math.min(1.6, le(0) - 1.2);
+T.headEnd = le(0) - 0.3;
+T.c1e = ls(1) + 0.45;
+T.clkEnd = le(1) - 0.45;
+T.c2e = ls(2) + 0.35;
+T.lstEnd = le(2) - 0.25;
+T.c3e = ls(3) + 0.5;
+T.finE = T.c3e + 1.6;
+T.pullS = T.finE + 0.4;
+T.pullE = T.pullS + 2.6;
+
+const segs = [];
+const seg = (t0, t1, i0, i1, e) => segs.push({ t0, t1, i0, i1, e: e || eSine });
+seg(0.15, T.scrEnd, 0, mk.scrE, (u) => u);
+seg(T.scrEnd, T.headEnd, mk.scrE, mk.headE, eSine);
+seg(T.headEnd, T.c1e, mk.headE, mk.clkS, eCub);
+seg(T.c1e, T.clkEnd, mk.clkS, mk.clkE, eSine);
+seg(T.clkEnd, T.c2e, mk.clkE, mk.lstS, eCub);
+seg(T.c2e, T.lstEnd, mk.lstS, mk.lstE, eSine);
+seg(T.lstEnd, T.c3e, mk.lstE, mk.finS, eCub);
+seg(T.c3e, T.finE, mk.finS, NPT - 1, eSine);
+const tipAt = (t) => { let idx = 0; for (const s of segs) { if (t < s.t0) return idx; if (t < s.t1) return lerp(s.i0, s.i1, s.e((t - s.t0) / (s.t1 - s.t0))); idx = s.i1; } return idx; };
+
+/* camera keys: [t, x, y, z]; hold between equal keys, eased cubic between; the final pull-back reveals the whole journey as one line */
+const keys = [
+  [0, 10, 30, 1.0],
+  [T.headEnd - 0.2, 10, 30, 1.0],
+  [T.c1e + 0.2, O_CLK[0], O_CLK[1], 1.0],
+  [T.clkEnd - 0.2, O_CLK[0], O_CLK[1], 1.0],
+  [T.c2e + 0.2, O_LST[0], O_LST[1], 1.0],
+  [T.lstEnd - 0.1, O_LST[0], O_LST[1], 1.0],
+  [T.c3e + 0.2, 60, O_FIN[1], 0.92],
+  [T.pullS, 60, O_FIN[1], 0.92],
+  [T.pullE, 10, 1950, 0.2],
+];
+
+const camAt = (t) => { if (t <= keys[0][0]) return keys[0].slice(1); for (let i = 1; i < keys.length; i++) if (t < keys[i][0]) { const a = keys[i - 1], b = keys[i], u = eCub((t - a[0]) / (b[0] - a[0])); return [lerp(a[1], b[1], u), lerp(a[2], b[2], u), a[3] === b[3] ? a[3] : Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u))]; } return keys[keys.length - 1].slice(1); };
+const travelDip = (t) => { let d = 0; for (const [a, b] of [[T.headEnd - 0.2, T.c1e + 0.2], [T.clkEnd - 0.2, T.c2e + 0.2], [T.lstEnd - 0.1, T.c3e + 0.2]]) if (t > a && t < b) d = Math.sin(Math.PI * (t - a) / (b - a)); return 1 - 0.2 * d; };
+
+/* ------------------------------------------------------------------ labels, figure notes, progress ------------------------------------------------------------------ */
+const labels = $("#labels");
+const addLabel = (txt, x, y, size, anchor, t0) => { const el = document.createElementNS(NS, "text"); el.textContent = txt; el.setAttribute("x", x); el.setAttribute("y", y); el.setAttribute("font-size", size); el.setAttribute("text-anchor", anchor || "middle"); el.setAttribute("opacity", 0); labels.appendChild(el);
+  tl.to(el, { attr: { opacity: 1 }, duration: 0.6, ease: "power2.out" }, t0); return el; };
+addLabel("1927", O_CLK[0] + 215, O_CLK[1] - 335, 64, "start", ls(1) + 1.0);
+addLabel("PLACEHOLDER", -330, O_FIN[1] - 160, 58, "start", ls(3) + 0.4);
+const figTxt = ["I \u00b7 PLACEHOLDER the problem", "II \u00b7 PLACEHOLDER the clue", "III \u00b7 PLACEHOLDER the list", "IV \u00b7 PLACEHOLDER one line", "V \u00b7 quiet"];
+const figAt = [0.35, ls(1) + 0.15, ls(2) + 0.15, ls(3) + 0.15, T.pullS + 0.3, DUR + 1];
+const figs = $("#figs");
+figTxt.forEach((txt, i) => { const d = document.createElement("div"); d.className = "fig"; d.textContent = txt; figs.appendChild(d);
+  tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, figAt[i]);
+  tl.to(d, { opacity: 0, duration: 0.3, ease: "power1.in" }, figAt[i + 1] - 0.05); });
+for (let i = 0; i < 5; i++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", 120 + (840 / 4) * i); c.setAttribute("cy", 1646); c.setAttribute("r", 5); c.setAttribute("fill", "#1C1A17"); $("#ticks").appendChild(c); }
+tl.to("#rail", { opacity: 0, duration: 0.6 }, T.pullS + 0.3);
+tl.to("#endcard", { opacity: 1, duration: 1.2, ease: "power2.out" }, T.pullS + 1.1);
+
+tl.to("#endcard", { opacity: 1, duration: 1.2, ease: "power2.out" }, T.pullS + 1.1);
+
+/* ------------------------------------------------------------------ render(t) ------------------------------------------------------------------ */
+const ink = $("#ink"), tip = $("#tip"), halo = $("#halo"), world = $("#world"), prog = $("#prog"), errEl = $("#err");
+const XS = new Float32Array(NPT), YS = new Float32Array(NPT);
+function render(t) {
+  try {
+    const idx = Math.min(NPT - 1, tipAt(t)), n = Math.floor(idx), fr = idx - n;
+    const calm = eCub(clamp((t - T.headEnd + 1.2) / 1.2));
+    for (let i = 0; i <= Math.min(NPT - 1, n + 1); i++) {
+      let x = X0[i], y = Y0[i];
+      if (i <= mk.scrE) { const j = 2.6 * (1 - calm) * (i > 20 ? 1 : 0.3); x += j * Math.sin(t * 11 + i * 0.41); y += j * Math.cos(t * 9 + i * 0.33); }
+      XS[i] = x; YS[i] = y;
+    }
+    let d = "M" + XS[0].toFixed(1) + " " + YS[0].toFixed(1);
+    for (let i = 1; i <= n; i++) d += "L" + XS[i].toFixed(1) + " " + YS[i].toFixed(1);
+    let tx = XS[n], ty = YS[n];
+    if (n < NPT - 1) { tx = lerp(XS[n], XS[n + 1], fr); ty = lerp(YS[n], YS[n + 1], fr); d += "L" + tx.toFixed(1) + " " + ty.toFixed(1); }
+    ink.setAttribute("d", d);
+    const [cx, cy, cz] = camAt(t); const z = cz * travelDip(t) * (1 + 0.008 * Math.sin(t * 0.7));
+    const lean = t < T.pullS ? 0.16 : 0; const camx = cx + (tx - cx) * lean, camy = cy + (ty - cy) * lean; // gentle follow
+    world.setAttribute("transform", `translate(540 650) scale(${z.toFixed(4)}) translate(${(-camx).toFixed(2)} ${(-camy).toFixed(2)})`);
+    const vis = clamp((t - 0.05) / 0.25), pulse = 1 + 0.18 * Math.sin(t * 4.2);
+    tip.setAttribute("cx", tx); tip.setAttribute("cy", ty); tip.setAttribute("r", (15 / z) * vis);
+    halo.setAttribute("cx", tx); halo.setAttribute("cy", ty); halo.setAttribute("r", (30 / z) * pulse * vis);
+    prog.setAttribute("cx", 120 + 840 * (idx / (NPT - 1)));
+    errEl.textContent = "";
+  } catch (e) { errEl.textContent = "render error: " + e.message; }
+}
+const proxy = { t: 0 };
+tl.to(proxy, { t: DUR, duration: DUR, ease: "none", modifiers: { t: (v) => { render(parseFloat(v)); return v; } } }, 0);
+render(0);
+
+/* ------------------------------------------------------------------ captions: serif on a paper plate ------------------------------------------------------------------ */
+const capGroups = vfrey.captions("#captions", { style: "color", size: 70, color: "#1C1A17", highlight: "#C23A1E", font: '"Playfair Display", Georgia, serif', maxWords: 3 });
+(() => {
+  const g = capGroups.map((x) => ({ s: x.start, e: x.end }));
+  tl.set("#capplate", { opacity: 0 }, 0);
+  g.forEach((x, i) => { const prevEnd = i ? g[i - 1].e : -9, nextStart = i < g.length - 1 ? g[i + 1].s : 99;
+    if (x.s - prevEnd > 0.3) tl.to("#capplate", { opacity: 1, duration: 0.2, ease: "power2.out" }, Math.max(0, x.s - 0.12));
+    if (nextStart - x.e > 0.3) tl.to("#capplate", { opacity: 0, duration: 0.2 }, x.e + 0.02); });
+})();
+</script>
+</body>
+</html>

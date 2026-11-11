@@ -1,0 +1,397 @@
+<!doctype html>
+<!-- STORYBOOK WATERCOLOUR scene: SVG washes + filters, page-turn transitions, paper strip captions. Everything is on one GSAP timeline. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #e9dcc0; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Playfair Display", Georgia, serif; }
+  #stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; perspective: 2800px; perspective-origin: 50% 50%; background: #eadfc4; }
+  .pg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: #f6ecd4; backface-visibility: hidden; transform-origin: 0 50%; }
+  .win { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; -webkit-mask-size: 1080px 1920px; -webkit-mask-repeat: no-repeat; }
+  .lay { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .lay > svg, .lay > div { position: absolute; }
+  svg.lay { overflow: visible; }
+  .crowp, .pitp { position: absolute; transform-origin: 0 0; width: 440px; height: 420px; }
+  .pitp { width: 540px; height: 660px; }
+  .crowa { position: absolute; left: 0; top: 0; width: 440px; height: 420px; }
+  .frame { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+  .grain { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; opacity: .9; }
+  .hd { position: absolute; left: 0; top: 0; width: 1080px; height: 600px; pointer-events: none; }
+  .ttl { position: absolute; left: 0; top: 0; width: 1080px; height: 600px; }
+  .lt { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "Playfair Display", Georgia, serif; font-weight: 800; white-space: nowrap; line-height: 1.05; filter: url(#letter); letter-spacing: .01em; }
+  .plop { position: absolute; font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 800; font-size: 62px; color: #2f6f7c; opacity: 0; filter: url(#letter); }
+  .shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(40,22,10,.0), rgba(40,22,10,.85)); opacity: 0; pointer-events: none; }
+  .cast { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(40,22,10,.55), rgba(40,22,10,0) 46%); opacity: 0; pointer-events: none; }
+  #strip { position: absolute; left: 40px; top: 1318px; width: 1000px; height: 200px; z-index: 100; filter: drop-shadow(0 10px 12px rgba(50,28,14,.35)); }
+  #captions { position: absolute; left: 80px; right: 80px; top: 1330px; height: 176px; z-index: 101; font-weight: 700; justify-content: center !important; filter: url(#round); }
+  #captions .vf-w { padding: 2px 8px 6px; }
+</style>
+</head>
+<body>
+<div id="filters"></div>
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="stage"></div>
+  <div id="strip"></div>
+  <div id="captions"></div>
+</div>
+<script>
+/* STORYBOOK WATERCOLOUR: drawing library. Everything is SVG strings + SVG filters; nothing is a bitmap except the paper grain (made on a canvas). */
+const PAPER = "#f6ecd4", INK = "#3b2a22";
+const COL = { ochre: "#e3a84a", sun: "#f3c24f", sienna: "#b8643a", terra: "#d98c5f", sage: "#a2b07c", olive: "#6f8355", water: "#6fb1b3", water2: "#a8d6d3", plum: "#7a5c86", rose: "#e8a98f", crow: "#44415a", crow2: "#34324a", sheen: "#9a9fc4" };
+
+function rng(seed) { let a = seed >>> 0; return () => ((a = (a * 1664525 + 1013904223) >>> 0) / 4294967296); }
+const f1 = (n) => Math.round(n * 10) / 10;
+function cr(pts) { // closed Catmull-Rom spline as cubic beziers
+  const n = pts.length; let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    d += `C${f1(p1[0] + (p2[0] - p0[0]) / 6)} ${f1(p1[1] + (p2[1] - p0[1]) / 6)} ${f1(p2[0] - (p3[0] - p1[0]) / 6)} ${f1(p2[1] - (p3[1] - p1[1]) / 6)} ${f1(p2[0])} ${f1(p2[1])}`;
+  }
+  return d + "Z";
+}
+function blob(cx, cy, rx, ry, o = {}) {
+  const n = o.n || 9, j = o.j ?? 0.1, r = rng(o.seed || 1), rot = ((o.rot || 0) * Math.PI) / 180, pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2, k = 1 + (r() - 0.5) * 2 * j, x = Math.cos(a) * rx * k, y = Math.sin(a) * ry * k;
+    pts.push([cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]);
+  }
+  return cr(pts);
+}
+const W = (d, fill, op = 0.85, extra = "") => `<path d="${d}" fill="${fill}" fill-opacity="${op}" ${extra}/>`;
+/* ink line: drawn a few px off the wash, like a misregistered pencil outline */
+const I = (d, w = 4, col = INK, dx = 3, dy = -2, extra = "") => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" transform="translate(${dx} ${dy})" ${extra}/>`;
+const svgT = (w, h, inner, extra = "") => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" ${extra}>${inner}</svg>`;
+
+/* shared SVG filters (one hidden svg) */
+const FILTERS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <!-- big wash: warped edge, granulated pigment, darker rim where the paint pooled -->
+ <filter id="wc" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.011 0.014" numOctaves="3" seed="2" result="w"/>
+  <feDisplacementMap in="SourceGraphic" in2="w" scale="34" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feGaussianBlur in="d" stdDeviation="1.4" result="db"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" seed="7" result="p"/>
+  <feColorMatrix in="p" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.15 1.42" result="pa"/>
+  <feComposite in="db" in2="pa" operator="in" result="body"/>
+  <feMorphology in="db" operator="erode" radius="4" result="er"/>
+  <feGaussianBlur in="er" stdDeviation="4" result="erb"/>
+  <feComposite in="db" in2="erb" operator="out" result="rim"/>
+  <feMerge><feMergeNode in="body"/><feMergeNode in="rim"/></feMerge>
+ </filter>
+ <!-- small wash for props and characters -->
+ <filter id="wcs" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="w"/>
+  <feDisplacementMap in="SourceGraphic" in2="w" scale="7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="9" result="p"/>
+  <feColorMatrix in="p" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.9 1.38" result="pa"/>
+  <feComposite in="d" in2="pa" operator="in"/>
+ </filter>
+ <!-- wobbly hand-drawn line -->
+ <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+  <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="11" result="w"/>
+  <feDisplacementMap in="SourceGraphic" in2="w" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+ </filter>
+ <!-- brush lettering -->
+ <filter id="letter" x="-5%" y="-10%" width="110%" height="125%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="5" result="w"/>
+  <feDisplacementMap in="SourceGraphic" in2="w" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="3" seed="3" result="p"/>
+  <feColorMatrix in="p" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1 1.5" result="pa"/>
+  <feComposite in="d" in2="pa" operator="in"/>
+ </filter>
+ <!-- rounds the corners of serif type: blur, then re-threshold the alpha -->
+ <filter id="round" x="-3%" y="-10%" width="106%" height="120%">
+  <feGaussianBlur stdDeviation="1.5"/>
+  <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 11 -4.6"/>
+ </filter>
+ <filter id="b6" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter>
+ <filter id="b16" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="16"/></filter>
+ <filter id="b34" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter>
+</defs></svg>`;
+
+/* rough page window: used both as the mask of the painting and as the path of the painted border (same filter, same numbers, so they line up) */
+const WIN = { x: 64, y: 64, w: 952, h: 1792 };
+const WIN_FILTER = `<filter id="wf" x="-6%" y="-4%" width="112%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.022" numOctaves="3" seed="5" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="44" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation="1.6"/></filter>`;
+function maskURI() {
+  const s = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><defs>${WIN_FILTER}</defs><rect x="${WIN.x}" y="${WIN.y}" width="${WIN.w}" height="${WIN.h}" rx="22" fill="#000" filter="url(#wf)"/></svg>`;
+  return `url("data:image/svg+xml;utf8,${encodeURIComponent(s)}")`;
+}
+function frameSVG(tint) {
+  const inner = `<defs>${WIN_FILTER}<filter id="wf2" x="-6%" y="-4%" width="112%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.014 0.017" numOctaves="3" seed="21" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="30" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+  <g filter="url(#wcs)"><rect x="${WIN.x}" y="${WIN.y}" width="${WIN.w}" height="${WIN.h}" rx="22" fill="none" stroke="${tint}" stroke-opacity=".78" stroke-width="20" filter="url(#wf)"/></g>
+  <rect x="${WIN.x - 26}" y="${WIN.y - 26}" width="${WIN.w + 52}" height="${WIN.h + 52}" rx="30" fill="none" stroke="${INK}" stroke-opacity=".55" stroke-width="3.5" filter="url(#wf2)"/>
+  <rect x="${WIN.x - 38}" y="${WIN.y - 36}" width="${WIN.w + 74}" height="${WIN.h + 70}" rx="34" fill="none" stroke="${tint}" stroke-opacity=".4" stroke-width="2.5" filter="url(#wf2)"/>
+  ${[[WIN.x - 4, WIN.y - 4, 1, 1], [WIN.x + WIN.w + 4, WIN.y - 4, -1, 1], [WIN.x - 4, WIN.y + WIN.h + 4, 1, -1], [WIN.x + WIN.w + 4, WIN.y + WIN.h + 4, -1, -1]].map(([x, y, sx, sy]) => `<g transform="translate(${x} ${y}) scale(${sx} ${sy})" filter="url(#ink)"><path d="M-4 22C14 8 30 2 52 4" fill="none" stroke="${INK}" stroke-opacity=".6" stroke-width="3.5" stroke-linecap="round"/><path d="M22 -2C32 14 40 22 60 24" fill="none" stroke="${tint}" stroke-opacity=".7" stroke-width="3.5" stroke-linecap="round"/><circle cx="16" cy="14" r="4.5" fill="${tint}" fill-opacity=".8"/></g>`).join("")}`;
+  return svgT(1080, 1920, inner);
+}
+
+/* cold-press paper grain, built once on a canvas from value noise and fibres (deterministic) */
+function makeGrain() {
+  const w = 540, h = 960, c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"), img = x.createImageData(w, h), d = img.data, r = rng(77);
+  const oct = [[3, 0.22], [9, 0.3], [40, 0.48]].map(([cell, amp]) => { const gw = Math.ceil(w / cell) + 2, gh = Math.ceil(h / cell) + 2, g = new Float32Array(gw * gh); for (let i = 0; i < g.length; i++) g[i] = r(); return { cell, amp, gw, g }; });
+  const sm = (t) => t * t * (3 - 2 * t);
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
+    let v = 0;
+    for (const o of oct) { const gx = i / o.cell, gy = j / o.cell, ix = gx | 0, iy = gy | 0, fx = sm(gx - ix), fy = sm(gy - iy), a = o.g[iy * o.gw + ix], b = o.g[iy * o.gw + ix + 1], cc = o.g[(iy + 1) * o.gw + ix], dd = o.g[(iy + 1) * o.gw + ix + 1]; v += o.amp * (a + (b - a) * fx + (cc - a + (a - b - cc + dd) * fx) * fy); }
+    v += (r() - 0.5) * 0.05; const k = (j * w + i) * 4, s = v - 0.5;
+    if (s > 0) { d[k] = 255; d[k + 1] = 250; d[k + 2] = 236; d[k + 3] = Math.min(255, s * 150); } else { d[k] = 92; d[k + 1] = 66; d[k + 2] = 40; d[k + 3] = Math.min(255, -s * 130); }
+  }
+  x.putImageData(img, 0, 0);
+  x.lineCap = "round";
+  for (let n = 0; n < 900; n++) { const px = r() * w, py = r() * h, a = r() * 6.28, l = 3 + r() * 9; x.strokeStyle = r() > 0.5 ? "rgba(255,250,236,.32)" : "rgba(110,80,50,.16)"; x.lineWidth = 0.6; x.beginPath(); x.moveTo(px, py); x.quadraticCurveTo(px + Math.cos(a) * l * 0.6, py + Math.sin(a) * l * 0.6 + 2, px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+  return c;
+}
+function grainCanvas(master) { const c = document.createElement("canvas"); c.width = master.width; c.height = master.height; c.getContext("2d").drawImage(master, 0, 0); c.className = "grain"; return c; }
+
+/* pebbles */
+const PEB = ["#a89a8c", "#c9b7a0", "#8f8d89", "#b79f89", "#d4c4aa", "#9c8f86"];
+function pebble(cx, cy, r, seed = 1, rot = 0) {
+  const q = rng(seed), c = PEB[Math.floor(q() * PEB.length)], d = blob(cx, cy, r, r * 0.78, { n: 7, j: 0.1, seed, rot: rot || q() * 60 - 30 });
+  return `<g>${W(d, c, 0.95)}${I(d, 2.4, "#4a3a30", 1.5, -1)}<path d="M${f1(cx - r * 0.5)} ${f1(cy - r * 0.25)}q${f1(r * 0.25)} ${f1(-r * 0.4)} ${f1(r * 0.6)} ${f1(-r * 0.3)}" fill="none" stroke="#fff6e4" stroke-opacity=".75" stroke-width="${Math.max(2, r * 0.13)}" stroke-linecap="round"/></g>`;
+}
+
+/* The characters and the scenery. Local coordinates; the page code scales and places them. */
+
+/* ---- the crow: 440x420 box, feet at (170,380), faces right. Each moving part is its own <g id> inside one <svg>. ---- */
+function crowSVG(id) {
+  const body = "M60 285C50 215 110 165 190 170C265 175 300 225 285 280C270 335 200 350 140 340C95 332 65 315 60 285Z";
+  const wing = "M195 205C250 215 272 270 215 312C160 347 90 332 48 306C100 300 140 270 160 230C170 215 180 207 195 205Z";
+  const head = blob(262, 150, 63, 58, { n: 8, j: 0.035, seed: 3 });
+  const tailF = (rot, c) => `<g transform="rotate(${rot} 95 285)"><path d="M92 278C60 284 30 300 -6 322C28 340 62 336 96 304Z" fill="${c}" fill-opacity=".92"/></g>`;
+  return `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" width="440" height="420" viewBox="0 0 440 420" style="position:absolute;left:0;top:0;overflow:visible">
+  <g id="${id}-all">
+   <g id="${id}-tail" filter="url(#wcs)">${tailF(-14, COL.crow2)}${tailF(0, COL.crow)}${tailF(14, COL.crow2)}${I("M92 288C60 296 30 312 -2 334", 3, "#8e93b8", 0, 0, 'stroke-opacity=".6"')}</g>
+   <g id="${id}-legs" fill="none" stroke="#3a2a2a" stroke-width="8" stroke-linecap="round" filter="url(#ink)">
+     <path d="M150 336L146 384M146 384l-24 7M146 384l5 12M146 384l24 8"/><path d="M196 340L202 384M202 384l-24 7M202 384l6 12M202 384l24 8"/></g>
+   <g id="${id}-body" filter="url(#wcs)">${W(body, COL.crow, 0.96)}<path d="M120 300C130 335 190 345 240 322C225 336 170 352 130 338Z" fill="#5d5a7c" fill-opacity=".85"/>${I("M70 235C95 196 150 178 205 184", 4, "#9a9fc4", 0, 0, 'stroke-opacity=".7"')}${I(body, 3.5, "#1c1826", 2, -2, 'stroke-opacity=".85"')}</g>
+   <g id="${id}-wing" filter="url(#wcs)">${W(wing, COL.crow2, 0.98)}${I("M205 232C170 262 130 288 82 304", 4, "#9a9fc4", 0, 0, 'stroke-opacity=".65"')}${I("M210 260C175 288 140 308 100 318", 3.5, "#9a9fc4", 0, 0, 'stroke-opacity=".5"')}${I(wing, 3.5, "#1c1826", 2, -2, 'stroke-opacity=".9"')}</g>
+   <g id="${id}-head">
+    <g filter="url(#wcs)">
+     <g id="${id}-lb"><path d="M318 184C352 192 386 196 410 196C382 214 346 212 320 204Z" fill="#4b3f50"/>${I("M318 184C352 192 386 196 410 196C382 214 346 212 320 204Z", 3, "#1c1826", 1.5, -1)}</g>
+     ${W(head, COL.crow, 0.98)}
+     <path d="M236 106C236 82 258 78 268 94C256 90 244 96 240 112Z" fill="${COL.crow2}"/>
+     <path d="M262 96C268 80 288 80 292 96C282 92 272 92 266 104Z" fill="${COL.crow2}"/>
+     <path d="M308 126C346 122 392 148 416 190C382 186 346 184 312 180Z" fill="#2f2937"/>
+     <path d="M322 136C352 134 382 150 398 168" fill="none" stroke="#8a7f98" stroke-width="4" stroke-linecap="round" stroke-opacity=".7"/>
+     ${I(head, 3.5, "#1c1826", 2, -2, 'stroke-opacity=".85"')}${I("M308 126C346 122 392 148 416 190C382 186 346 184 312 180", 3.5, "#1c1826", 1.5, -1)}
+     <ellipse cx="298" cy="170" rx="17" ry="11" fill="${COL.rose}" fill-opacity=".62" filter="url(#b6)"/>
+    </g>
+    <g id="${id}-eye"><circle cx="280" cy="140" r="17" fill="#fff8e8"/><circle cx="280" cy="140" r="17" fill="none" stroke="#1c1826" stroke-width="3"/>
+      <g id="${id}-pup"><circle cx="284" cy="142" r="9.5" fill="#1b1722"/><circle cx="288" cy="137" r="3.6" fill="#fff"/></g>
+      <ellipse id="${id}-lid" cx="280" cy="140" rx="19" ry="19" fill="${COL.crow}"/>
+      <path id="${id}-shut" d="M262 142Q280 156 298 142" fill="none" stroke="#1c1826" stroke-width="4" stroke-linecap="round" opacity="0"/>
+      <path d="M262 118Q278 110 296 120" fill="none" stroke="#1c1826" stroke-width="4.5" stroke-linecap="round" id="${id}-brow"/></g>
+    <circle id="${id}-held" cx="404" cy="190" r="0" fill="#a89a8c"/>
+    <circle id="${id}-tip" cx="412" cy="190" r="1" fill="none"/>
+    <g id="${id}-sweat" opacity="0"><path d="M232 112C226 128 218 134 224 146C230 154 244 148 242 136C240 128 236 122 232 112Z" fill="#9ed3dc" stroke="#4a7f8c" stroke-width="2.5"/></g>
+   </g>
+  </g></svg>`;
+}
+
+/* ---- scenery ---- */
+const MOODS = {
+  A: { top: "#f6cf8e", bot: "#fdf1d4", sun: [850, 690, 105], sunc: "#f3c24f", hill1: "#c8c78a", hill2: "#a9b57d", ground: "#e8c07a", ground2: "#d4a25a", kind: "sun" },
+  B: { top: "#f2b27a", bot: "#fcead0", sun: [840, 280, 170], sunc: "#f7d36a", hill1: "#d6bf86", hill2: "#bba56c", ground: "#e9b86d", ground2: "#cf9650", kind: "sun" },
+  C: { top: "#e8d3c0", bot: "#faefdb", sun: [220, 340, 100], sunc: "#f4d98a", hill1: "#c9c595", hill2: "#a3b180", ground: "#e6c283", ground2: "#d1a763", kind: "cloud" },
+  D: { top: "#f5c58a", bot: "#fcebcc", sun: [180, 560, 150], sunc: "#f2b45a", hill1: "#c6bf84", hill2: "#9fb078", ground: "#e5b777", ground2: "#c98f55", kind: "sun" },
+  E: { top: "#7b5a86", bot: "#f2c8a0", sun: [840, 700, 100], sunc: "#fff0cf", hill1: "#8d7a91", hill2: "#6c6a80", ground: "#a98a78", ground2: "#7f6a68", kind: "moon" },
+};
+function skyLayer(m, id) {
+  const M = MOODS[m], r = rng(m.charCodeAt(0) * 13);
+  const clouds = [[200, 640, 150], [700, 520, 120], [880, 760, 100]].map(([x, y, s], i) => `<g transform="translate(${x} ${y})" class="cloud">${[[-.5, .1, .55], [0, -.15, .7], [.5, .1, .5]].map(([a, b, c], k) => W(blob(a * s, b * s * 0.6, s * c, s * c * 0.52, { n: 8, j: 0.1, seed: i * 7 + k }), M.kind === "moon" ? "#d9a9b4" : "#fffaf0", M.kind === "moon" ? 0.55 : 0.7)).join("")}</g>`).join("");
+  const blooms = Array.from({ length: 7 }, (_, i) => `<ellipse cx="${100 + r() * 880}" cy="${200 + r() * 800}" rx="${90 + r() * 140}" ry="${50 + r() * 80}" fill="${i % 2 ? "#fffaf0" : M.top}" fill-opacity="${i % 2 ? 0.45 : 0.3}" filter="url(#b34)"/>`).join("");
+  let body = "";
+  const [sx, sy, sr] = M.sun;
+  if (M.kind === "moon") {
+    body = `<circle cx="${sx}" cy="${sy}" r="${sr * 2.2}" fill="#ffe9c9" fill-opacity=".38" filter="url(#b34)"/><g id="${id}-sun"><path d="${blob(sx, sy, sr, sr, { n: 10, j: 0.02, seed: 4 })}" fill="${M.sunc}" fill-opacity=".97"/><path d="${blob(sx + 34, sy - 10, sr * 0.78, sr * 0.9, { n: 9, j: 0.03, seed: 6 })}" fill="#7b5a86" fill-opacity=".5" transform="translate(-40 6)" opacity="0"/><circle cx="${sx - 30}" cy="${sy - 24}" r="14" fill="#e8d0b0" fill-opacity=".7"/><circle cx="${sx + 34}" cy="${sy + 30}" r="20" fill="#e8d0b0" fill-opacity=".55"/><circle cx="${sx + 8}" cy="${sy - 46}" r="9" fill="#e8d0b0" fill-opacity=".5"/></g>`;
+  } else if (M.kind === "sun") {
+    const rays = Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * 6.283; return `<path d="M${f1(sx + Math.cos(a) * (sr + 26))} ${f1(sy + Math.sin(a) * (sr + 26))}L${f1(sx + Math.cos(a) * (sr + 74 + (i % 2) * 30))} ${f1(sy + Math.sin(a) * (sr + 74 + (i % 2) * 30))}" stroke="${M.sunc}" stroke-width="12" stroke-linecap="round" stroke-opacity=".75" fill="none"/>`; }).join("");
+    body = `<circle cx="${sx}" cy="${sy}" r="${sr * 2.3}" fill="#fff1b8" fill-opacity=".55" filter="url(#b34)"/><g id="${id}-sun" style="transform-origin:${sx}px ${sy}px"><g id="${id}-rays">${rays}</g>${W(blob(sx, sy, sr, sr, { n: 10, j: 0.03, seed: 4 }), M.sunc, 0.95)}${W(blob(sx + 12, sy + 10, sr * 0.72, sr * 0.7, { n: 9, j: 0.05, seed: 8 }), "#f0a84a", 0.45)}<ellipse cx="${sx - 38}" cy="${sy - 40}" rx="38" ry="22" fill="#fffbe0" fill-opacity=".6" filter="url(#b6)"/></g>`;
+  } else {
+    body = `<g id="${id}-sun"><ellipse cx="${sx}" cy="${sy}" rx="${sr * 1.6}" ry="${sr * 1.1}" fill="#fffaf0" fill-opacity=".6" filter="url(#b16)"/></g>`;
+  }
+  const grad = `<linearGradient id="${id}-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${M.top}"/><stop offset=".62" stop-color="${M.bot}"/><stop offset="1" stop-color="${M.bot}"/></linearGradient>`;
+  return svgT(1080, 1920, `<defs>${grad}</defs><rect x="-400" y="-400" width="1880" height="2700" fill="url(#${id}-g)"/><g filter="url(#wc)">${blooms}</g><g filter="url(#wc)">${clouds}</g>${body}`);
+}
+function hillsLayer(m) {
+  const M = MOODS[m];
+  const h1 = cr([[-300, 1000], [-60, 930], [180, 960], [400, 900], [660, 950], [900, 905], [1180, 960], [1400, 1000], [1400, 1500], [-300, 1500]]);
+  const h2 = cr([[-300, 1080], [-20, 1020], [260, 1060], [520, 1010], [800, 1050], [1100, 1015], [1400, 1060], [1400, 1500], [-300, 1500]]);
+  const trees = [[150, 960, 1], [250, 985, .7], [960, 940, .85]].map(([x, y, s], i) => `<g transform="translate(${x} ${y}) scale(${s})">${W(`M-6 40L-4 -20L6 -20L8 40Z`, "#8a6a4e", 0.9)}${W(blob(0, -60, 62, 54, { n: 8, j: 0.12, seed: 20 + i }), M.hill2, 0.9)}${W(blob(-14, -70, 34, 30, { n: 7, j: 0.1, seed: 30 + i }), "#fffaf0", 0.18)}</g>`).join("");
+  return svgT(1080, 1920, `<g filter="url(#wc)">${W(h1, M.hill1, 0.9)}${trees}${W(h2, M.hill2, 0.92)}</g>`);
+}
+function groundLayer(m, y0) {
+  const M = MOODS[m], r = rng(99);
+  const g = cr([[-300, y0 - 140], [100, y0 - 160], [420, y0 - 128], [760, y0 - 150], [1100, y0 - 130], [1400, y0 - 150], [1400, 2300], [-300, 2300]]);
+  const g2 = cr([[-300, y0 - 20], [250, y0 - 36], [640, y0 - 12], [1000, y0 - 30], [1400, y0 - 16], [1400, 2300], [-300, 2300]]);
+  const dry = Array.from({ length: 26 }, () => { const x = -100 + r() * 1280, y = y0 - 110 + r() * 60, l = 14 + r() * 28; return `<path d="M${f1(x)} ${f1(y)}l${f1(l * 0.4)} ${f1(-l)}M${f1(x + 7)} ${f1(y)}l${f1(-l * 0.2)} ${f1(-l * 0.9)}" stroke="${M.sage === undefined ? "#9a8a4a" : "#9a8a4a"}" stroke-opacity=".7" stroke-width="4.5" stroke-linecap="round" fill="none"/>`; }).join("");
+  const cracks = [[120, y0 + 60], [520, y0 + 90], [820, y0 + 50]].map(([x, y]) => `<path d="M${x} ${y}l30 -14l22 18l34 -10M${x + 52} ${y + 4}l8 26" fill="none" stroke="#8b5a36" stroke-opacity=".5" stroke-width="3.5" stroke-linecap="round"/>`).join("");
+  return svgT(1080, 1920, `<g filter="url(#wc)">${W(g, M.ground, 0.95)}${W(g2, M.ground2, 0.9)}<ellipse cx="540" cy="${y0 + 20}" rx="560" ry="40" fill="#fffaf0" fill-opacity=".14" filter="url(#b16)"/></g><g filter="url(#ink)">${dry}${cracks}</g>`);
+}
+/* foreground: grass, flowers, pebbles, below and beside the action. Drawn big, full to the bottom edge. */
+function fgLayer(m, y0, id) {
+  const M = MOODS[m], r = rng(500 + m.charCodeAt(0)), night = m === "E";
+  const greens = night ? ["#6e7488", "#586078", "#8a8498"] : ["#8fa862", "#789a52", "#5f8447", "#a9bf70"];
+  const blades = (cx, base, n, hMax, spread, seed) => { const q = rng(seed); return Array.from({ length: n }, () => { const x = cx + (q() - 0.5) * spread, h = hMax * (0.45 + q() * 0.55), lean = (q() - 0.5) * 80, c = greens[Math.floor(q() * greens.length)]; return `<path d="M${f1(x - 9)} ${base}C${f1(x - 6)} ${f1(base - h * 0.5)} ${f1(x + lean * 0.5)} ${f1(base - h * 0.8)} ${f1(x + lean)} ${f1(base - h)}C${f1(x + lean * 0.7 + 5)} ${f1(base - h * 0.7)} ${f1(x + 8)} ${f1(base - h * 0.4)} ${f1(x + 9)} ${base}Z" fill="${c}" fill-opacity=".92"/>`; }).join(""); };
+  const tuft = (cx, base, n, h, sp, seed, tid) => `<g id="${id}-${tid}" style="transform-origin:${cx}px ${base}px" filter="url(#wcs)">${blades(cx, base, n, h, sp, seed)}</g>`;
+  const flowers = Array.from({ length: night ? 5 : 14 }, (_, i) => { const x = 90 + r() * 900, y = 1600 + r() * 260, s = 1.1 + r() * 0.8, c = night ? ["#d8a9c4", "#e9c6a0"][i % 2] : ["#f2e6b4", "#e58d70", "#fff3d8", "#d98c9c"][i % 4]; return `<g transform="translate(${f1(x)} ${f1(y)}) scale(${f1(s)})"><path d="M0 0C-4 30 4 50 0 74" stroke="${greens[2]}" stroke-width="5" fill="none" stroke-linecap="round"/>${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-17" rx="9" ry="16" transform="rotate(${a})" fill="${c}" fill-opacity=".92"/>`).join("")}<circle r="8" fill="#e7a53a"/></g>`; }).join("");
+  const pebs = [[130, 1700, 34], [250, 1790, 26], [880, 1730, 30], [970, 1800, 22], [60, 1620, 20]].map(([x, y, s], i) => pebble(x, y, s, 200 + i)).join("");
+  return svgT(1080, 1920, `<g filter="url(#wcs)">${W(cr([[-300, 1560], [200, 1540], [560, 1570], [900, 1545], [1400, 1565], [1400, 2300], [-300, 2300]]), night ? "#6a647e" : "#9db06a", 0.62)}</g>
+   <g filter="url(#wcs)">${pebs}</g>
+   ${tuft(540, 1930, 16, 260, 900, 9, "t5")}${tuft(60, 1920, 18, 520, 240, 5, "t1")}${tuft(1020, 1920, 18, 480, 240, 6, "t2")}${tuft(330, 1920, 10, 300, 240, 7, "t3")}${tuft(760, 1920, 10, 300, 260, 8, "t4")}
+   <g filter="url(#wcs)">${flowers}</g>`);
+}
+
+/* Pages, camera and timeline. All animation is on ONE paused GSAP timeline (seek-safe). STARTER: a bird as the stock character; swap it for the topic's figure.
+   Every piece of text here marked PLACEHOLDER is topic content to replace. */
+const tl = vfrey.timeline();
+const TM = vfrey.timing, DUR = TM.durationSec;
+const $ = (id) => document.getElementById(id);
+const lineStart = (i) => TM.lines[Math.min(i, TM.lines.length - 1)].start, lineEnd = (i) => TM.lines[Math.min(i, TM.lines.length - 1)].end;
+const wi = (txt, from = 0) => TM.words.findIndex((w, i) => i >= from && w.text.replace(/[^\w']/g, "").toLowerCase() === txt.toLowerCase());
+const WS = (txt, from = 0, fallback = 0) => { const i = wi(txt, from); return i < 0 ? fallback : TM.words[i].start; };
+
+const Y0 = 1240, SC = 1.1;
+const CROW = { x: 420, left: 420 - 170 * SC, top: Y0 - 380 * SC };
+const POSE = { rest: { rot: 0, hx: 0, hy: 0, bx: 0 }, look: { rot: -8, hx: 6, hy: 0, bx: 0 }, tilt: { rot: 14, hx: 6, hy: 4, bx: 0 } };
+
+const MASK = maskURI(), GRAIN = makeGrain();
+document.getElementById("filters").innerHTML = FILTERS;
+const stage = $("stage");
+
+/* ---- one page: four parallax layers (sky, hills, mid with the character, foreground), the painted window, the grain, a heading ---- */
+function buildPage(key, mood, o = {}) {
+  const el = document.createElement("div"); el.className = "pg"; el.id = "pg" + key; el.style.zIndex = 10 - o.z;
+  const cid = key + "c";
+  el.innerHTML = `<div class="win"><div class="lay" id="${key}0">${skyLayer(mood, key + "s")}</div><div class="lay" id="${key}1">${hillsLayer(mood)}</div>
+   <div class="lay" id="${key}2">${groundLayer(mood, Y0)}
+     <div class="crowp" style="left:${CROW.left}px;top:${CROW.top}px;transform:scale(${SC})"><div class="crowa" id="${key}a">${crowSVG(cid)}</div></div>
+     <svg class="lay air" id="${key}air" width="1080" height="1920" viewBox="0 0 1080 1920"></svg></div>
+   <div class="lay" id="${key}3">${fgLayer(mood, Y0, key + "f")}</div>
+   <svg class="lay dust" id="${key}dust" width="1080" height="1920" viewBox="0 0 1080 1920"></svg></div>
+   ${frameSVG(o.tint || "#a8643c").replace("<svg ", '<svg class="frame" ')}<div class="hd" id="${key}hd">${o.heading || ""}</div><div class="cast"></div><div class="shade"></div>`;
+  el.querySelector(".win").style.webkitMaskImage = MASK;
+  const g = grainCanvas(GRAIN); el.insertBefore(g, el.querySelector(".hd")); // paper grain sits over the paint
+  stage.appendChild(el);
+  return { el, key, cid, layers: [$(key + "0"), $(key + "1"), $(key + "2"), $(key + "3")], head: $(cid + "-head"), a: $(key + "a"), air: $(key + "air") };
+}
+const PAR = [0.25, 0.55, 1, 1.12];
+function camera(pg, t0, t1, s0, s1, fx, fy, sx, sy, dx = 0, dy = 0, ease = "sine.inOut") { // focus (fx,fy) lands on screen (sx,sy)
+  pg.layers.forEach((l, i) => {
+    const k = PAR[i];
+    const fg = i === 3, oy = fg ? 1850 : fy, my = fg ? 0 : (sy - fy) * k;
+    tl.fromTo(l, { scale: 1 + (s0 - 1) * k, x: (sx - fx) * k, y: my, transformOrigin: `${fx}px ${oy}px` }, { scale: 1 + (s1 - 1) * k, x: (sx - fx + dx) * k, y: fg ? 0 : (sy - fy + dy) * k, duration: t1 - t0, ease }, t0);
+  });
+}
+function loop(el, vars, t0, t1, period, ease = "sine.inOut") { const n = Math.max(1, Math.round((t1 - t0) / period)); tl.to(el, { ...vars, duration: period, ease, yoyo: true, repeat: n - 1 }, t0); }
+
+/* ---- lettering ---- */
+const lettered = (txt, size, o = {}) => `<div class="lt" style="font-size:${size}px;color:${o.color || "#5a3b2b"};${o.style || ""}">${txt}</div>`;
+function reveal(sel, t, d = 0.9) { tl.fromTo(sel, { clipPath: "inset(0 100% 0 0)", opacity: 1 }, { clipPath: "inset(0 -2% 0 0)", duration: d, ease: "power1.inOut" }, t); }
+
+/* ---- the bird's small actions ---- */
+function crowRig(pg) {
+  const c = pg.cid, g = (s) => $(c + "-" + s);
+  const r = { head: g("head"), body: g("body"), wing: g("wing"), tail: g("tail"), lb: g("lb"), lid: g("lid"), pup: g("pup"), shut: g("shut"), sweat: g("sweat"), brow: g("brow"), legs: g("legs"), all: g("all"), a: pg.a };
+  gsap.set(r.head, { svgOrigin: "215 205" }); gsap.set(r.wing, { svgOrigin: "195 215" }); gsap.set(r.tail, { svgOrigin: "92 285" });
+  gsap.set(r.lb, { svgOrigin: "318 186" }); gsap.set(r.lid, { svgOrigin: "280 118", scaleY: 0 }); gsap.set(r.body, { svgOrigin: "170 345" });
+  gsap.set(r.pup, { svgOrigin: "284 142" }); gsap.set(r.brow, { svgOrigin: "280 118" });
+  return r;
+}
+const blink = (r, t) => { tl.to(r.lid, { scaleY: 1, duration: 0.07, ease: "power1.in" }, t).to(r.lid, { scaleY: 0, duration: 0.12, ease: "power1.out" }, t + 0.1); };
+const flap = (r, t, n, per = 0.26, up = -52) => { for (let i = 0; i < n; i++) { tl.to(r.wing, { rotation: up, duration: per * 0.45, ease: "power2.out" }, t + i * per).to(r.wing, { rotation: 8, duration: per * 0.55, ease: "power2.in" }, t + i * per + per * 0.45); } tl.to(r.wing, { rotation: 0, duration: 0.3, ease: "power2.out" }, t + n * per); };
+const headTo = (r, t, d, p, ease = "power2.inOut") => { tl.to(r.head, { rotation: p.rot, x: p.hx, y: p.hy, duration: d, ease }, t); tl.to(r.a, { x: p.bx / SC, y: (p.by || 0) / SC, duration: d, ease }, t); };
+let sparkN = 0;
+const spark = (parent, x, y, s, t, col = "#fff6c8") => { // four-point glint
+  const id = "sp" + (sparkN++);
+  parent.insertAdjacentHTML("beforeend", `<g id="${id}" opacity="0" style="transform-origin:${x}px ${y}px"><path d="M${x} ${y - s}Q${x + s * 0.14} ${y - s * 0.14} ${x + s} ${y}Q${x + s * 0.14} ${y + s * 0.14} ${x} ${y + s}Q${x - s * 0.14} ${y + s * 0.14} ${x - s} ${y}Q${x - s * 0.14} ${y - s * 0.14} ${x} ${y - s}Z" fill="${col}" stroke="#d9a73a" stroke-width="2"/></g>`);
+  tl.fromTo("#" + id, { opacity: 0, scale: 0.2, rotation: -30 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.28, ease: "back.out(2)" }, t).to("#" + id, { opacity: 0, scale: 0.4, duration: 0.35, ease: "power1.in" }, t + 0.5);
+};
+function motes(pg, n, col, t0, t1, seed) {
+  const q = rng(seed), s = $(pg.key + "dust"); let h = "";
+  for (let i = 0; i < n; i++) h += `<circle id="${pg.key}m${i}" cx="${f1(120 + q() * 840)}" cy="${f1(500 + q() * 1100)}" r="${f1(3 + q() * 5)}" fill="${col}" fill-opacity="${f1(0.35 + q() * 0.4)}"/>`;
+  s.innerHTML = h;
+  for (let i = 0; i < n; i++) { tl.to(`#${pg.key}m${i}`, { y: -(90 + q() * 160), x: (q() - 0.5) * 120, duration: t1 - t0, ease: "none" }, t0); }
+}
+function drift(sel, dx, t0, t1) { tl.fromTo(sel, { x: -dx }, { x: dx, duration: t1 - t0, ease: "none" }, t0); }
+
+/* ================= pages ================= */
+const b1 = lineStart(1), b2 = lineStart(2);
+const heads = {
+  A: `<div class="ttl">${lettered("A Title", 150, { style: "top:132px" })}${lettered("and the title", 98, { style: "top:292px;font-style:italic" })}${lettered("a short subtitle line", 50, { style: "top:424px;font-style:italic;color:#8a5a3c;font-weight:600" })}</div>`,
+  B: lettered("A page title", 110, { style: "top:150px;font-style:italic" }),
+  C: `<div class="ttl">${lettered("The moral of", 124, { color: "#fff1d2", style: "top:132px;font-style:italic;text-shadow:0 3px 16px rgba(60,20,50,.55)" })}${lettered("the story.", 124, { color: "#fff1d2", style: "top:272px;font-style:italic;text-shadow:0 3px 16px rgba(60,20,50,.55)" })}</div>`
+};
+const PA = buildPage("A", "A", { z: 0, heading: heads.A, tint: "#b0703c" });
+const PB = buildPage("B", "C", { z: 1, heading: heads.B, tint: "#a8774a" });
+const PC = buildPage("C", "E", { z: 2, heading: heads.C, tint: "#7a5c86" });
+const pages = [PA, PB, PC];
+
+/* --- page flips: the old page turns on its left edge, the next is already there --- */
+[b1, b2].forEach((b, i) => {
+  const old = pages[i], nxt = pages[i + 1], t0 = b - 0.5, d = 0.8;
+  tl.set(old.el, { transformOrigin: "0% 50%" }, 0);
+  tl.fromTo(old.el, { rotationY: 0 }, { rotationY: -104, duration: d, ease: "power2.inOut" }, t0);
+  tl.fromTo(old.el.querySelector(".shade"), { opacity: 0 }, { opacity: 0.7, duration: d * 0.8, ease: "power1.in" }, t0 + d * 0.15);
+  tl.fromTo(nxt.el.querySelector(".cast"), { opacity: 0.85 }, { opacity: 0, duration: d * 1.05, ease: "power1.out" }, t0);
+  tl.fromTo(nxt.el, { scale: 1.035 }, { scale: 1, duration: d + 0.2, ease: "power2.out", transformOrigin: "50% 50%" }, t0);
+  tl.set(old.el, { visibility: "hidden" }, t0 + d + 0.02);
+});
+
+/* ---------- PAGE A: the establishing page (title brushes in, the bird glides in and lands) ---------- */
+(() => {
+  const r = crowRig(PA);
+  camera(PA, 0, b1, 1.22, 1.34, 600, 1120, 560, 1000, 0, -10);
+  reveal("#Ahd .lt:nth-child(1)", 0.05, 0.8); reveal("#Ahd .lt:nth-child(2)", 0.35, 0.8); reveal("#Ahd .lt:nth-child(3)", 0.8, 0.6);
+  tl.fromTo(r.a, { x: -330 / SC, y: -300 / SC, rotation: -10 }, { x: 0, y: 0, rotation: 0, duration: 1.7, ease: "power2.out" }, 0);
+  flap(r, 0, 6, 0.27, -58);
+  tl.to(r.body, { scaleY: 0.93, duration: 0.14, yoyo: true, repeat: 1, ease: "power1.out" }, 1.65);
+  tl.to(r.tail, { rotation: -10, duration: 0.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 1.7);
+  tl.to(r.head, { rotation: 5, y: 6, duration: 0.8, ease: "sine.inOut" }, 1.9);
+  [2.7, 5.1].forEach((t) => blink(r, t));
+  headTo(r, 2.4, 0.5, POSE.look); tl.to(r.pup, { x: 5, duration: 0.3 }, 2.5); tl.to(r.brow, { y: -6, duration: 0.2 }, 2.6);
+  spark(PA.air, 800, 1100, 34, 3.0); spark(PA.air, 880, 1130, 22, 3.3);
+  loop($("As-sun"), { scale: 1.05 }, 0, b1, 1.6); loop($("As-rays"), { rotation: 6 }, 0, b1, 2.4);
+  drift("#A0 .cloud", 36, 0, b1); loop(PA.layers[3].querySelector("[id$=-t1]"), { rotation: 3 }, 0, b1, 1.4); loop(PA.layers[3].querySelector("[id$=-t2]"), { rotation: -3 }, 0, b1, 1.7);
+  loop(r.tail, { rotation: -5 }, 3.6, b1, 0.7); motes(PA, 12, "#fff4c0", 0, b1 + 0.5, 3);
+  PA.layers[0].querySelector("svg").insertAdjacentHTML("beforeend", `<g id="Abirds" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" filter="url(#ink)"><path d="M120 560q22 -22 44 0q22 -22 44 0"/><path d="M230 520q16 -16 32 0q16 -16 32 0"/></g>`);
+  tl.fromTo("#Abirds", { x: 0, y: 150 }, { x: 260, y: 90, duration: b1, ease: "none" }, 0);
+})();
+
+/* ---------- PAGE B: the action page (head tilt, an idea glint, a hand-lettered sound word) ---------- */
+(() => {
+  const r = crowRig(PB), t = b1;
+  camera(PB, t - 0.5, b2, 1.42, 1.75, 600, 1010, 600, 900, 30, 10);
+  reveal("#Bhd .lt", t - 0.1, 0.9);
+  headTo(r, t + 0.6, 0.6, POSE.tilt); blink(r, t + 1.2);
+  spark(PB.air, 560, 880, 36, t + 1.6); spark(PB.air, 640, 840, 22, t + 1.9);
+  PB.air.insertAdjacentHTML("beforeend", `<text id="Bplop" x="660" y="900" font-family="Playfair Display, Georgia, serif" font-style="italic" font-weight="800" font-size="62" fill="#2f6f7c" opacity="0" filter="url(#letter)">plop!</text>`);
+  tl.fromTo("#Bplop", { opacity: 0, y: 20, scale: 0.6, transformOrigin: "660px 900px" }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2)" }, t + 2.2).to("#Bplop", { opacity: 0, y: -50, duration: 0.8, ease: "power1.in" }, t + 2.9);
+  loop($("Bs-sun"), { scale: 1.05 }, t - 0.5, b2, 1.8); drift("#B0 .cloud", 30, t - 0.5, b2); loop(r.tail, { rotation: -5 }, t, b2, 0.8);
+  [t + 0.4, t + 3.2].forEach((tt) => blink(r, tt)); motes(PB, 10, "#fff4c0", t - 0.5, b2 + 0.5, 4);
+})();
+
+/* ---------- PAGE C: the closing page (night, moon, moral lettering) ---------- */
+(() => {
+  const r = crowRig(PC), t = b2;
+  camera(PC, t - 0.5, DUR + 1, 1.16, 1.3, 540, 1080, 540, 1000, 0, -10);
+  reveal("#Chd .lt:nth-child(1)", t, 0.9); reveal("#Chd .lt:nth-child(2)", t + 0.5, 0.9);
+  blink(r, t + 1.2); blink(r, t + 4.2); loop(r.tail, { rotation: -4 }, t, DUR + 1, 0.9);
+  spark(PC.air, 790, 1000, 30, t + 1.5); spark(PC.air, 300, 900, 22, t + 2.2);
+  motes(PC, 14, "#fff1d2", t - 0.5, DUR + 1, 5); loop($("Cs-sun"), { scale: 1.04 }, t, DUR + 1, 2.2);
+})();
+
+/* ---- the caption strip: a torn paper label with washi tape; words sit on it, same place all video ---- */
+(() => {
+  const q = rng(8), top = [], bot = []; for (let i = 0; i <= 16; i++) { top.push(`${f1(i * 62.5)},${f1(6 + q() * 9)}`); bot.push(`${f1(1000 - i * 62.5)},${f1(186 - q() * 9)}`); }
+  $("strip").innerHTML = `<svg width="1000" height="200" viewBox="0 0 1000 200" style="overflow:visible"><polygon points="${top.join(" ")} ${bot.join(" ")}" fill="#fbf3df" stroke="#c9a77c" stroke-width="3" stroke-linejoin="round"/><rect x="-24" y="-8" width="132" height="44" rx="4" transform="rotate(-12 40 14)" fill="#e3a84a" fill-opacity=".62"/><rect x="892" y="162" width="132" height="44" rx="4" transform="rotate(-10 958 184)" fill="#b8643a" fill-opacity=".55"/></svg>`;
+  vfrey.captions("#captions", { style: "color", font: '"Playfair Display", Georgia, serif', size: 66, color: "#4a3326", highlight: "#b04a2c", maxWords: 5, maxChars: 30, align: "center" });
+})();
+
+</script>
+</body>
+</html>
