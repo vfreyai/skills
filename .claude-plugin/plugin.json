@@ -1,6 +1,6 @@
 {
   "name": "vfrey",
-  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine.",
+  "description": "Make short videos and research social media by asking your coding agent. The vfrey skill: scripts, scenes, captions, voice, music and renders on your own machine. Includes 20 video styles, each also installable on its own.",
   "version": "1.0.0-beta.3",
   "author": {
     "name": "vfrey",
