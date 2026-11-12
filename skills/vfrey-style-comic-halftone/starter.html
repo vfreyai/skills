@@ -1,0 +1,93 @@
+<!doctype html>
+<!-- starter.html for vfrey-style-comic-halftone: two comic pages (a hero with a burst, a label box, a sound effect, a dial; then an impact with a counter). Copy to scenes/<idea>/index.html with comic.js; replace the hero, labels, numbers and cues. -->
+<html lang="en"><head><meta charset="UTF-8" /><link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<script src="comic.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #F4E7C5; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #F4E7C5; font-family: "Titan One", "Baloo 2", sans-serif; }
+  .cam { position: absolute; inset: 0; }
+  .panel { position: absolute; }
+  .panel > svg { position: absolute; overflow: visible; }
+  svg text { font-family: "Titan One", "Baloo 2", sans-serif; }
+  svg text.bl { font-family: "Baloo 2", "Arial Black", sans-serif; font-weight: 800; }
+  /* the plate follows vfrey's caption band: the same place all film long */
+  #capplate { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-left); top: var(--vf-caption-at); height: var(--vf-caption-h); background: #FFD11A; border: 9px solid #16111C; box-shadow: 13px 13px 0 #16111C; z-index: 49; transform: rotate(-0.5deg);
+    background-image: radial-gradient(#E8272F 22%, transparent 24%); background-size: 22px 22px; box-sizing: border-box; }
+  #capplate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #FFD11A 25%, rgba(255,209,26,.35) 60%, #FFD11A 100%); }
+  #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-left); top: var(--vf-caption-at); height: var(--vf-caption-h); z-index: 50; text-transform: uppercase; }
+  #captions.vf-captions { justify-content: center !important; }
+  #paper { position: absolute; inset: 0; z-index: 60; pointer-events: none; mix-blend-mode: multiply; background-size: 256px 256px; opacity: .25; }  /* .4 made a 12.6 Mbps file */
+  #dots { position: absolute; inset: 0; z-index: 61; pointer-events: none; mix-blend-mode: multiply; opacity: .06; background-image: radial-gradient(#16111C 28%, transparent 31%); background-size: 9px 9px; }
+  #flash { position: absolute; inset: 0; background: #FFFBEF; opacity: 0; z-index: 70; pointer-events: none; }
+  #fontwarm { position: absolute; left: -999px; top: 0; font-family: "Titan One"; }
+</style>
+<div id="root" data-composition-id="main" data-start="0"></div>
+
+<script>
+const tl = vfrey.timeline();
+const LNS = vfrey.timing.lines, LS = (i) => LNS[Math.min(i, LNS.length - 1)].start;      // cue pages to script lines (anchors([...]) finds words by text, see helpers.md)
+const T = { intro: LS(0) + 0.5, p2: Math.max(3, LS(1) - 0.12), beat: Math.max(3.4, LS(1) + 0.5), p3: Math.max(6, LS(2) - 0.12) };
+const GRN = "#2FBF62";
+let html = defs("#127A3E");
+const A = ROW_A, B = ROW_B, half = (B.w - 24) / 2;
+
+// an original hero built from rounded shapes with P(): body, two eye stalks, big eyes, a grin, four legs
+const hero = () => `<g>` +
+  [-120, -50, 40, 110].map((x) => LN(`M${x} 90 L${x - 10} 170`, 20, "#1F9A4C")).join("") +
+  LN("M-70 -90 L-90 -190", 16, GRN) + LN("M30 -100 L60 -200", 16, GRN) +
+  P(E(0, 0, 190, 125), GRN, { sw: 8, shade: "dkH", sr: [-190, 10, 380, 120] }) +
+  P(E(-92, -205, 46, 46), WH, { sw: 7 }) + P(E(66, -215, 46, 46), WH, { sw: 7 }) +
+  `<circle cx="-80" cy="-200" r="17" fill="${INK}"/><circle cx="78" cy="-210" r="17" fill="${INK}"/>` +
+  LN("M-70 20 Q10 80 90 15", 11, WH) + `</g>`;
+
+// PAGE 1: one big panel A (ground + dot-gradient sky, hero, a burst with a number, a label box, a sound effect), two small panels B
+html += panel("a1", A.x, A.y, A.w, A.h, [[0, 0], [1, 0], [1, 1], [0, 0.985]],
+  `<rect width="${A.w}" height="${A.h}" fill="${CY}"/><path d="${ht(A.w, A.h, 26, 0.5, 15, (x, y) => (y / A.h - 0.18) * 1.5)}" fill="${BL}"/>` +
+  `<rect y="${A.h * 0.82}" width="${A.w}" height="${A.h * 0.18}" fill="${YEL}"/><path d="${ht(A.w, A.h * 0.18, 18, 0.3, 10, () => 0.6)}" transform="translate(0 ${A.h * 0.82})" fill="${ORG}"/>` +
+  `<g id="hero1w"><g transform="translate(${A.w * 0.46} ${A.h * 0.6}) scale(1.35)">${hero()}</g></g>` +
+  `<g id="burst1"><g transform="translate(${A.w * 0.76} ${A.h * 0.2})">${burst(0, 0, 215)}<text x="0" y="40" text-anchor="middle" font-size="120" fill="${RED}" stroke="${INK}" stroke-width="20" paint-order="stroke" transform="rotate(-6)">50</text></g></g>` +
+  box("PLACEHOLDER LABEL!", 60, 80, 560, 100, 58, YEL, INK, "title1", -4) + sfx("ZIP!", A.w * 0.24, A.h * 0.36, 160, -10, RED, "zip1"), { z: 12 });
+html += panel("b1a", B.x, B.y, half, B.h, [[0, 0.07], [1, 0], [1, 1], [0, 1]], `<rect width="${half}" height="${B.h}" fill="${YEL}"/>` + speedRadial(half / 2, B.h / 2, 110, 380, 28, INK, 0.2, 0.03) +
+  `<g transform="translate(${half / 2} ${B.h / 2})">${P(E(0, 0, 110, 110), WH, { sw: 8 })}<circle cx="16" cy="6" r="48" fill="${INK}"/><circle cx="34" cy="-12" r="14" fill="${WH}"/></g>`, { z: 12 });
+const dr = Math.min(150, B.h / 2 - 24);
+html += panel("b1b", B.x + half + 24, B.y, half, B.h, [[0, 0], [1, 0.07], [1, 1], [0, 1]], `<rect width="${half}" height="${B.h}" fill="${NAVY}"/>` + dial("needle1", half / 2, B.h / 2 + 10, dr, 150, 390, 10, 0.72), { z: 12 });
+
+// PAGE 2: a red-and-yellow impact panel A with a big burst and lettering, and a number panel B
+html += panel("a2", A.x, A.y, A.w, A.h, [[0, 0.015], [1, 0], [1, 1], [0, 1]],
+  `<rect width="${A.w}" height="${A.h}" fill="${RED}"/>` + speedRadial(A.w * 0.55, A.h * 0.5, 80, 1500, 46, INK, 0.1, 0.035) +
+  `<g id="sk-hit"><g id="hero2w"><g transform="translate(${A.w * 0.34} ${A.h * 0.6}) scale(1.1)">${hero()}</g></g>` +
+  `<g id="burst2"><g transform="translate(${A.w * 0.7} ${A.h * 0.42})">${burst(0, 0, 260, YEL, ORG, 15)}</g></g></g>` +
+  sfx("KRAK!", A.w * 0.5, A.h * 0.2, 220, -8, YEL, "krak2"), { z: 12 });
+html += panel("b2a", B.x, B.y, B.w, B.h, [[0, 0.05], [1, 0], [1, 1], [0, 1]], `<rect width="${B.w}" height="${B.h}" fill="${ORG}"/><path d="${ht(B.w, B.h, 20, 0.5, 11, (x, y) => 0.5 + 0.5 * Math.sin(x / 140))}" fill="${RED}"/>` +
+  `<text id="num2" x="${B.w * 0.3}" y="${B.h * 0.62}" text-anchor="middle" font-size="190" fill="${YEL}" stroke="${INK}" stroke-width="22" paint-order="stroke">0</text>` + box("TIMES PLACEHOLDER", B.w * 0.57, B.h * 0.3, 400, 84, 40, WH, INK, "lab2", -2), { z: 12 });
+
+$("#root").innerHTML = shell(html);
+setupPage();                                                         // paper grain on, vfrey captions on the plate
+const PG = [{ t: 0, ids: ["a1", "b1a", "b1b"] }, { t: T.p2, ids: ["a2", "b2a"] }];   // a page change starts 0.1 s before its word
+slam(PG, { a1: "t", b1a: "l", b1b: "r", a2: "l", b2a: "b" });
+
+// page 1 choreography: popped elements appear on their words, the burst breathes, the hero bobs
+["burst1", "zip1", "title1", "burst2", "krak2", "lab2"].forEach(hide);
+pop("#title1", 0.15, { at: [340, 130] });
+pop("#zip1", T.intro, { at: [A.w * 0.24, A.h * 0.36], d: 0.3 });
+pop("#burst1", T.intro + 0.35, { at: [A.w * 0.76, A.h * 0.2], d: 0.4 });
+tl.fromTo("#burst1", { rotation: -4 }, { rotation: 3, duration: 2.6, ease: "sine.inOut", svgOrigin: `${A.w * 0.76} ${A.h * 0.2}` }, T.intro + 0.4);
+push("a1", 0, T.p2, 1.0, 1.06, A.w / 2, A.h * 0.6);
+const nd = { a: -190 }; tl.to(nd, { a: 6, duration: 0.45, ease: "power4.out" }, T.intro + 0.6);
+ambient.push((t) => { const j = t > T.intro + 1.05 && t < T.intro + 4 ? Math.sin(t * 60) * 1.8 : 0; $("#needle1").setAttribute("transform", `rotate(${f1(nd.a + j)} ${half / 2} ${B.h / 2 + 10})`); });
+
+// page 2: an impact (flash, shake, hit-stop shove, lettering pop), a counter that ends on a number you can cite
+flash(T.beat, 1, 0.22);
+shake("#sk-a2", T.beat + 0.06, 20, 9, 0.5);
+tl.to("#hero2w", { x: -50, duration: 0.14, ease: "power2.out" }, T.beat); tl.to("#hero2w", { x: 0, duration: 0.7, ease: "power2.inOut" }, T.beat + 0.5);
+pop("#burst2", T.beat, { at: [A.w * 0.7, A.h * 0.42], d: 0.4 });
+pop("#krak2", T.beat + 0.02, { at: [A.w * 0.5, A.h * 0.2], d: 0.3 });
+pop("#lab2", T.beat + 0.5, { at: [B.w * 0.77, B.h * 0.42], d: 0.3 });
+const g = { v: 0 }; tl.fromTo(g, { v: 0 }, { v: 1000, duration: 0.9, ease: "power3.out" }, T.beat + 0.1);
+ambient.push((t) => { $("#num2").textContent = Math.round(g.v).toLocaleString("en-US"); });
+push("a2", T.p2, DUR, 1.0, 1.05, A.w / 2, A.h / 2);
+ticker();
+</script>
+</body></html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<!-- 2D flat starter: three acts (hook with a character, a live chart, a payoff), shape-wipe seams, caption plate. 1080x1920.
+     Replace every PLACEHOLDER: the numbers (INPUTS), the labels, the value object, the palette hues. Keep the structure and the numbers in the recipe.
+     Sample script (any script works: words are looked up by text and fall back to even thirds): "Most of the planet is water. Seventy-one percent is ocean. Only twenty-nine percent is land. Look at the globe again." -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #16213E; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Baloo 2", "Arial Black", sans-serif; }
+  .scene, .tr { position: absolute; inset: 0; overflow: hidden; }
+  .cam { position: absolute; inset: 0; transform-origin: 50% 60%; }
+  svg.layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+  svg text { font-family: "Baloo 2", "Arial Black", sans-serif; font-weight: 800; text-anchor: middle; }
+  svg text.mono { font-family: "JetBrains Mono", monospace; font-weight: 700; }
+  svg text.st { text-anchor: start; }
+  #capplate { position: absolute; left: var(--vf-safe-left, 36px); right: var(--vf-safe-left, 36px); top: var(--vf-caption-at, 1322px); height: var(--vf-caption-h, 214px); background: #16213E; border-radius: 48px; z-index: 49; box-shadow: 0 10px 0 rgba(0,0,0,.12); }
+  #captions { position: absolute; left: var(--vf-safe-left, 36px); right: var(--vf-safe-left, 36px); top: var(--vf-caption-at, 1322px); height: var(--vf-caption-h, 214px); z-index: 50; }
+  #captions.vf-captions { justify-content: center !important; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0"></div>
+<script>
+"use strict";
+const tl = vfrey.timeline();
+const C = { cream: "#FFF3DC", cream2: "#F6DFB4", navy: "#16213E", teal: "#18B7A4", tealD: "#0C7A70", coral: "#FF6A4D", coralD: "#C9442C",
+  gold: "#FFC233", goldD: "#E39B12", skinA: "#8D5A3B", skinB: "#F1B58A", white: "#FFFFFF" };
+/* PLACEHOLDER content: swap for the topic. Charts are computed from these inputs, never typed in. */
+const INPUTS = { aName: "WATER", aVal: 71, bName: "LAND", bVal: 29, unit: "%", headline: "SHARE OF EARTH'S SURFACE", chip: "ROUGH ESTIMATE" };
+
+const WD = vfrey.timing.words, DUR = vfrey.timing.durationSec;
+const $ = (s) => document.querySelector(s), lerp = (a, b, u) => a + (b - a) * u;
+const norm = (t) => t.toLowerCase().replace(/[^a-z0-9-]/g, "");
+// a spoken word's start by its text (never by index); a missing word falls back to a share of the film, so the starter renders for any script
+const at = (word, share, from = 0) => { for (let i = from; i < WD.length; i++) if (norm(WD[i].text) === word) return WD[i].start; return DUR * share; };
+const ambient = [];
+const VB = 1920 / vfrey.frame.height, CAP_TOP = vfrey.captionBox.top * VB;
+const GROUND_Y = vfrey.captionBox.position === "bottom" ? CAP_TOP - 30 : 1290;
+
+const DEFS = `<svg width="0" height="0" style="position:absolute"><defs>
+ <pattern id="floorPat" width="120" height="70" patternUnits="userSpaceOnUse"><rect y="64" width="120" height="6" fill="#000" opacity=".07"/><circle cx="30" cy="30" r="4" fill="#000" opacity=".08"/><circle cx="90" cy="10" r="4" fill="#000" opacity=".08"/></pattern>
+ <pattern id="dotPat" width="26" height="26" patternUnits="userSpaceOnUse"><circle cx="13" cy="13" r="3.2" fill="#fff" opacity=".35"/></pattern>
+ <pattern id="stripePat" width="40" height="26" patternUnits="userSpaceOnUse"><rect y="22" width="40" height="4" fill="#000" opacity=".16"/></pattern>
+</defs></svg>`;
+const cloud = (id, x, y, s = 1) => `<g id="${id}" opacity=".95"><g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="90" ry="38" fill="#fff"/><circle cx="-30" cy="-26" r="40" fill="#fff"/><circle cx="26" cy="-34" r="48" fill="#fff"/></g></g>`;
+const stack = (id, x, yb, n, sc = 1) => `<g id="${id}"><g transform="translate(${x} ${yb}) scale(${sc})">${Array.from({ length: n }, (_, i) => `<path d="M-84,${-i * 24} a84,24 0 0 0 168,0 v24 a84,24 0 0 1 -168,0z" fill="${C.goldD}"/><ellipse cx="0" cy="${-i * 24}" rx="84" ry="24" fill="${C.gold}"/>`).join("")}</g></g>`;
+const scene = (id, bg, bgSvg, fgSvg) => `<div class="scene" id="${id}" style="background:${bg}"><div class="cam" id="${id}c"><svg class="layer" id="${id}b" viewBox="0 0 1080 1920">${bgSvg}</svg><svg class="layer" id="${id}f" viewBox="0 0 1080 1920">${fgSvg}</svg></div></div>`;
+const trDiv = (id, col) => `<div class="tr" id="${id}" style="background:${col}"></div>`;
+const floor = (k, y, col) => `<rect x="-20" y="${y}" width="1120" height="${1960 - y}" fill="${col}"/><rect x="-20" y="${y}" width="1120" height="${1960 - y}" fill="url(#floorPat)"/><rect x="-20" y="${y}" width="1120" height="10" fill="${C.navy}" opacity=".14"/>
+  ${stack(k + "-dl", 120, 1800, 5, 1)}${stack(k + "-dr", 960, 1740, 3, 0.9)}`;
+const decoIn = (k, t) => { tl.from(`#${k}-dl`, { y: 420, duration: 0.7, ease: "back.out(1.4)" }, t); tl.from(`#${k}-dr`, { y: 420, duration: 0.7, ease: "back.out(1.4)" }, t + 0.12); };
+
+/* ---------- characters: feet at (0,0), about 450 tall, posed by a ticker ---------- */
+const chars = [];
+function person(id, o) {
+  const hairBack = o.long ? `<rect x="-74" y="-408" width="148" height="125" rx="62" fill="${o.hair}"/>` : "";
+  const bun = o.long ? `<circle cx="0" cy="-426" r="32" fill="${o.hair}"/>` : "";
+  const glasses = o.glasses ? `<g fill="none" stroke="${C.navy}" stroke-width="6"><circle cx="-26" cy="-342" r="21"/><circle cx="26" cy="-342" r="21"/><path d="M-5,-342 h10"/></g>` : "";
+  const fringe = o.long ? `<path d="M-68,-345 C-66,-418 66,-418 68,-345 C46,-386 -4,-396 -68,-345Z" fill="${o.hair}"/>` : `<path d="M-68,-338 C-72,-428 72,-428 68,-338 C42,-372 -10,-380 -68,-338Z" fill="${o.hair}"/>`;
+  chars.push({ id, seed: o.seed, pose: { aL: 6, aR: 6, hop: 0, smile: 1 }, arm: `<rect x="-21" y="-14" width="42" height="130" rx="21" fill="${o.shirt}"/><circle cx="0" cy="124" r="25" fill="${o.skin}"/>` });
+  return `<g id="${id}"><ellipse cx="0" cy="8" rx="120" ry="16" fill="#000" opacity=".13"/><g id="${id}-body">
+    <rect x="-52" y="-124" width="44" height="118" rx="14" fill="${C.navy}"/><rect x="8" y="-124" width="44" height="118" rx="14" fill="${C.navy}"/>
+    <rect x="-66" y="-22" width="62" height="26" rx="13" fill="#fff"/><rect x="4" y="-22" width="62" height="26" rx="13" fill="#fff"/>
+    <g id="${id}-aL"></g><g id="${id}-aR"></g>
+    <rect x="-80" y="-292" width="160" height="196" rx="52" fill="${o.shirt}"/><rect x="-80" y="-222" width="160" height="24" fill="${o.shirtD}"/>
+    <rect x="-18" y="-312" width="36" height="40" rx="12" fill="${o.skin}"/>
+    <g id="${id}-head">${hairBack}<circle cx="0" cy="-348" r="66" fill="${o.skin}"/>${fringe}${bun}
+     <circle cx="-42" cy="-322" r="11" fill="${C.coral}" opacity=".35"/><circle cx="42" cy="-322" r="11" fill="${C.coral}" opacity=".35"/>
+     <g id="${id}-eyes"><circle cx="-26" cy="-342" r="8.5" fill="${C.navy}"/><circle cx="26" cy="-342" r="8.5" fill="${C.navy}"/></g>${glasses}
+     <path id="${id}-mouth" d="M-18,-318 Q0,-300 18,-318" fill="none" stroke="${C.navy}" stroke-width="6" stroke-linecap="round"/></g></g></g>`;
+}
+function initChars() {
+  chars.forEach((c) => { for (const k of ["aL", "aR"]) { $(`#${c.id}-${k}`).innerHTML = `<g class="arm">${c.arm}</g>`; c[k] = $(`#${c.id}-${k} .arm`); }
+    for (const k of ["head", "eyes", "body", "mouth"]) c[k] = $(`#${c.id}-${k}`); });
+  ambient.push((t) => chars.forEach((c) => { const p = c.pose, sd = c.seed;
+    c.body.setAttribute("transform", `translate(0 ${-p.hop})`);
+    c.aL.setAttribute("transform", `translate(-78 -262) rotate(${p.aL + Math.sin(t * 2.1 + sd) * 2.5})`);
+    c.aR.setAttribute("transform", `translate(78 -262) rotate(${-(p.aR + Math.sin(t * 2.1 + sd + 1.6) * 2.5)})`);
+    c.head.setAttribute("transform", `translate(0 ${Math.sin(t * 2.6 + sd) * 2.6}) rotate(${Math.sin(t * 1.3 + sd) * 1.2} 0 -300)`);
+    c.eyes.setAttribute("transform", `translate(0 -342) scale(1 ${((t + sd * 0.37) % 3.4) < 0.13 ? 0.1 : 1}) translate(0 342)`);
+    c.mouth.setAttribute("d", `M-18,-318 Q0,${-318 + 20 * p.smile} 18,-318`); }));
+}
+const place = (id, x, y, s) => gsap.set("#" + id, { x, y, scale: s, svgOrigin: "0 0" });
+const pose = (id) => chars.find((c) => c.id === id).pose;
+const HERO = { shirt: C.teal, shirtD: C.tealD, skin: C.skinA, hair: "#2B1B17", long: true, seed: 0.4 };
+const PAL = { shirt: C.coral, shirtD: C.coralD, skin: C.skinB, hair: "#3A2A5B", glasses: true, seed: 2.1 };
+
+/* ---------- the three acts ---------- */
+const root = $("#root");
+// act 0: hook. cream ground, pale spotlight circle, two hills, hero and a pal, big value badge
+const badge = (id, x, y, r, big, small) => `<g id="${id}"><g transform="translate(${x} ${y})"><circle r="${r}" fill="${C.gold}" stroke="${C.navy}" stroke-width="9"/><text y="${r * 0.14}" font-size="${r * 0.78}" fill="${C.navy}">${big}</text><text y="${r * 0.52}" font-size="${r * 0.26}" fill="${C.navy}">${small}</text></g></g>`;
+const s0bg = `<circle cx="540" cy="760" r="480" fill="${C.cream2}"/><ellipse cx="190" cy="1330" rx="560" ry="170" fill="${C.tealD}"/><ellipse cx="920" cy="1340" rx="560" ry="150" fill="${C.teal}"/>
+  <g id="s0-sh1"><circle cx="150" cy="600" r="22" fill="${C.coral}"/></g><g id="s0-sh2"><rect x="880" y="900" width="46" height="46" rx="10" fill="${C.teal}" transform="rotate(20 903 923)"/></g>${cloud("s0-cl1", 170, 330)}${cloud("s0-cl2", 900, 760, 0.7)}`;
+const s0fg = `${floor("s0", GROUND_Y, C.cream2)}${person("hero", HERO)}${person("pal", PAL)}${badge("s0-badge", 200, 250, 150, INPUTS.aVal + INPUTS.unit, "OF EARTH")}`;
+// act 1: chart. teal ground, headline chip, two bars redrawn from state, name chips under the baseline above the plate
+const BASE = Math.min(GROUND_Y - 100, 1190), TOP = 520, MAXV = Math.max(INPUTS.aVal, INPUTS.bVal) * 1.15, K = MAXV / (BASE - TOP);
+const barX = [250, 640], barW = 270;
+const grid = [0.25, 0.5, 0.75, 1].map((f) => { const y = BASE - f * MAXV / K; return `<line x1="90" x2="1000" y1="${y}" y2="${y}" stroke="#fff" stroke-opacity=".25" stroke-width="4"/><text class="mono st" x="90" y="${y - 12}" font-size="30" fill="#fff" opacity=".7">${Math.round(f * MAXV)}${INPUTS.unit}</text>`; }).join("");
+const s1bg = `<rect width="1080" height="1920" fill="url(#dotPat)"/><circle cx="880" cy="800" r="330" fill="${C.tealD}" opacity=".55"/>${cloud("s1-cl", 200, 300, 0.9)}`;
+const s1fg = `${floor("s1", GROUND_Y, C.cream2)}
+  <rect x="150" y="215" width="780" height="92" rx="46" fill="${C.navy}"/><text x="540" y="278" font-size="50" fill="${C.cream}">${INPUTS.headline}</text>${grid}
+  <line x1="90" x2="990" y1="${BASE}" y2="${BASE}" stroke="${C.navy}" stroke-width="10" stroke-linecap="round"/>
+  <rect id="barA" x="${barX[0]}" width="${barW}" fill="${C.gold}" stroke="${C.navy}" stroke-width="8"/><rect id="barAs" x="${barX[0]}" width="${barW}" fill="url(#stripePat)"/><text id="valA" x="${barX[0] + barW / 2}" font-size="84" fill="${C.navy}"></text>
+  <rect id="barB" x="${barX[1]}" width="${barW}" fill="${C.coral}" stroke="${C.navy}" stroke-width="8"/><rect id="barBs" x="${barX[1]}" width="${barW}" fill="url(#stripePat)"/><text id="valB" x="${barX[1] + barW / 2}" font-size="84" fill="${C.navy}"></text>
+  <g id="chipA"><rect x="${barX[0] + 10}" y="${BASE + 24}" width="250" height="64" rx="32" fill="${C.navy}"/><text x="${barX[0] + 135}" y="${BASE + 70}" font-size="40" fill="${C.cream}">${INPUTS.aName}</text></g>
+  <g id="chipB"><rect x="${barX[1] + 10}" y="${BASE + 24}" width="250" height="64" rx="32" fill="${C.navy}"/><text x="${barX[1] + 135}" y="${BASE + 70}" font-size="40" fill="${C.cream}">${INPUTS.bName}</text></g>`;
+// act 2: payoff. gold ground, a huge ring, the hero hopping, the number big with an assumption chip
+const s2bg = `<circle cx="540" cy="700" r="520" fill="${C.cream2}" opacity=".8"/><circle cx="540" cy="700" r="370" fill="${C.gold}"/>${cloud("s2-cl", 880, 330, 0.8)}`;
+const s2fg = `${floor("s2", GROUND_Y, C.teal)}<g id="s2-hero">${person("hero2", HERO)}</g>
+  <g id="s2-num"><text x="745" y="700" font-size="250" fill="${C.navy}">${INPUTS.aVal}${INPUTS.unit}</text></g>
+  <g id="s2-chip"><rect x="300" y="220" width="480" height="78" rx="39" fill="${C.navy}"/><text class="mono" x="540" y="272" font-size="34" fill="${C.cream}">${INPUTS.chip}</text></g>`;
+
+root.innerHTML = DEFS + scene("s0", C.cream, s0bg, s0fg) + trDiv("t1", C.navy) + scene("s1", C.teal, s1bg, s1fg) + trDiv("t2", C.navy) + scene("s2", C.gold, s2bg, s2fg) + `<div id="capplate"></div><div id="captions"></div>`;
+initChars();
+place("hero", 300, GROUND_Y, 1.4); place("pal", 790, GROUND_Y, 1.3); place("hero2", 260, GROUND_Y, 1.45);
+
+/* ---------- timeline: act starts are word times, seams start 0.45 s before the next act ---------- */
+const T1 = at("seventy-one", 0.34), T2 = at("only", 0.68);   // PLACEHOLDER cue words
+const seam = (rim, sc, kind, x, y, t) => { const a = { circle: `circle(0px at ${x}px ${y}px)`, rise: "inset(100% 0% 0% 0% round 80px)", square: "inset(50% 50% 50% 50% round 50%)" }[kind];
+  const b = { circle: `circle(2300px at ${x}px ${y}px)`, rise: "inset(0% 0% 0% 0% round 0px)", square: "inset(0% 0% 0% 0% round 0%)" }[kind];
+  tl.set("#" + rim, { clipPath: a }, 0); tl.set("#" + sc, { clipPath: a }, 0);
+  tl.to("#" + rim, { clipPath: b, duration: 0.6, ease: "power2.inOut" }, t); tl.to("#" + sc, { clipPath: b, duration: 0.6, ease: "power2.inOut" }, t + 0.1); };
+seam("t1", "s1", "circle", 540, 900, T1 - 0.45); seam("t2", "s2", "rise", 540, 1920, T2 - 0.45);
+const cam = (id, s0, s1, x1, t0, dur) => tl.fromTo("#" + id, { scale: s0, x: 0, y: 0 }, { scale: s1, x: x1, y: -10, duration: dur, ease: "power1.inOut" }, t0);
+cam("s0c", 1, 1.08, -14, 0, T1 + 0.2); cam("s1c", 1.02, 1.1, 10, T1 - 0.3, T2 - T1 + 0.3); cam("s2c", 1, 1.08, -10, T2 - 0.3, DUR - T2 + 0.4);
+tl.from("#s0-badge", { scale: 0, svgOrigin: "200 250", duration: 0.5, ease: "back.out(1.8)" }, 0.15);
+tl.from("#hero", { x: -420, duration: 0.7, ease: "back.out(1.3)" }, 0.1); tl.from("#pal", { x: 1500, duration: 0.7, ease: "back.out(1.3)" }, 0.25); decoIn("s0", 0.2);
+tl.to(pose("hero"), { aR: 150, smile: 1.6, duration: 0.3, ease: "back.out(2)" }, 0.9); tl.to(pose("hero"), { aR: 6, duration: 0.4 }, 1.9);
+decoIn("s1", T1 - 0.1);
+const st = { a: 0, b: 0 };
+const draw = () => { for (const [k, v, x] of [["A", st.a, barX[0]], ["B", st.b, barX[1]]]) { const h = v / K;
+  for (const id of ["bar" + k, "bar" + k + "s"]) { $("#" + id).setAttribute("y", BASE - h); $("#" + id).setAttribute("height", Math.max(0, h)); }
+  $("#val" + k).setAttribute("y", BASE - h - 22); $("#val" + k).textContent = Math.round(v) + INPUTS.unit; } };
+draw();
+tl.from("#chipA", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.05); tl.from("#chipB", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.2);
+tl.to(st, { a: INPUTS.aVal, duration: 1.4, ease: "power2.out", onUpdate: draw }, T1 + 0.3);
+tl.to(st, { b: INPUTS.bVal, duration: 1.4, ease: "power2.out", onUpdate: draw }, T1 + 0.6);
+vfrey.onFrame(draw);
+tl.from("#s2-hero", { y: 700, duration: 0.7, ease: "back.out(1.4)" }, T2 + 0.05); decoIn("s2", T2 + 0.1);
+tl.from("#s2-num", { scale: 0, svgOrigin: "745 620", duration: 0.55, ease: "back.out(1.8)" }, T2 + 0.3); tl.from("#s2-chip", { y: -120, opacity: 0, duration: 0.4, ease: "back.out(1.5)" }, T2 + 0.6);
+tl.to(pose("hero2"), { aL: 150, aR: 150, smile: 1.8, hop: 40, duration: 0.3, ease: "power2.out" }, T2 + 0.5); tl.to(pose("hero2"), { hop: 0, duration: 0.45, ease: "bounce.out" }, T2 + 0.8);
+ambient.push((t) => { $("#s0-sh1").setAttribute("transform", `translate(0 ${Math.sin(t * 1.6) * 14})`); $("#s0-sh2").setAttribute("transform", `translate(0 ${Math.sin(t * 1.3 + 1) * 12})`);
+  $("#s0-cl1").setAttribute("transform", `translate(${Math.sin(t * 0.3) * 24} 0)`); $("#s1-cl").setAttribute("transform", `translate(${Math.sin(t * 0.3 + 2) * 24} 0)`); });
+
+/* ---------- captions on the plate ---------- */
+const groups = vfrey.captions("#captions", { style: "box", size: 74, color: "#FFFFFF", highlight: "#FFC233", highlightText: "#16213E", maxWords: 3 });
+tl.set("#capplate", { opacity: 0 }, 0);
+groups.forEach((g, i) => { const prevEnd = i ? groups[i - 1].end : -9, nextStart = i < groups.length - 1 ? groups[i + 1].start : 99;
+  if (g.start - prevEnd > 0.3) tl.fromTo("#capplate", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, Math.max(0, g.start - 0.12));
+  if (nextStart - g.end > 0.3) tl.to("#capplate", { opacity: 0, y: 24, duration: 0.15 }, g.end + 0.02); });
+const clock = { t: 0 };
+tl.to(clock, { t: DUR + 0.3, duration: DUR + 0.3, ease: "none", onUpdate: () => ambient.forEach((f) => f(clock.t)) }, 0);
+vfrey.onFrame((t) => ambient.forEach((f) => f(t)));
+</script>
+</body>
+</html>

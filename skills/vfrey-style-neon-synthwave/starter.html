@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #07011a; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: "Baloo 2", sans-serif; background: #07011a; }
+  #frame { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; overflow: hidden; }
+  #world { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; filter: url(#ca); }
+  #world > svg, #fx, #scan { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  .sc { transform-origin: 540px 900px; }
+  #scan { pointer-events: none; z-index: 20; background: repeating-linear-gradient(0deg, rgba(0,0,0,.20) 0 2px, rgba(0,0,0,0) 2px 5px); mix-blend-mode: multiply; }
+  #vig { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 21; pointer-events: none; background: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 55%, rgba(8,0,26,.62) 100%); }
+  #band { position: absolute; left: -40px; width: 1160px; height: 150px; z-index: 22; pointer-events: none; opacity: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(190,230,255,.13) 45%, rgba(255,255,255,.22) 52%, rgba(255,255,255,0) 100%); mix-blend-mode: screen; }
+  #fx { z-index: 23; pointer-events: none; }
+  .gb { position: absolute; left: 0; width: 1080px; opacity: 0; mix-blend-mode: screen; }
+  #captions { position: absolute; left: 44px; right: 44px; top: 1250px; height: 250px; z-index: 40; }
+  #captions .vf-grp.on { position: relative; padding: 16px 30px 22px; text-align: center; }
+  #captions .vf-grp.on::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(14,2,40,.90), rgba(30,4,66,.90));
+    border: 3px solid #ff2bd6; box-shadow: 0 0 14px #ff2bd6, 0 0 34px rgba(255,43,214,.55), inset 0 0 18px rgba(255,43,214,.35); }
+  #captions .vf-w { color: #fff; font-weight: 800; padding: 0 9px 2px; text-shadow: 0 0 10px rgba(80,230,255,.75), -2px 0 rgba(255,40,120,.55), 2px 0 rgba(40,230,255,.55); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="ca" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+      <feOffset in="r" dx="-3" dy="0" result="ro"/>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+      <feOffset in="b" dx="3" dy="0" result="bo"/>
+      <feBlend in="ro" in2="g" mode="screen" result="rg"/>
+      <feBlend in="rg" in2="bo" mode="screen"/>
+    </filter>
+    <filter id="gl" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0007 0.045" numOctaves="1" seed="3" result="n"/>
+      <feDisplacementMap id="dmap" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feColorMatrix in="d" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+      <feOffset in="r" dx="-9" dy="0" result="ro"/>
+      <feColorMatrix in="d" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+      <feColorMatrix in="d" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+      <feOffset in="b" dx="9" dy="0" result="bo"/>
+      <feBlend in="ro" in2="g" mode="screen" result="rg"/>
+      <feBlend in="rg" in2="bo" mode="screen"/>
+    </filter>
+  </defs>
+</svg>
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="frame">
+    <div id="world"></div>
+    <div id="scan"></div><div id="vig"></div><div id="band"></div><div id="fx"></div>
+    <div id="captions"></div>
+  </div>
+</div>
+<script>
+/* NEON SYNTHWAVE scene: glowing line art that draws on like light tubes, perspective grid, striped sun, VHS glitch cuts. */
+const NS = "http://www.w3.org/2000/svg";
+const S = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+function rng(seed) { let a = seed >>> 0; return () => { a += 0x6D2B79F5; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const tl = vfrey.timeline();
+const LN = i => vfrey.line(i).start;
+const WD = (i, re, nth = 0) => { const rx = new RegExp(re.source, "i"), ws = vfrey.timing.words.filter(w => w.line === i && rx.test(w.text)); return ws.length ? ws[Math.min(nth, ws.length - 1)].start : LN(i); };
+const DUR = vfrey.timing.durationSec;
+document.getElementById("frame").style.transform = `scale(${vfrey.frame.width / 1080})`;
+const world = document.getElementById("world");
+const C = { mag: "#ff2bd6", cya: "#27f0ff", pink: "#ff4f9a", yel: "#ffe14a", pur: "#a66bff", red: "#ff3b5c", ink: "#0b0224", white: "#ffffff" };
+const HY = 1010; /* horizon y */
+const M = [0, LN(1) - 0.16, LN(2) - 0.16]; /* glitch-cut midpoints */
+
+/* ---------- helpers ---------- */
+const glowStr = c => `drop-shadow(0 0 3px ${c}) drop-shadow(0 0 12px ${c}) drop-shadow(0 0 30px ${c}88)`;
+function glowG(par, col) { const g = S("g", {}, par); g.style.filter = glowStr(col); return g; }
+/* a light tube: colored wide stroke + white-hot thin core, both drawn with pathLength=1 so they can draw on */
+function neon(par, d, col, o = {}) {
+  const w = o.w || 7, g = S("g", {}, par);
+  let f = null;
+  if (o.fill) f = S("path", { d, fill: o.fill, stroke: "none", opacity: 0 }, g);
+  const a = S("path", { d, fill: "none", stroke: col, "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round", pathLength: 1 }, g);
+  const b = S("path", { d, fill: "none", stroke: "#fff", "stroke-width": w * 0.36, "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-opacity": .92, pathLength: 1 }, g);
+  const paths = [a, b]; gsap.set(paths, { strokeDasharray: "1 1", strokeDashoffset: 1 }); gsap.set(g, { autoAlpha: 0 });
+  return { g, paths, f, fa: o.fa ?? .22, col };
+}
+function draw(N, t, dur = .5, ease = "power2.inOut") {
+  tl.set(N.g, { autoAlpha: 1 }, t);
+  tl.fromTo(N.paths, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: dur, ease }, t);
+  if (N.f) tl.to(N.f, { opacity: N.fa, duration: .3 }, t + dur * .7);
+  /* tube flicker as it strikes */
+  const e = t + dur;
+  tl.set(N.g, { opacity: .45 }, e + .02).set(N.g, { opacity: 1 }, e + .07).set(N.g, { opacity: .6 }, e + .11).set(N.g, { opacity: 1 }, e + .15);
+}
+function drawAll(list, t, dur, stagger, ease) { list.forEach((n, i) => draw(n, t + i * stagger, dur, ease)); }
+function show(el, t) { tl.set(el, { autoAlpha: 1 }, t); }
+function jit(el, t, n = 5, amp = 18, seed = 1) { const r = rng(seed); for (let k = 0; k < n; k++) tl.set(el, { x: (r() - .5) * 2 * amp * (1 - k / n) }, t + k / 30); tl.set(el, { x: 0 }, t + n / 30); }
+function pulse(el, t, from = 1, to = 1.12, dur = .5, rep = 1) { tl.fromTo(el, { scale: from }, { scale: to, duration: dur, yoyo: true, repeat: rep * 2 - 1, ease: "sine.inOut" }, t); }
+function chrome(par, txt, x, y, size, o = {}) {
+  const outer = S("g", { transform: `translate(${x},${y}) skewX(${o.skew ?? -8})` }, par), g = S("g", {}, outer);
+  const base = { "font-family": '"Titan One", sans-serif', "font-size": size, "text-anchor": o.anchor || "middle", "letter-spacing": o.ls ?? 4 };
+  S("text", { ...base, x: 0, y: 0, fill: "url(#chrome)", stroke: o.stroke || C.mag, "stroke-width": size * .045, "paint-order": "stroke", "stroke-linejoin": "round" }, g).textContent = txt;
+  outer.style.filter = `drop-shadow(5px 7px 0 #2a0670) drop-shadow(0 0 10px ${o.stroke || C.mag}) drop-shadow(0 0 26px ${o.stroke || C.mag}99)`;
+  gsap.set(g, { autoAlpha: 0, transformOrigin: "50% 50%" }); return g;
+}
+function mono(par, txt, x, y, size, col, o = {}) {
+  const t = S("text", { x, y, "font-family": '"JetBrains Mono", monospace', "font-size": size, "text-anchor": o.anchor || "middle", fill: col, "letter-spacing": o.ls ?? 3, "font-weight": 500 }, par);
+  t.textContent = txt; t.style.filter = `drop-shadow(0 0 6px ${col}) drop-shadow(0 0 16px ${col}88)`; gsap.set(t, { autoAlpha: 0 }); return t;
+}
+function ambient(par, seed, cols, n = 10) {
+  const r = rng(seed), g = S("g", {}, par), items = [];
+  for (let i = 0; i < n; i++) { const x = 70 + r() * 940, y = 210 + r() * 900, s = 8 + r() * 10, c = cols[i % cols.length];
+    const e = S("path", { d: `M${-s},0 H${s} M0,${-s} V${s}`, stroke: c, "stroke-width": 3, "stroke-linecap": "round", transform: `translate(${x},${y})`, opacity: .55 }, g); items.push(e); }
+  tl.to(items, { y: "-=60", opacity: .15, duration: 3, ease: "sine.inOut", yoyo: true, repeat: 12, stagger: .17 }, 0); return g;
+}
+function hud(par, txt, col, t) {
+  const g = S("g", {}, par), L = glowG(g, col);
+  const box = S("path", { d: "M70,1590 H1010 V1776 H70 Z M70,1648 H1010", stroke: col, "stroke-width": 3, fill: C.ink, "fill-opacity": .7, opacity: 0 }, L);
+  const wave = S("path", { d: (() => { let d = "M100,1716"; for (let x = 100; x <= 980; x += 8) d += ` L${x},${(1716 + Math.sin(x / 38) * 20 * Math.sin(x / 190 + 1)).toFixed(1)}`; return d; })(), stroke: col, "stroke-width": 4, fill: "none", "stroke-dasharray": "34 14", opacity: 0 }, L);
+  const tx = mono(L, txt, 540, 1632, 36, col);
+  tl.to(box, { opacity: .85, duration: .3 }, t + .1); tl.to(wave, { opacity: .9, duration: .3 }, t + .25);
+  tl.fromTo(wave, { strokeDashoffset: 0 }, { strokeDashoffset: -480, duration: 40, ease: "none" }, t);
+  tl.fromTo(tx, { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: .35, ease: "power2.out" }, t + .2);
+  return g;
+}
+
+/* ---------- the moth ---------- */
+function Moth(par, cx, cy, s, col, o = {}) {
+  const outer = S("g", { transform: `translate(${cx},${cy}) scale(${s})` }, par), root = S("g", {}, outer), L = glowG(root, col);
+  const bodyG = S("g", {}, L), wrO = S("g", {}, L), wlO = S("g", { transform: "scale(-1,1)" }, L);
+  const wr = S("g", {}, wrO), wl = S("g", {}, wlO); gsap.set([wr, wl], { svgOrigin: "0 0" });
+  const fw = "M12,-44 C60,-130 170,-128 208,-52 C198,-4 120,18 12,8 Z", hw = "M12,12 C84,14 150,36 138,104 C98,124 34,92 12,44 Z";
+  const wingDefs = [[fw, o.fa ?? .18], [hw, o.fa ?? .18]], details = ["M26,-30 C80,-74 140,-76 190,-52", "M28,-12 C90,-40 150,-34 194,-18", "M124,-50 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0", "M40,40 C80,50 110,64 118,92"];
+  const parts = [];
+  [wr, wl].forEach(W => { wingDefs.forEach(([d, fa]) => parts.push(neon(W, d, col, { w: 6, fill: col, fa })));
+    details.forEach(d => parts.push(neon(W, d, col, { w: 3.5 }))); });
+  parts.push(neon(bodyG, "M0,-58 C16,-46 16,34 0,78 C-16,34 -16,-46 0,-58 Z", col, { w: 6, fill: col, fa: .3 }));
+  parts.push(neon(bodyG, "M-13,-70 A13,13 0 1,1 13,-70 A13,13 0 1,1 -13,-70 Z", col, { w: 5 }));
+  parts.push(neon(bodyG, "M6,-82 C14,-130 50,-146 82,-132 M-6,-82 C-14,-130 -50,-146 -82,-132", col, { w: 4 }));
+  parts.push(neon(bodyG, "M-12,-20 H12 M-12,0 H12 M-11,20 H11 M-9,40 H9", col, { w: 3 }));
+  return { root, wr, wl, parts, show(t, dur = .7) { drawAll(parts, t, dur, 0.012); }, flap(t, n = 6, sx = .45, per = .1) { tl.to([wr, wl], { scaleX: sx, duration: per, yoyo: true, repeat: n * 2 - 1, ease: "sine.inOut" }, t); } };
+}
+
+/* ---------- build the world ---------- */
+world.insertAdjacentHTML("beforeend", `<svg id="bg" viewBox="0 0 1080 1920" width="1080" height="1920"></svg>`);
+const bg = document.getElementById("bg");
+const defs = S("defs", {}, bg);
+const lg = (id, stops, x1 = 0, y1 = 0, x2 = 0, y2 = 1, units) => { const g = S("linearGradient", { id, x1, y1, x2, y2, ...(units ? { gradientUnits: units } : {}) }, defs); stops.forEach(([o, c, op], i) => S("stop", { offset: o, "stop-color": c, "stop-opacity": op ?? 1, id: id + i }, g)); return g; };
+lg("sky", [[0, "#04010f"], [.45, "#16043f"], [.8, "#4a0c78"], [1, "#a0147f"]], 0, 0, 0, 1);
+lg("sunG", [[0, "#fff35c"], [.45, "#ff9a3c"], [1, "#ff1f8e"]], 0, 0, 0, 1);
+lg("chrome", [[0, "#ffffff"], [.44, "#aee6ff"], [.5, "#3a2a9e"], [.54, "#ff3dd0"], [1, "#ffc2f2"]], 0, 0, 0, 1);
+lg("gg", [[0, "#ff2bd6", .0], [1, "#ff2bd6", 1]], 0, HY, 0, 1920, "userSpaceOnUse");
+lg("hz", [[0, "#ff2bd6", 0], [1, "#ff2bd6", .55]], 0, 0, 0, 1);
+S("rect", { width: 1080, height: 1920, fill: "url(#sky)" }, bg);
+S("rect", { y: HY, width: 1080, height: 910, fill: "#0a0120" }, bg);
+/* stars */
+const r0 = rng(77), starGs = [S("g", {}, bg), S("g", {}, bg), S("g", {}, bg)];
+for (let i = 0; i < 70; i++) S("circle", { cx: r0() * 1080, cy: 40 + r0() * 760, r: .8 + r0() * 2, fill: i % 5 === 0 ? "#9fe9ff" : "#fff", opacity: .85 }, starGs[i % 3]);
+starGs.forEach((g, i) => tl.to(g, { opacity: .25, duration: 1 + i * .35, yoyo: true, repeat: 40, ease: "sine.inOut" }, i * .3));
+/* striped sun */
+const sunG = S("g", { }, bg);
+const sunMask = S("mask", { id: "sunmask", maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 1080, height: 1920 }, defs);
+S("rect", { x: 0, y: 0, width: 1080, height: HY, fill: "#fff" }, sunMask);
+const stripes = S("path", { fill: "#000" }, sunMask);
+S("circle", { cx: 540, cy: 800, r: 282, fill: "url(#sunG)", mask: "url(#sunmask)" }, sunG);
+const sunHalo = S("circle", { cx: 540, cy: 800, r: 330, fill: "#ff2bd6", opacity: .0 }, sunG); sunHalo.style.filter = "blur(30px)"; sunG.insertBefore(sunHalo, sunG.firstChild); tl.set(sunHalo, { opacity: .38 }, 0);
+/* wireframe mountains */
+const mtn = (pts, flip) => { const g = S("g", {}, bg), p = pts.map(([x, y]) => [flip ? 1080 - x : x, y]), d = "M" + p.map(q => q.join(",")).join(" L"); 
+  S("path", { d: d + ` L${p[p.length - 1][0]},${HY} L${p[0][0]},${HY} Z`, fill: "#0e0235", stroke: "none" }, g);
+  const l = S("path", { d, fill: "none", stroke: C.cya, "stroke-width": 3.5, "stroke-linejoin": "round" }, g); l.style.filter = glowStr(C.cya); 
+  const ridges = p.map(([x, y], i) => i % 2 ? `M${x},${y} L${x + (flip ? 40 : -40)},${HY}` : "").join(" "); S("path", { d: ridges, fill: "none", stroke: C.cya, "stroke-width": 1.6, opacity: .5 }, g); };
+mtn([[-40, HY], [40, 880], [105, 930], [190, 800], [265, 905], [330, 860], [420, HY]], false);
+mtn([[-60, HY], [20, 930], [80, 900], [170, 960], [240, 840], [310, 940], [380, HY]], true);
+/* horizon glow + line */
+S("rect", { y: HY - 150, width: 1080, height: 150, fill: "url(#hz)" }, bg);
+const hl = S("rect", { y: HY - 3, width: 1080, height: 6, fill: "#ffd6fb" }, bg); hl.style.filter = glowStr(C.mag);
+/* perspective grid */
+const gridG = S("g", {}, bg);
+const hP = [[9, .2], [4.5, .38], [1.9, 1]].map(([w, o]) => S("path", { fill: "none", stroke: "url(#gg)", "stroke-width": w, "stroke-opacity": o }, gridG));
+let vd = ""; for (let j = -18; j <= 18; j++) vd += `M540,${HY} L${540 + j * 170},1930 `;
+[[9, .2], [4.5, .38], [1.9, 1]].forEach(([w, o]) => S("path", { d: vd, fill: "none", stroke: "url(#gg)", "stroke-width": w, "stroke-opacity": o }, gridG));
+const SPEED = 0.42, DZ = .5, F = 910;
+function gridD(t) { const ph = t * SPEED, fr = ph % 1; let d = ""; for (let k = 0; k < 44; k++) { const z = 1 + (k - fr) * DZ; if (z < .98) continue; const y = HY + F / z; if (y > 1935) continue; d += `M-120,${y.toFixed(1)} H1200 `; } return d; }
+function stripeD(t) { const ph = (t * .16) % 1, N = 7, top = 800, span = 212; let d = ""; for (let k = 0; k < N; k++) { const f = (k + ph) / N, y = top + f * span, h = 3 + f * 24; d += `M0,${y.toFixed(1)} h1080 v${h.toFixed(1)} h-1080 Z `; } return d; }
+for (let k = 0, n = Math.ceil(DUR * 30) + 1; k < n; k++) { const t = k / 30; tl.set(hP, { attr: { d: gridD(t) } }, t); if (k % 2 === 0) tl.set(stripes, { attr: { d: stripeD(t) } }, t); }
+/* sky/sun recolour per scene and slow forward drift */
+tl.fromTo(sunG, { scale: 1, svgOrigin: "540 1010" }, { scale: 1.09, duration: DUR, ease: "none" }, 0);
+const gridCol = [C.mag, C.cya, C.pur];
+gridCol.forEach((c, i) => { const t = M[i] + (i ? 0 : 0); [0, 1].forEach(k => tl.set(`#gg${k}`, { attr: { "stop-color": c } }, t)); });
+
+/* ---------- scenes ---------- */
+const sc = [], mk = i => { const s = S("svg", { viewBox: "0 0 1080 1920", width: 1080, height: 1920, class: "sc" }, world); if (i) gsap.set(s, { autoAlpha: 0 }); sc.push(s); return s; };
+for (let i = 0; i < 3; i++) mk(i);
+const drift = (i, to = 1.06) => tl.fromTo(sc[i], { scale: 1 }, { scale: to, duration: (i < 2 ? M[i + 1] : DUR) - M[i] + .4, ease: "none" }, M[i]);
+/* ---------- stock props (outline only: tube colour, optional faint fill, a dark plate behind) ---------- */
+const P = {
+  bulb: (par, x, y, s, col) => { const g = S("g", { transform: `translate(${x},${y}) scale(${s})` }, par), L = glowG(g, col);
+    return [neon(L, "M0,-120 C-70,-120 -100,-70 -100,-30 C-100,20 -50,40 -40,90 H40 C50,40 100,20 100,-30 C100,-70 70,-120 0,-120 Z", col, { w: 8, fill: col, fa: .16 }), neon(L, "M-40,110 H40 M-30,134 H30 M-16,-60 L0,20 L16,-60", col, { w: 6 })]; },
+  gear: (par, x, y, s, col) => { const g = S("g", { transform: `translate(${x},${y}) scale(${s})` }, par), L = glowG(g, col); let d = "";
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, c = Math.cos(a), sn = Math.sin(a), px = -sn, py = c; const p = (r, o) => `${(c * r + px * o).toFixed(1)},${(sn * r + py * o).toFixed(1)}`; d += (k ? " L" : "M") + p(78, -20) + " L" + p(108, -14) + " L" + p(108, 14) + " L" + p(78, 20) + " L" + p(78, 20); }
+    const ring = neon(L, d + " Z", col, { w: 7, fill: col, fa: .14 }), hub = neon(L, "M-30,0 a30,30 0 1,0 60,0 a30,30 0 1,0 -60,0 Z", col, { w: 6 }); return { parts: [ring, hub], spin: g }; },
+  cabinet: (par, x, top, w, col) => { const g = S("g", {}, glowG(par, col)), h = HY - top;
+    const body = neon(g, `M${x},${HY} V${top} H${x + w} V${HY}`, col, { w: 7, fill: C.ink, fa: .92 });
+    let cells = ""; const cols = 4, rows = 6, cw = (w - 60) / cols, ch = (h - 140) / rows;
+    for (let a = 0; a < rows; a++) for (let b = 0; b < cols; b++) cells += `M${x + 30 + b * cw + 6},${top + 80 + a * ch + 5} h${cw - 14} v${ch - 12} h${-(cw - 14)} Z`;
+    return [body, neon(g, cells, C.mag, { w: 3 })]; },
+  arrow: (par, x1, y1, x2, y2, col) => { const a = Math.atan2(y2 - y1, x2 - x1), hx = (k) => (x2 - Math.cos(a + k) * 46).toFixed(1), hy = (k) => (y2 - Math.sin(a + k) * 46).toFixed(1);
+    return neon(glowG(par, col), `M${x1},${y1} L${x2},${y2} M${hx(.5)},${hy(.5)} L${x2},${y2} L${hx(-.5)},${hy(-.5)}`, col, { w: 8 }); },
+  plate: (par, x, y, w, h, col) => neon(glowG(par, col), `M${x},${y} h${w} v${h} h${-w} Z`, col, { w: 6, fill: C.ink, fa: .85 }),
+  ring: (par, cx, cy, col, t) => { const r = S("circle", { cx, cy, r: 40, fill: "none", stroke: col, "stroke-width": 6, opacity: 0 }, par); r.style.filter = glowStr(col);
+    tl.set(r, { opacity: .85, attr: { r: 50 } }, t); tl.to(r, { attr: { r: 420 }, opacity: 0, duration: 1.0, ease: "power2.out" }, t); return r; }
+};
+
+/* 0: HOOK  ------------------------------------------------------------ (shot: Title + skyline) */
+(function () { const s = sc[0], t0 = 0.3; ambient(s, 5, [C.cya, C.mag, C.yel], 9);
+  const T1 = chrome(s, "PLACEHOLDER", 540, 310, 112, { ls: 2 }), T2 = chrome(s, "1985", 540, 590, 240);
+  tl.fromTo(T1, { autoAlpha: 0, y: -30 }, { autoAlpha: 1, y: 0, duration: .45, ease: "power3.out" }, t0);
+  const key = WD(0, /\w+/, 2); tl.fromTo(T2, { autoAlpha: 0, scale: 1.5 }, { autoAlpha: 1, scale: 1, duration: .4, ease: "back.out(2)" }, key - .05); jit(T2, key + .05, 6, 14, 3);
+  [[78, 640, 280], [400, 600, 280], [722, 640, 280]].forEach(([x, top, w], i) => drawAll(P.cabinet(s, x, top, w, C.cya), t0 + .15 + i * .22, .7, .1));
+  hud(s, "PLACEHOLDER LABEL  //  YEAR", C.cya, WD(0, /\w+/, 1) - .3);
+  const bu = P.bulb(s, 540, 470, .9, C.yel); drawAll(bu, key - .2, .6, .1); P.ring(s, 540, 470, C.yel, key + .25);
+  drift(0, 1.07);
+})();
+
+/* 1: PANEL + DIAGRAM  ------------------------------------------------- (shot: Diagram) */
+(function () { const s = sc[1], t0 = M[1] + .1; ambient(s, 6, [C.mag, C.cya], 8);
+  const T = chrome(s, "PLACEHOLDER", 540, 280, 104, { stroke: C.cya, ls: 2 });
+  tl.fromTo(T, { autoAlpha: 0, y: -26 }, { autoAlpha: 1, y: 0, duration: .4, ease: "power3.out" }, t0);
+  const a = P.plate(s, 90, 420, 400, 360, C.cya), b = P.plate(s, 590, 420, 400, 360, C.mag), ar = P.arrow(s, 500, 600, 580, 600, C.yel);
+  draw(a, t0 + .3, .6); draw(b, t0 + .55, .6); draw(ar, t0 + .85, .4);
+  const gr = P.gear(s, 290, 600, 1.0, C.cya), bu = P.bulb(s, 790, 620, .8, C.mag);
+  drawAll(gr.parts, t0 + .4, .6, .1); drawAll(bu, t0 + .7, .6, .1);
+  tl.to(gr.spin, { rotation: 360, svgOrigin: "290 600", duration: 12, ease: "none" }, t0);
+  const l1 = mono(s, "INPUT", 290, 860, 40, C.cya), l2 = mono(s, "OUTPUT", 790, 860, 40, C.mag);
+  tl.fromTo([l1, l2], { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .35, stagger: .15 }, t0 + 1);
+  hud(s, "PLACEHOLDER READOUT", C.mag, WD(1, /\w+/, 1) - .2);
+  drift(1, 1.05);
+})();
+
+/* 2: PAYOFF  --------------------------------------------------------- (shot: Big number) */
+(function () { const s = sc[2], t0 = M[2] + .1; ambient(s, 7, [C.yel, C.pur, C.cya], 10);
+  const N = chrome(s, "99%", 540, 560, 300, { stroke: C.yel }), L2 = chrome(s, "PLACEHOLDER", 540, 760, 100, { stroke: C.yel, ls: 2 });
+  const k = WD(2, /\w+/, 2);
+  tl.fromTo(N, { autoAlpha: 0, scale: 1.6 }, { autoAlpha: 1, scale: 1, duration: .5, ease: "back.out(2)" }, k - .05); jit(N, k + .1, 6, 16, 5);
+  tl.fromTo(L2, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: .4, ease: "power3.out" }, k + .15);
+  P.ring(s, 540, 500, C.yel, k + .2);
+  const bu = P.bulb(s, 540, 960, .5, C.pur); drawAll(bu, k + .3, .6, .1);
+  hud(s, "PLACEHOLDER FOOTNOTE", C.yel, t0 + .2);
+  drift(2, 1.05);
+})();
+
+tl.set(sunG, { opacity: .6 }, M[2]); tl.set(sunG, { opacity: 1 }, 0);
+/* ---------- VHS: glitch cuts, tracking band, flicker ---------- */
+const fx = document.getElementById("fx"), bars = [];
+for (let i = 0; i < 6; i++) { const b = document.createElement("div"); b.className = "gb"; b.style.background = i % 2 ? "#27f0ff" : "#ff2bd6"; fx.appendChild(b); bars.push(b); }
+const rg = rng(123);
+function glitchCut(i) { const m = M[i], t0 = m - .2, n = 12;
+  tl.set(world, { filter: "url(#gl)" }, t0);
+  tl.fromTo("#dmap", { attr: { scale: 0 } }, { attr: { scale: 110 }, duration: .2, ease: "power2.in" }, t0).to("#dmap", { attr: { scale: 0 }, duration: .2, ease: "power2.out" }, t0 + .2);
+  for (let k = 0; k < n; k++) { const t = t0 + k / 30; tl.set(world, { x: (rg() - .5) * 70 * Math.sin(Math.PI * k / n), skewX: (rg() - .5) * 8 * Math.sin(Math.PI * k / n) }, t);
+    bars.forEach((b, bi) => { if (rg() < .55) tl.set(b, { top: Math.round(rg() * 1800), height: 14 + Math.round(rg() * 90), opacity: .18 + rg() * .35, x: (rg() - .5) * 120 }, t); else tl.set(b, { opacity: 0 }, t); }); }
+  tl.set(world, { x: 0, skewX: 0, filter: "url(#ca)" }, t0 + n / 30); bars.forEach(b => tl.set(b, { opacity: 0 }, t0 + n / 30));
+  tl.set(sc[i - 1], { autoAlpha: 0 }, m); tl.set(sc[i], { autoAlpha: 1 }, m); tl.set("#band", { opacity: 0 }, 0);
+}
+for (let i = 1; i < 3; i++) glitchCut(i);
+/* tracking band rolls down the frame a few times */
+[3.2, 9.8, 15].forEach(t => { tl.fromTo("#band", { top: -170, opacity: .9, skewX: 0 }, { top: 2000, duration: 1.5, ease: "none" }, t); tl.set("#band", { opacity: 0 }, t + 1.55); });
+/* mild frame flicker */
+const rf = rng(55); for (let t = 0; t < DUR; t += .1) if (rf() < .18) { tl.set(world, { opacity: .93 + rf() * .05 }, t); tl.set(world, { opacity: 1 }, t + .04); }
+
+</script>
+<script>
+  vfrey.captions("#captions", { style: "box", font: '"Baloo 2", sans-serif', size: 76, color: "#ffffff", highlight: "#ff2bd6", highlightText: "#ffffff", maxWords: 4 });
+</script>
+</body>
+</html>

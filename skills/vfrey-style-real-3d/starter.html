@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- starter.html for vfrey-style-real-3d: copy to scenes/<idea>/index.html; the 3D content is scene-starter.js (bundled to scene3d.js, see helpers.md) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000004; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #000004; font-family: "Google Sans Flex", sans-serif; color: #fff; }
+  #gl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0) 55%, rgba(0,0,4,0.55) 100%); pointer-events: none; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }   /* hides a hard cut */
+  #hud { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); top: calc(var(--vf-safe-top) + 6px); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+  #hud-lab { white-space: nowrap; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: calc(var(--vf-vmin) * 0.031); letter-spacing: 0.1em; color: #ffcf8a; background: rgba(0,0,8,0.62); padding: 7px 14px; }
+  #hud-val { font-weight: 800; font-size: calc(var(--vf-vmin) * 0.145); line-height: 1.02; letter-spacing: -0.02em; text-shadow: 0 2px 22px rgba(0,0,10,0.9); }
+  .tag { position: absolute; left: 0; top: 0; opacity: 0; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: calc(var(--vf-vmin) * 0.03); letter-spacing: 0.06em; white-space: nowrap; color: #fff; background: rgba(0,0,10,0.72); border: 2px solid rgba(255,214,150,0.9); padding: 6px 12px; margin-top: -14px; will-change: transform; }
+  #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); top: var(--vf-caption-at); height: var(--vf-caption-h); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+  <canvas id="gl"></canvas>
+  <div id="vig"></div>
+  <div id="hud"><div id="hud-lab"></div><div id="hud-val"></div></div>
+  <div class="tag" id="tg-a"></div><div class="tag" id="tg-b"></div>
+  <div id="flash"></div>
+  <div id="captions"></div>
+</div>
+<script>
+  const tl = vfrey.timeline();
+  vfrey.captions("#captions", { style: "box", color: "#ffffff", highlight: "#ffb23e", highlightText: "#0a0a14", maxWords: 4 });
+</script>
+<script src="scene3d.js"></script>
+</body>
+</html>

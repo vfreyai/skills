@@ -1,0 +1,376 @@
+<!doctype html>
+<!-- Vintage newspaper / letterpress: a 19th-century broadsheet comes to life. Period display faces, greeked columns,
+     engraved (line-hatched) SVG illustrations that animate inside their frames, ink-press word reveals, paper fibre and
+     yellowing from SVG filters, red halftone spot colour printed slightly out of register, page turns / sheet stacks / ink floods. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  :root{--ink:#21170f;--red:#c63a22;--pap:#e9dbb0}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#2b1f14}
+  #root{position:relative;width:1080px;height:1920px;overflow:hidden;background:#2b1f14;color:var(--ink);font-family:"Playfair Display",Georgia,serif}
+  #stage{position:absolute;inset:0;perspective:2600px;perspective-origin:50% 50%}
+  .page{position:absolute;inset:0;overflow:hidden;visibility:hidden;opacity:0;backface-visibility:hidden;
+    background:radial-gradient(ellipse 90% 80% at 50% 45%,#efe2b8 0%,#e9dbb0 55%,#dcc994 100%);box-shadow:0 -40px 70px rgba(30,15,0,.55)}
+  .thump,.cam{position:absolute;inset:0}
+  .cam{will-change:transform}
+  .shade{position:absolute;inset:0;background:#1a0f05;opacity:0;pointer-events:none}
+  svg{display:block}
+  .bgsvg{position:absolute;inset:0;width:1080px;height:1920px}
+  .art{position:absolute;left:60px;width:960px;overflow:hidden;clip-path:inset(0 0 100% 0)}
+  .tx{position:absolute;left:0;width:1080px;text-align:center;color:var(--ink)}
+  .mast{top:44px;height:240px}
+  .mast h1{margin:0;position:absolute;left:0;right:0;top:-2px;font-weight:900;font-size:206px;line-height:1;letter-spacing:-2px;white-space:nowrap;transform:scaleX(.8);transform-origin:50% 50%}
+  .mast .ear{position:absolute;top:196px;font-size:22px;font-weight:700;letter-spacing:.14em}
+  .dateline{top:284px;height:44px;line-height:44px;font-weight:700;font-size:24px;letter-spacing:.2em}
+  .hdr{top:34px;height:88px;line-height:88px;font-weight:900;font-size:50px;letter-spacing:.34em;padding-left:.34em}
+  .hdr small{position:absolute;top:0;font-size:20px;letter-spacing:.16em;font-weight:700;line-height:88px}
+  .hl{font-weight:900;line-height:.96;text-transform:uppercase;filter:url(#roughK)}
+  .hl .ln{display:block;white-space:nowrap;transform:scaleX(.82);transform-origin:50% 50%}
+  .w{display:inline-block;transform-origin:50% 62%}
+  .hl em{font-style:normal;color:var(--red)}
+  .deck{font-style:italic;font-weight:500;font-size:34px;letter-spacing:.01em;filter:url(#rough)}
+  .deck b{font-weight:800;font-style:normal;letter-spacing:.16em;font-size:26px;color:var(--red)}
+  .tag{position:absolute;font-weight:800;font-size:25px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+  #paperfx{position:absolute;inset:0;mix-blend-mode:multiply;pointer-events:none;opacity:.7}
+  #yellow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;
+    background:
+      linear-gradient(90deg,transparent 49.4%,rgba(70,40,5,.16) 50%,transparent 50.6%),
+      linear-gradient(180deg,transparent 49.6%,rgba(70,40,5,.12) 50%,transparent 50.4%),
+      radial-gradient(ellipse 80% 70% at 50% 46%,rgba(255,235,170,0) 45%,rgba(140,80,15,.42) 100%)}
+  #flash{position:absolute;inset:0;background:#fff3d8;opacity:0;pointer-events:none;mix-blend-mode:screen}
+  .wipe{position:absolute;left:0;width:1080px;height:3840px;top:1920px;pointer-events:none;will-change:transform}
+  #capstrip{position:absolute;left:54px;width:972px;top:1436px;height:222px;background:#f1e5bd;border:5px solid var(--ink);
+    box-shadow:inset 0 0 0 9px #f1e5bd,inset 0 0 0 11px var(--ink),9px 11px 0 rgba(33,23,15,.38)}
+  #captab{position:absolute;left:34px;top:-31px;background:var(--red);color:#f6ead0;font-weight:800;font-size:24px;letter-spacing:.22em;padding:4px 18px 4px 22px;
+    border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink)}
+  #capnum{position:absolute;right:30px;top:-27px;background:#f1e5bd;color:var(--ink);font-weight:700;font-style:italic;font-size:24px;padding:2px 14px;border:3px solid var(--ink)}
+  #captions{position:absolute;left:84px;right:84px;top:1462px;height:170px;justify-content:center !important;align-items:center;font-weight:800;letter-spacing:.002em}
+  #captions .vf-w{padding:2px 8px 6px}
+  #captions .vf-w.on{text-shadow:3px 2px 0 rgba(198,58,34,.28)}
+  #stamp5,#stamp6{position:absolute;visibility:hidden;opacity:0;border:7px double var(--red);color:var(--red);font-weight:900;text-transform:uppercase;text-align:center;
+    mix-blend-mode:multiply;filter:url(#rough);padding:8px 26px;line-height:1.02;letter-spacing:.06em;background:rgba(198,58,34,.05)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hA" width="6" height="5" patternUnits="userSpaceOnUse"><rect width="6" height="2.6" fill="#21170f"/></pattern>
+    <pattern id="hB" width="6" height="5" patternUnits="userSpaceOnUse"><rect width="6" height="1.6" fill="#21170f"/></pattern>
+    <pattern id="hC" width="6" height="5" patternUnits="userSpaceOnUse"><rect width="6" height="0.9" fill="#21170f"/></pattern>
+    <pattern id="vA" width="5" height="6" patternUnits="userSpaceOnUse"><rect width="2.4" height="6" fill="#21170f"/></pattern>
+    <pattern id="vC" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="1.1" height="6" fill="#21170f"/></pattern>
+    <pattern id="dA" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.9" height="6" fill="#21170f"/></pattern>
+    <pattern id="dB" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="1.9" height="6" fill="#21170f"/></pattern>
+    <pattern id="dC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.2" height="8" fill="#21170f"/></pattern>
+    <pattern id="dotL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="6" cy="6" r="3.9" fill="#c63a22"/></pattern>
+    <pattern id="dotM" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="4.5" cy="4.5" r="2.5" fill="#c63a22"/></pattern>
+    <pattern id="dotS" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.5" cy="3.5" r="1.3" fill="#c63a22"/></pattern>
+    <pattern id="dotK" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(15)"><circle cx="4.5" cy="4.5" r="2.1" fill="#21170f"/></pattern>
+    <linearGradient id="gTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="gBot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient>
+    <linearGradient id="gMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <radialGradient id="gRad"><stop offset=".25" stop-color="#000"/><stop offset="1" stop-color="#fff"/></radialGradient>
+    <radialGradient id="gRadI"><stop offset="0" stop-color="#fff"/><stop offset=".95" stop-color="#000"/></radialGradient>
+    <mask id="mTop" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#gTop)"/></mask>
+    <mask id="mBot" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#gBot)"/></mask>
+    <mask id="mMid" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#gMid)"/></mask>
+    <mask id="mRad" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#gRad)"/></mask>
+    <mask id="mRadI" maskContentUnits="objectBoundingBox"><rect width="1" height="1" fill="url(#gRadI)"/></mask>
+    <radialGradient id="gGlow"><stop offset="0" stop-color="#f6ecc8" stop-opacity="1"/><stop offset=".55" stop-color="#f1e4b9" stop-opacity=".75"/><stop offset="1" stop-color="#e9dbb0" stop-opacity="0"/></radialGradient>
+    <filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="roughK" x="-3%" y="-6%" width="106%" height="112%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation=".55"/></filter>
+  </defs>
+</svg>
+
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="stage"></div>
+  <div class="wipe" id="wipeR"></div>
+  <div class="wipe" id="wipeK"></div>
+  <svg id="paperfx" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <filter id="pf" x="0" y="0" width="1" height="1">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="3" seed="7" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 .32  0 0 0 0 .22  0 0 0 0 .09  0 0 0 1.25 -.5" result="speck"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".006 .32" numOctaves="2" seed="2" result="f"/>
+      <feColorMatrix in="f" type="matrix" values="0 0 0 0 .5  0 0 0 0 .36  0 0 0 0 .15  0 0 0 1 -.42" result="fib"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="3" seed="21" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 .55  0 0 0 0 .35  0 0 0 0 .1  0 0 0 .9 -.38" result="blot"/>
+      <feMerge><feMergeNode in="blot"/><feMergeNode in="fib"/><feMergeNode in="speck"/></feMerge>
+    </filter>
+    <rect width="1080" height="1920" filter="url(#pf)"/>
+  </svg>
+  <div id="yellow"></div>
+  <div id="capstrip"><div id="captab">WIRE NEWS</div><div id="capnum">Extra</div></div>
+  <div id="captions"></div>
+  <div id="stamp5" style="left:70px;top:818px;width:940px;font-size:116px;transform:rotate(-7deg);border-width:12px">PLACEHOLDER<br>STAMP</div>
+  <div id="flash"></div>
+</div>
+
+<script>
+const tl = vfrey.timeline();
+const T = vfrey.timing;
+const D = T.durationSec;
+const INK = "#21170f", RED = "#c63a22", PAP = "#e9dbb0";
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => [...(r || document).querySelectorAll(s)];
+const L = (i) => vfrey.line(i).start;
+const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+function wt(line, re){ const w = T.words.find((w) => w.line === line && re.test(norm(w.text))); return w ? w.start : L(line); }
+function R(seed){ let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const f1 = (n) => (+n).toFixed(1);
+const loopN = (dur) => Math.max(1, Math.ceil(D / dur) + 1);
+
+/* ======================= drawing helpers ======================= */
+const hatch = (pat, x, y, w, h, mask, extra) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${pat})"${mask ? ` mask="url(#${mask})"` : ""}${extra || ""}/>`;
+function greek(x, y, w, rows, seed, lh = 15.5){
+  const r = R(seed); let d = "", yy = y;
+  for (let i = 0; i < rows; i++){
+    const para = r() < .13; const full = para ? w * (.25 + r() * .55) : w;
+    let xx = x; const end = x + full;
+    while (xx < end - 4){
+      const ww = Math.min(end - xx, 14 + r() * 46);
+      d += `M${f1(xx)} ${f1(yy)}h${f1(Math.max(4, ww - 5))}v6.2h-${f1(Math.max(4, ww - 5))}z`;
+      xx += ww;
+    }
+    yy += lh; if (para) yy += lh * .55;
+  }
+  return `<path d="${d}" fill="${INK}" opacity=".82"/>`;
+}
+function spark(cx, cy, r, cls, seed){
+  const q = R(seed || 5); let s = `<g transform="translate(${cx} ${cy})"><g class="${cls}"><circle r="${r * .95}" fill="url(#dotM)" opacity=".9"/><circle r="${r * .42}" fill="${PAP}"/>`;
+  for (let i = 0; i < 12; i++){
+    const a = (i / 12) * 6.283 + q() * .4, r1 = r * .3, r2 = r * (.75 + q() * .9);
+    s += `<line x1="${f1(Math.cos(a) * r1)}" y1="${f1(Math.sin(a) * r1)}" x2="${f1(Math.cos(a) * r2)}" y2="${f1(Math.sin(a) * r2)}" stroke="${i % 3 ? INK : RED}" stroke-width="${i % 3 ? 3 : 4.5}" stroke-linecap="round"/>`;
+  }
+  return s + `</g></g>`;
+}
+function zig(x1, y1, x2, y2, seed, n = 9, amp = 22){
+  const q = R(seed); let d = `M${x1} ${y1}`;
+  for (let i = 1; i < n; i++){ const t = i / n; d += `L${f1(x1 + (x2 - x1) * t + (q() - .5) * amp * 1.4)} ${f1(y1 + (y2 - y1) * t + (q() - .5) * amp)}`; }
+  return d + `L${x2} ${y2}`;
+}
+function city(r, x0, x1, base, hmin, hmax, wmin, wmax, fill, win, flat){
+  let s = "", x = x0;
+  while (x < x1){
+    const w = wmin + r() * (wmax - wmin), h = hmin + r() * (hmax - hmin), t = r(), y = base - h;
+    let d = `M${f1(x)} ${base + 400}V${f1(y)}`;
+    if (flat) d += t < .4 ? `H${f1(x + 8)}V${f1(y - 12)}H${f1(x + w - 8)}V${f1(y)}H${f1(x + w)}` : `H${f1(x + w)}`;
+    else if (t < .38) d += `L${f1(x + w / 2)} ${f1(y - w * .36)}L${f1(x + w)} ${f1(y)}`;
+    else if (t < .55) d += `H${f1(x + w * .3)}V${f1(y - 22)}H${f1(x + w * .46)}V${f1(y)}H${f1(x + w)}`;
+    else d += `H${f1(x + w)}`;
+    d += `V${base + 400}Z`;
+    s += `<path d="${d}" fill="${fill}" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>`;
+    if (win){
+      for (let wy = y + 22; wy < base - 16; wy += 34) for (let wx = x + 12; wx < x + w - 18; wx += 26)
+        if (r() < .62) s += `<rect x="${f1(wx)}" y="${f1(wy)}" width="11" height="17" fill="${PAP}" stroke="${INK}" stroke-width="1.4"/>`;
+    }
+    x += w - 1;
+  }
+  return s;
+}
+function star4(x, y, s, cls){ return `<path class="${cls}" d="M${f1(x)} ${f1(y - s)}Q${f1(x)} ${f1(y)} ${f1(x + s)} ${f1(y)}Q${f1(x)} ${f1(y)} ${f1(x)} ${f1(y + s)}Q${f1(x)} ${f1(y)} ${f1(x - s)} ${f1(y)}Q${f1(x)} ${f1(y)} ${f1(x)} ${f1(y - s)}Z" fill="${PAP}" stroke="${PAP}" stroke-width="1"/>`; }
+function palm(x, y, h, lean, cls, seed){
+  const q = R(seed);
+  let s = `<g transform="translate(${x} ${y})"><path d="M0 0C${lean * .2} ${-h * .4} ${lean * .7} ${-h * .8} ${lean} ${-h}" stroke="${INK}" stroke-width="15" fill="none" stroke-linecap="round"/><path d="M0 0C${lean * .2} ${-h * .4} ${lean * .7} ${-h * .8} ${lean} ${-h}" stroke="${PAP}" stroke-width="3" stroke-dasharray="7 9" fill="none"/>`;
+  s += `<g transform="translate(${lean} ${-h})"><g class="${cls}">`;
+  for (let i = 0; i < 9; i++){
+    const a = -170 + i * 22 + (q() - .5) * 8, len = 110 + q() * 50, rad = a * Math.PI / 180;
+    const ex = Math.cos(rad) * len, ey = Math.sin(rad) * len * .75 + len * .28;
+    const cx = Math.cos(rad) * len * .55, cy = Math.sin(rad) * len * .75 - 24;
+    s += `<path d="M0 0Q${f1(cx)} ${f1(cy)} ${f1(ex)} ${f1(ey)}Q${f1(cx * .9)} ${f1(cy + 20)} 0 8Z" fill="${INK}" stroke="${INK}" stroke-width="2"/>`;
+    s += `<path d="M0 3Q${f1(cx * .95)} ${f1(cy + 8)} ${f1(ex * .88)} ${f1(ey * .9)}" fill="none" stroke="${PAP}" stroke-width="1.6" opacity=".7"/>`;
+  }
+  return s + `</g></g></g>`;
+}
+function frameRect(x, y, w, h){
+  return `<rect x="${x - 9}" y="${y - 9}" width="${w + 18}" height="${h + 18}" fill="none" stroke="${INK}" stroke-width="6"/><rect x="${x - 2}" y="${y - 2}" width="${w + 4}" height="${h + 4}" fill="none" stroke="${INK}" stroke-width="2"/>`;
+}
+
+/* ======================= the engravings (960 x H, local coordinates) ======================= */
+const ART = {};
+
+/* ======================= the engravings (960 x H, local coordinates). STARTER: three generic ones, redraw them for the topic. ======================= */
+
+/* 0: sun/lamp over rooftops (hero, front page) */
+ART[0] = (H) => {
+  const r = R(11); let s = "";
+  s += hatch("hA", 0, 0, 960, 620, "mRad") + hatch("hC", 0, 0, 960, 620, "mTop", ` opacity=".9"`);
+  s += `<g transform="translate(500 292)"><circle r="300" fill="url(#dotS)" mask="url(#mRadI)" opacity=".7"/><g class="corona">`;
+  for (let i = 0; i < 56; i++){ const a = i / 56 * 6.283, r1 = 130, r2 = r1 + (i % 2 ? 62 : 120) + (i % 7) * 8; s += `<line x1="${f1(Math.cos(a) * r1)}" y1="${f1(Math.sin(a) * r1)}" x2="${f1(Math.cos(a) * r2)}" y2="${f1(Math.sin(a) * r2)}" stroke="${INK}" stroke-width="${i % 2 ? 2 : 3.4}" stroke-linecap="round"/>`; }
+  s += `</g><circle r="124" fill="${PAP}"/>`;
+  for (let i = 0; i < 110; i++){ const a = i / 110 * 6.283, r1 = 38 + (i % 5) * 10; s += `<line x1="${f1(Math.cos(a) * r1)}" y1="${f1(Math.sin(a) * r1)}" x2="${f1(Math.cos(a) * 120)}" y2="${f1(Math.sin(a) * 120)}" stroke="${INK}" stroke-width=".9" opacity=".65"/>`; }
+  s += `<circle r="52" fill="${PAP}"/><circle r="124" fill="none" stroke="${INK}" stroke-width="4"/></g>`;
+  s += city(r, -20, 980, 560, 30, 90, 46, 90, "url(#dC)", false);
+  s += hatch("hB", 0, 520, 960, 190, "mBot", ` opacity=".5"`);
+  s += city(r, -30, 990, 640, 40, 120, 60, 110, "url(#dA)", false);
+  s += city(r, -30, 990, 700, 20, 90, 60, 120, INK, true);
+  [[200, 120], [760, 90], [860, 240], [90, 300]].forEach((p, i) => { s += star4(p[0], p[1], 22, "tw0 tw0-" + i); });
+  s += spark(500, 292, 70, "spk0 s0-0", 31);
+  return s;
+};
+/* 1: a portrait bust inside an oval, hatched, with a red halftone cheek (figure) */
+ART[1] = (H) => {
+  let s = hatch("dA", 0, 0, 960, H, "mRad") + hatch("dB", 0, 0, 960, H, "mTop", ` opacity=".6"`);
+  s += `<g transform="translate(480 ${H * .52})"><ellipse rx="300" ry="${H * .44}" fill="${PAP}" stroke="${INK}" stroke-width="5"/><ellipse rx="300" ry="${H * .44}" fill="url(#dC)" opacity=".5"/>`;
+  s += `<path d="M-200 ${H * .42}C-200 ${H * .2} -120 ${H * .12} 0 ${H * .12}C120 ${H * .12} 200 ${H * .2} 200 ${H * .42}Z" fill="${INK}"/><path d="M-60 ${H * .12}L0 ${H * .26}L60 ${H * .12}Z" fill="${PAP}" stroke="${INK}" stroke-width="3"/>`;
+  s += `<ellipse cx="0" cy="${-H * .1}" rx="112" ry="150" fill="${PAP}" stroke="${INK}" stroke-width="5"/><ellipse cx="-30" cy="${-H * .1}" rx="82" ry="150" fill="url(#dB)" opacity=".55"/>`;
+  s += `<path d="M-120 ${-H * .16}C-110 ${-H * .3} 110 ${-H * .3} 120 ${-H * .16}C90 ${-H * .22} -90 ${-H * .22} -120 ${-H * .16}Z" fill="${INK}"/>`;
+  s += `<circle cx="-42" cy="${-H * .1}" r="9" fill="${INK}"/><circle cx="42" cy="${-H * .1}" r="9" fill="${INK}"/><path d="M-30 ${-H * .0}Q0 ${H * .02} 30 ${-H * 0}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
+  s += `<g style="mix-blend-mode:multiply"><circle cx="62" cy="${-H * .04}" r="30" fill="url(#dotM)"/></g></g>`;
+  s += star4(120, 120, 24, "tw1 tw1-0") + star4(840, 160, 20, "tw1 tw1-1");
+  return s;
+};
+/* 2: a jar on a shelf with a spot-red label (object) */
+ART[2] = (H) => {
+  let s = hatch("vA", 0, 0, 960, H, "mBot", ` opacity=".5"`) + hatch("hB", 0, 0, 960, H, "mTop", ` opacity=".5"`);
+  s += `<rect x="0" y="${H * .72}" width="960" height="${H * .28}" fill="${INK}"/><rect x="0" y="${H * .72}" width="960" height="8" fill="${PAP}" opacity=".7"/>`;
+  s += `<g transform="translate(480 ${H * .72})"><path d="M-170 0V-420C-170 -470 -120 -480 -120 -520H120C120 -480 170 -470 170 -420V0Z" fill="${PAP}" stroke="${INK}" stroke-width="6"/><path d="M-170 0V-420C-170 -470 -120 -480 -120 -520H-30V0Z" fill="url(#dB)" opacity=".7"/>`;
+  s += `<rect x="-130" y="-590" width="260" height="70" fill="${INK}"/><rect x="-130" y="-590" width="260" height="14" fill="${PAP}" opacity=".5"/>`;
+  s += `<g class="lbl"><rect x="-120" y="-330" width="240" height="150" fill="${PAP}" stroke="${INK}" stroke-width="4"/><g style="mix-blend-mode:multiply"><rect x="-108" y="-318" width="216" height="126" fill="url(#dotL)"/></g><rect x="-100" y="-262" width="200" height="14" fill="${INK}"/><rect x="-70" y="-236" width="140" height="10" fill="${INK}"/></g></g>`;
+  s += greek(60, 70, 300, 6, 77) + greek(620, 70, 300, 6, 78);
+  return s;
+};
+
+const PAGES = [
+  { kind: "front", art: 0, top: 690, h: 710, hl: [["Big words", 150], ["in <em>red</em>", 130]], deck: "<b>EXTRA</b> &nbsp;PLACEHOLDER deck line, one italic sentence" },
+  { art: 1, top: 520, h: 880, hl: [["Second", 150], ["<em>story</em> page", 130]], deck: "PLACEHOLDER dateline and source, Month Year" },
+  { art: 2, top: 520, h: 880, hl: [["The <em>payoff</em>", 140], ["in two lines", 130]], deck: "PLACEHOLDER what it means, in one sentence" }
+];
+const stage = $("#stage");
+PAGES.forEach((p, i) => {
+  const front = p.kind === "front";
+  const H = p.h, headTop = front ? 340 : 150;
+  let bg = "";
+  if (front){
+    bg += `<rect x="40" y="28" width="1000" height="7" fill="${INK}"/><rect x="40" y="40" width="1000" height="2.5" fill="${INK}"/><rect x="40" y="276" width="1000" height="2.5" fill="${INK}"/><rect x="40" y="326" width="1000" height="7" fill="${INK}"/><rect x="40" y="336" width="1000" height="2.5" fill="${INK}"/>`;
+    bg += `<rect x="40" y="206" width="170" height="64" fill="none" stroke="${INK}" stroke-width="3"/><rect x="870" y="206" width="170" height="64" fill="none" stroke="${INK}" stroke-width="3"/>`;
+  } else {
+    bg += `<rect x="40" y="26" width="1000" height="7" fill="${INK}"/><rect x="40" y="38" width="1000" height="2.5" fill="${INK}"/><rect x="40" y="124" width="1000" height="2.5" fill="${INK}"/><rect x="40" y="130" width="1000" height="6" fill="${INK}"/>`;
+  }
+  bg += frameRect(60, p.top, 960, H);
+  bg += `<rect x="40" y="1688" width="1000" height="4" fill="${INK}"/><rect x="40" y="1696" width="1000" height="1.6" fill="${INK}"/>`;
+  [40, 372, 706].forEach((x, k) => { bg += greek(x + 4, 1716, 312, 13, 100 + i * 7 + k); if (k) bg += `<rect x="${x - 10}" y="1708" width="2" height="212" fill="${INK}"/>`; });
+  bg += `<rect x="44" y="1718" width="38" height="38" fill="${INK}"/>`;
+  if (!front) bg += `<g transform="translate(540 ${p.top - 30})"><path d="M-470 0H-40M40 0H470" stroke="${INK}" stroke-width="2"/><path d="M0 -9L9 0L0 9L-9 0Z" fill="${RED}"/></g>`;
+  let hl = "", y = headTop;
+  p.hl.forEach((ln) => {
+    const words = ln[0].split(" ").map((w) => `<span class="w">${w}</span>`).join(" ");
+    hl += `<span class="ln" style="font-size:${ln[1]}px;height:${Math.round(ln[1] * .96)}px;line-height:${Math.round(ln[1] * .96)}px">${words}</span>`;
+    y += Math.round(ln[1] * .96);
+  });
+  const hh = y - headTop;
+  const mast = front ? `<div class="tx mast"><h1 class="mh">THE GAZETTE</h1>
+      <div class="tag" style="left:48px;top:212px;width:154px;text-align:center;font-size:17px;letter-spacing:.12em;line-height:1.1;white-space:normal">FAIR<br>&amp; WARM</div>
+      <div class="tag" style="left:878px;top:212px;width:154px;text-align:center;font-size:17px;letter-spacing:.12em;line-height:1.1;white-space:normal">PRICE<br>ONE CENT</div></div>
+      <div class="tx dateline">VOL. XIV &nbsp;&middot;&nbsp; NO. 217 &nbsp;&middot;&nbsp; MONTH 1900 &nbsp;&middot;&nbsp; PLACEHOLDER</div>`
+    : `<div class="tx hdr">THE GAZETTE<small style="left:48px">VOL. XIV</small><small style="right:48px">ONE CENT</small></div>`;
+  stage.insertAdjacentHTML("beforeend", `<div class="page" id="p${i}"><div class="thump"><div class="cam" id="cam${i}">
+    <svg class="bgsvg" viewBox="0 0 1080 1920">${bg}</svg>
+    ${mast}
+    <div class="tx hl" id="hl${i}" style="top:${headTop}px;height:${hh}px">${hl}</div>
+    <div class="tx deck" id="dk${i}" style="top:${headTop + hh + 8}px;height:46px;line-height:46px">${p.deck}</div>
+    <svg class="art" id="art${i}" style="top:${p.top}px;height:${H}px" viewBox="0 0 960 ${H}">${ART[p.art](H)}</svg>
+  </div></div><div class="shade" id="sh${i}"></div></div>`);
+});
+const P = PAGES.map((_, i) => $("#p" + i));
+const CAM = PAGES.map((_, i) => $("#cam" + i));
+const TH = P.map((p) => $(".thump", p));
+
+function wipeSvg(col, seed){
+  const r = R(seed);
+  let d = "M0 400";
+  for (let x = 0; x <= 1080; x += 18) d += `L${x} ${f1(300 + (r() - .5) * 70 + Math.sin(x / 90) * 28)}`;
+  d += `L1080 3540`;
+  for (let x = 1080; x >= 0; x -= 18) d += `L${x} ${f1(3520 + (r() - .5) * 70 + Math.sin(x / 70) * 30)}`;
+  d += "Z";
+  const dot = col === INK ? "url(#dotK)" : "url(#dotL)";
+  return `<svg width="1080" height="3840" viewBox="0 0 1080 3840"><path d="${d}" fill="${col === INK ? "#1b120a" : col}"/><rect y="130" width="1080" height="190" fill="${dot}" mask="url(#mBot)"/><rect y="3520" width="1080" height="190" fill="${dot}" mask="url(#mTop)"/></svg>`;
+}
+$("#wipeR").innerHTML = wipeSvg(RED, 3);
+$("#wipeK").innerHTML = wipeSvg(INK, 8);
+
+/* ======================= timeline ======================= */
+gsap.set(P, { autoAlpha: 0 }); gsap.set(P[0], { autoAlpha: 1 });
+const loop = (sel, vars, dur, at = 0) => tl.to(sel, Object.assign({ duration: dur, repeat: loopN(dur), ease: "sine.inOut" }, vars), at);
+const thump = (t, a = 7) => { tl.to(TH, { y: a, duration: .06, ease: "power2.out", overwrite: false }, t); tl.to(TH, { y: 0, duration: .32, ease: "elastic.out(1,.35)", overwrite: false }, t + .06); };
+function pressHeadline(i, t0, gap = .2){
+  const ws = $$(".w", $("#hl" + i));
+  ws.forEach((w, k) => {
+    const t = t0 + k * gap;
+    tl.fromTo(w, { autoAlpha: 0, scale: 1.3, y: -12, filter: "blur(5px)" }, { autoAlpha: 1, scale: 1, y: 0, filter: "blur(0px)", duration: .2, ease: "power3.in" }, t);
+    tl.fromTo(w, { textShadow: "0px 0px 0px rgba(198,58,34,0)" }, { textShadow: "6px 5px 0px rgba(198,58,34,.45)", duration: .35, ease: "power2.out", immediateRender: false }, t + .12);
+    if (k % 2 === 0) thump(t + .2, 5);
+  });
+  tl.fromTo("#dk" + i, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: .5, ease: "power2.out" }, t0 + ws.length * gap + .1);
+}
+function revealArt(i, t0, dur = .75){
+  tl.fromTo("#art" + i, { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: dur, ease: "power2.inOut" }, t0);
+}
+
+function turn(a, b, t0, dur = .85){
+  tl.set(P[b], { autoAlpha: 1, zIndex: 1 }, t0); tl.set(P[a], { zIndex: 2 }, t0);
+  tl.fromTo(P[a], { rotationY: 0 }, { rotationY: -118, duration: dur, ease: "power2.in", transformOrigin: "0% 50%" }, t0);
+  tl.fromTo("#sh" + a, { opacity: 0 }, { opacity: .8, duration: dur, ease: "power1.in" }, t0);
+  tl.fromTo(P[b], { scale: 1.05 }, { scale: 1, duration: dur, ease: "power2.out" }, t0);
+  tl.set(P[a], { autoAlpha: 0, rotationY: 0, zIndex: 0 }, t0 + dur); tl.set("#sh" + a, { opacity: 0 }, t0 + dur);
+}
+function slide(a, b, t0, dur = .8){
+  tl.set(P[b], { autoAlpha: 1, zIndex: 3 }, t0);
+  tl.fromTo(P[b], { yPercent: 102, rotation: 2.6, transformOrigin: "50% 100%" }, { yPercent: 0, rotation: 0, duration: dur, ease: "power3.out" }, t0);
+  tl.fromTo(P[a], { scale: 1 }, { scale: .955, duration: dur, ease: "power2.out" }, t0);
+  tl.fromTo("#sh" + a, { opacity: 0 }, { opacity: .5, duration: dur }, t0);
+  tl.set(P[a], { autoAlpha: 0, scale: 1, zIndex: 0 }, t0 + dur); tl.set("#sh" + a, { opacity: 0 }, t0 + dur); tl.set(P[b], { zIndex: 1 }, t0 + dur);
+}
+function flood(a, b, t0, dur = 1.0){
+  tl.fromTo("#wipeR", { y: 0 }, { y: -5760, duration: dur, ease: "power2.inOut" }, t0 - .06);
+  tl.fromTo("#wipeK", { y: 0 }, { y: -5760, duration: dur, ease: "power2.inOut" }, t0 + .08);
+  tl.set(P[b], { autoAlpha: 1, zIndex: 1 }, t0 + dur * .5); tl.set(P[a], { autoAlpha: 0, zIndex: 0 }, t0 + dur * .5);
+  tl.set(["#wipeR", "#wipeK"], { y: 0 }, t0 + dur + .3);
+}
+turn(0, 1, L(1) - .8); slide(1, 2, L(2) - .8);
+
+tl.fromTo(CAM[0], { scale: 1.14, y: 0, transformOrigin: "50% 7%" }, { scale: 1, duration: 3.6, ease: "power3.inOut" }, 0);
+tl.to(CAM[0], { scale: 1.07, y: -52, transformOrigin: "50% 62%", duration: 2.6, ease: "sine.inOut" }, 3.6);
+tl.fromTo(CAM[1], { scale: 1.16, y: 0, transformOrigin: "50% 10%" }, { scale: 1.0, duration: 2.8, ease: "power2.out" }, L(1) - .3);
+tl.to(CAM[1], { scale: 1.1, x: -26, y: -80, transformOrigin: "50% 55%", duration: 3.2, ease: "sine.inOut" }, L(1) + 2.5);
+tl.fromTo(CAM[2], { scale: 1.2, transformOrigin: "50% 62%" }, { scale: 1.0, duration: 2.4, ease: "power3.out" }, L(2) - .3);
+tl.to(CAM[2], { scale: 1.06, y: -36, transformOrigin: "50% 55%", duration: 7.5, ease: "sine.inOut" }, L(2) + 2.2);
+
+// ----- page 0: front page, hook -----
+(() => {
+  tl.fromTo(".mh", { autoAlpha: 0, scaleY: 1.18, filter: "blur(6px)" }, { autoAlpha: 1, scaleY: 1, filter: "blur(0px)", duration: .25, ease: "power3.in" }, 0); thump(.4, 9);
+  pressHeadline(0, .3, .22);
+  revealArt(0, .05, .7);
+  loop("#p0 .corona", { rotation: 360, ease: "none", svgOrigin: "0 0" }, 40);
+  $$("#p0 .tw0").forEach((e, k) => tl.fromTo(e, { opacity: 1 }, { opacity: .25, duration: 1.1 + k * .3, yoyo: true, repeat: loopN(1.1 + k * .3) * 2, ease: "sine.inOut" }, k * .2));
+  const sp = $("#p0 .spk0"), tS = L(0) + 1.4;
+  tl.fromTo(sp, { scale: 0, rotation: 0, svgOrigin: "0 0" }, { scale: 1, rotation: 25, duration: .2, ease: "back.out(2)", svgOrigin: "0 0" }, tS);
+  tl.to(sp, { scale: .35, rotation: 70, duration: .26, repeat: loopN(.52), yoyo: true, ease: "sine.inOut", svgOrigin: "0 0" }, tS + .22);
+  tl.fromTo("#flash", { opacity: 0 }, { opacity: .5, duration: .06, yoyo: true, repeat: 1 }, tS); thump(tS, 10);
+})();
+
+// ----- page 1: portrait -----
+(() => {
+  pressHeadline(1, L(1) - .62, .22); revealArt(1, L(1) - .66, .65);
+  $$("#p1 .tw1").forEach((e, k) => tl.fromTo(e, { opacity: 1 }, { opacity: .25, duration: 1.2 + k * .3, yoyo: true, repeat: loopN(1.2 + k * .3) * 2, ease: "sine.inOut" }, L(1)));
+  tl.fromTo("#p1 #art1", { x: 0 }, { x: -14, duration: 6, ease: "sine.inOut", yoyo: true, repeat: loopN(6) }, L(1));
+})();
+
+// ----- page 2: object + stamp -----
+(() => {
+  pressHeadline(2, L(2) - .6, .2); revealArt(2, L(2) - .64, .6);
+  tl.fromTo("#p2 .lbl", { rotation: -2, svgOrigin: "0 -250" }, { rotation: 2, duration: 2.4, ease: "sine.inOut", yoyo: true, repeat: loopN(2.4) }, L(2));
+  const ts = L(2) + 2.2;
+  tl.set("#stamp5", { visibility: "visible" }, ts); tl.fromTo("#stamp5", { opacity: 0, scale: 2, rotation: -14 }, { opacity: 1, scale: 1, rotation: -7, duration: .22, ease: "power4.in" }, ts); thump(ts + .2, 14);
+  tl.fromTo("#flash", { opacity: 0 }, { opacity: .45, duration: .06, yoyo: true, repeat: 1 }, ts + .2);
+})();
+
+tl.fromTo("#yellow", { opacity: .92 }, { opacity: 1, duration: 3, repeat: loopN(3), yoyo: true, ease: "sine.inOut" }, 0);
+
+vfrey.captions("#captions", { style: "color", font: '"Playfair Display", Georgia, serif', size: 64, color: INK, highlight: RED, maxWords: 4, maxChars: 24 });
+</script>
+</body>
+</html>

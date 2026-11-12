@@ -1,0 +1,203 @@
+<!doctype html>
+<!-- Pixel art starter: a 135x240 canvas (frame / 8), 21-colour palette, 5x7 bitmap font, three scenes (hook, play field, payoff), pixel wipes, captions on a pixel plate.
+     Replace the PLACEHOLDER sprites, INPUTS and cue words; keep the canvas, palette, clocks and plate. Any script works: cue words are looked up by text and fall back to shares of the film.
+     Sample script: "A honeybee beats its wings two hundred thirty times every second. Count with me. Tiny wings, big sound." -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0b1e; }
+  #root { position: relative; width: 100%; height: 100%; background: #0d0b1e; }
+  #cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges; }
+  /* one dark scanline per canvas row (8 real px), and a soft vignette */
+  #scan { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 6px, rgba(0,0,0,0.13) 6px 8px); pointer-events: none; }
+  #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.30) 100%); pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0"><canvas id="cv"></canvas><div id="scan"></div><div id="vig"></div></div>
+<script>
+"use strict";
+const PX = 8, W = Math.round(vfrey.frame.width / PX), H = Math.round(vfrey.frame.height / PX);   // 135 x 240 for 9:16
+const cv = document.getElementById("cv"); cv.width = W; cv.height = H;
+const ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
+const PAL = { k:"#0d0b1e", n:"#1b1744", i:"#2a2257", p:"#3b2a7a", l:"#6a5acd", w:"#f4f1ff", g:"#9aa0c8", d:"#4a4e7a",
+  y:"#ffd23f", o:"#ff8a1f", r:"#ef3b4e", e:"#8e1f3d", m:"#ff6fb5", a:"#3be07a", f:"#138a5a",
+  c:"#36d6e7", h:"#1b8fa0", b:"#2b7bff", u:"#1a3f9c", t:"#e0a878", s:"#7a4a33" };
+const rd = Math.round, fl = Math.floor;
+function R(x, y, w, h, c) { if (w <= 0 || h <= 0) return; ctx.fillStyle = PAL[c]; ctx.fillRect(rd(x), rd(y), rd(w), rd(h)); }
+function P(x, y, c) { R(x, y, 1, 1, c); }
+function S(spr, x, y, map, flip) {          // a sprite of strings; "." is transparent; map recolours letters
+  for (let j = 0; j < spr.length; j++) { const row = spr[j];
+    for (let i = 0; i < row.length; i++) { const ch = row[flip ? row.length - 1 - i : i]; if (ch !== ".") P(x + i, y + j, (map && map[ch]) || ch); } }
+}
+function SS(spr, x, y, k, map) {            // the same, scaled by a whole number
+  for (let j = 0; j < spr.length; j++) for (let i = 0; i < spr[j].length; i++) { const ch = spr[j][i]; if (ch !== ".") R(x + i * k, y + j * k, k, k, (map && map[ch]) || ch); }
+}
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);      // ease out; step it: fl(eo(u) * 6) / 6
+const tick = (t) => fl(t * 10);                        // the sprite clock: 10 fps
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+// a two-frame 8x8 sprite: S(WALKER[tick(t) % 2], x, y, { x: "c", z: "h" })
+const WALKER = [ [ "..xxxx..", ".xxxxxx.", "xxwxxwxx", "xxkxxkxx", "xxxxxxxx", ".xzzzzx.", ".x.xx.x.", "x..xx..x" ],
+                 [ "..xxxx..", ".xxxxxx.", "xxwxxwxx", "xxkxxkxx", "xxxxxxxx", ".xzzzzx.", "x.x..x.x", ".x....x." ] ];
+
+const FONT_SRC = {
+A:"01110|10001|10001|11111|10001|10001|10001", B:"11110|10001|10001|11110|10001|10001|11110", C:"01110|10001|10000|10000|10000|10001|01110",
+D:"11110|10001|10001|10001|10001|10001|11110", E:"11111|10000|10000|11110|10000|10000|11111", F:"11111|10000|10000|11110|10000|10000|10000",
+G:"01110|10001|10000|10111|10001|10001|01111", H:"10001|10001|10001|11111|10001|10001|10001", I:"01110|00100|00100|00100|00100|00100|01110",
+J:"00111|00010|00010|00010|00010|10010|01100", K:"10001|10010|10100|11000|10100|10010|10001", L:"10000|10000|10000|10000|10000|10000|11111",
+M:"10001|11011|10101|10101|10001|10001|10001", N:"10001|11001|10101|10011|10001|10001|10001", O:"01110|10001|10001|10001|10001|10001|01110",
+P:"11110|10001|10001|11110|10000|10000|10000", Q:"01110|10001|10001|10001|10101|10010|01101", R:"11110|10001|10001|11110|10100|10010|10001",
+S:"01111|10000|10000|01110|00001|00001|11110", T:"11111|00100|00100|00100|00100|00100|00100", U:"10001|10001|10001|10001|10001|10001|01110",
+V:"10001|10001|10001|10001|10001|01010|00100", W:"10001|10001|10001|10101|10101|11011|10001", X:"10001|10001|01010|00100|01010|10001|10001",
+Y:"10001|10001|01010|00100|00100|00100|00100", Z:"11111|00001|00010|00100|01000|10000|11111",
+"0":"01110|10001|10011|10101|11001|10001|01110", "1":"00100|01100|00100|00100|00100|00100|01110", "2":"01110|10001|00001|00010|00100|01000|11111",
+"3":"11110|00001|00001|01110|00001|00001|11110", "4":"00010|00110|01010|10010|11111|00010|00010", "5":"11111|10000|11110|00001|00001|10001|01110",
+"6":"00110|01000|10000|11110|10001|10001|01110", "7":"11111|00001|00010|00100|01000|01000|01000", "8":"01110|10001|10001|01110|10001|10001|01110",
+"9":"01110|10001|10001|01111|00001|00010|01100",
+".":"00000|00000|00000|00000|00000|01100|01100", ",":"00000|00000|00000|00000|00110|00100|01000", "!":"00100|00100|00100|00100|00100|00000|00100",
+"?":"01110|10001|00001|00110|00100|00000|00100", "-":"00000|00000|00000|11111|00000|00000|00000", ":":"00000|01100|01100|00000|01100|01100|00000",
+"'":"00100|00100|01000|00000|00000|00000|00000", "=":"00000|00000|11111|00000|11111|00000|00000", "/":"00001|00010|00010|00100|01000|01000|10000",
+"+":"00000|00100|00100|11111|00100|00100|00000", " ":"00000|00000|00000|00000|00000|00000|00000" };
+const FONT = {}; for (const k in FONT_SRC) FONT[k] = FONT_SRC[k].split("|");
+const tw = (s, sc = 1) => s.length * 6 * sc - sc;                       // width of a string
+function T(s, x, y, c, sc = 1) { let cx = rd(x); for (const ch of s) { const g = FONT[ch] || FONT[" "];
+  for (let j = 0; j < 7; j++) for (let i = 0; i < 5; i++) if (g[j][i] === "1") R(cx + i * sc, y + j * sc, sc, sc, c); cx += 6 * sc; } }
+function TO(s, x, y, c, sc = 1, oc = "k") { for (const [ox, oy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[-1,1],[1,-1]]) T(s, x + ox * sc, y + oy * sc, oc, sc); T(s, x, y, c, sc); }   // outlined
+const TC = (s, cx, y, c, sc = 1, oc) => (oc ? TO : T)(s, rd(cx - tw(s, sc) / 2), y, c, sc, oc);                                                         // centred
+
+const TM = vfrey.timing, WD = TM.words, DUR = TM.durationSec, SENT = [];
+{ let cur = null; WD.forEach((w, i) => { if (!cur) cur = { firstWord: i, start: w.start }; cur.lastWord = i; cur.end = w.end; if (/[.!?;]$/.test(w.text)) { SENT.push(cur); cur = null; } }); if (cur) SENT.push(cur); }
+const Ls = (i) => SENT[Math.min(i, SENT.length - 1)].start;             // start of sentence i
+const wS = (i) => WD[Math.min(i, WD.length - 1)].start;                 // start of word i; wS(SENT[2].firstWord + 3)
+
+function mkStars(seed, n, yMax) { const r = rng(seed), a = []; for (let i = 0; i < n; i++) a.push({ x: fl(r() * W), y: fl(r() * yMax), tw: fl(r() * 6) }); return a; }
+const STARS = [mkStars(11, 26, 150), mkStars(12, 16, 150), mkStars(13, 8, 150)];
+function stars(t, yMax = 150, speeds = [3, 8, 18]) { const cols = ["d", "g", "w"];           // three layers, whole-pixel scroll
+  for (let k = 0; k < 3; k++) for (const s of STARS[k]) { const y = (s.y + fl(t * speeds[k])) % yMax, blink = (tick(t) + s.tw) % 6 === 0; P(s.x, y, blink ? "d" : cols[k]); } }
+const BAYER = [ [0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],[60,28,52,20,62,30,54,22],[3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21] ];
+function ditherBand(y0, y1, cA, cB) { for (let y = y0; y < y1; y++) { const f = (y - y0 + .5) / (y1 - y0); for (let x = 0; x < W; x++) P(x, y, (BAYER[y & 7][x & 7] + .5) / 64 < f ? cB : cA); } }
+const SKY = {};
+function skyline(seed, base, hMin, hMax, wMin, wMax, col, scroll, winCol, t) {             // buildings with lit windows; scroll = fl(t * speed)
+  if (!SKY[seed]) { const r = rng(seed); let x = 0; const bl = []; while (x < W * 2) { const w = wMin + fl(r() * (wMax - wMin)), h = hMin + fl(r() * (hMax - hMin)); bl.push({ x, w, h, s: fl(r() * 1000) }); x += w; } SKY[seed] = { bl, tot: x }; }
+  const { bl, tot } = SKY[seed], off = fl(scroll) % tot;
+  for (const b of bl) for (const shift of [0, -tot]) { const bx = b.x - off + shift; if (bx > W || bx + b.w < 0) continue; R(bx, base - b.h, b.w, b.h, col);
+    if (winCol) for (let wy = base - b.h + 3; wy < base - 2; wy += 4) for (let wx = bx + 2; wx < bx + b.w - 2; wx += 3) if (((wx * 7 + wy * 13 + b.s) % 5) < 2) P(wx, wy, ((tick(t) + wx + wy) % 23 === 0) ? "d" : winCol); }
+}
+
+const CAPS_ON = !(TM.captions && TM.captions.mode === "off");
+const CAP_Y = rd((vfrey.captionBox.top + vfrey.captionBox.height / 2) / PX) - 8;   // plate is 15 rows tall, centred in the band
+const CAP_CX = rd(W * 0.47);                                                       // a little left of centre, off the right rail
+const CH = []; (() => { let cur = [], len = 0, prevEnd = -9;                        // phrases of up to 3 words / 17 characters
+  const flush = () => { if (cur.length) { CH.push({ ws: cur, start: cur[0].start }); cur = []; len = 0; } };
+  for (const w of WD) { const txt = w.text.toUpperCase().replace(/[^A-Z0-9.,!?'\-:]/g, ""); if (!txt) continue;
+    if (cur.length && (w.start - prevEnd > 0.45 || len + 1 + txt.length > 17 || cur.length >= 3)) flush();
+    cur.push({ txt, start: w.start, end: w.end }); len += (len ? 1 : 0) + txt.length; prevEnd = w.end;
+    if (/[.!?;]$/.test(txt) || (/,$/.test(txt) && cur.length >= 2)) flush(); }
+  flush();
+  for (let i = 0; i < CH.length; i++) { const last = CH[i].ws[CH[i].ws.length - 1], nx = CH[i + 1]; CH[i].end = nx ? (nx.start - last.end < 0.5 ? nx.start : last.end + 0.22) : DUR; } })();
+function captions(t) {
+  const c = CAPS_ON && CH.find((q) => t >= q.start && t < q.end); if (!c) return;
+  let len = 0; c.ws.forEach((w, i) => { len += w.txt.length + (i ? 1 : 0); });
+  const pw = len * 6 - 1 + 10, px = rd(CAP_CX - pw / 2), ph = 15, y0 = CAP_Y;
+  R(px + 2, y0 + 2, pw, ph, "n");                                                   // hard drop shadow
+  R(px, y0, pw, ph, "k"); R(px, y0, pw, 1, t - c.start < .12 ? "y" : "l"); R(px, y0 + ph - 1, pw, 1, "l"); R(px, y0, 1, ph, "l"); R(px + pw - 1, y0, 1, ph, "l");
+  let cx = px + 5, active = -1; c.ws.forEach((q, i) => { if (t >= q.start) active = i; });
+  c.ws.forEach((q, i) => { const hot = i === active; T(q.txt, cx, y0 + 4 + (hot && t - q.start < 0.1 ? -1 : 0), hot ? "y" : "w"); cx += (q.txt.length + 1) * 6; });
+}
+
+/* ---------- sprites (PLACEHOLDER art: swap the subject, keep the construction: 8x8 two-frame sprites, letters are palette keys) ---------- */
+const BEE = [ [ "..kk.kk.", ".kwwkwwk", "kwwwxxxx", "..xkxkxx", ".xxxxxxk", "..xkxkx.", "...kxk..", "........" ],
+              [ "........", "..kk.kk.", ".kwwkwwk", "..xxxxxx", ".xkxkxxk", "..xkxkx.", "...kxk..", "........" ] ];
+const BEECOL = [ { x: "y", z: "o" }, { x: "c", z: "h" }, { x: "m", z: "r" } ];
+const SHIP = [ "....w....", "...www...", "...www...", "..wwcww..", "..wwwww..", ".rwwwwwr.", "rrwwwwwrr", "r.wwwww.r" ];
+const HEART = [ "..rrr.rrr..", ".rrrrrrrrr.", "rrwwrrrrrrr", "rrwrrrrrrre", "rrrrrrrrrre", ".rrrrrrrre.", "..rrrrrre..", "...rrrre...", "....rre....", ".....r....." ];
+/* PLACEHOLDER content: the number is computed from these inputs, never typed on the picture */
+const INPUTS = { count: 230, unit: "BEATS A SECOND", title: "WING BEATS", cue1: "count", cue2: "tiny" };
+const at = (word, share) => { for (const w of WD) if (w.text.toLowerCase().replace(/[^a-z]/g, "") === word) return w.start; return DUR * share; };
+
+/* ---------- shared pieces: the floor grid, the control panel that always fills the bottom ---------- */
+function neonFloor(t, hz = 150) {
+  R(0, hz, W, H - hz, "k"); R(0, hz, W, 1, "m"); R(0, hz + 1, W, 1, "p");
+  const sc = (t * 0.7) % 1;
+  for (let k = 0; k < 9; k++) { const u = (k + sc) / 9, y = hz + 1 + rd((H - hz) * u * u); R(0, y, W, 1, u > .6 ? "l" : "p"); }
+  for (let xi = -9; xi <= 9; xi++) for (let y = hz + 2; y < H; y++) { const x = rd(67 + xi * 26 * (y - hz) / 90); if (x >= 0 && x < W) P(x, y, "i"); }
+}
+function panel(t, firing) {
+  const y0 = 180;
+  R(0, y0, W, H - y0, "i"); R(0, y0, W, 1, "k"); R(0, y0 + 1, W, 1, "g"); R(0, y0 + 2, W, 2, "l"); R(0, y0 + 4, W, 1, "k");
+  for (const [sx, sy] of [[4, y0 + 8], [130, y0 + 8], [4, H - 6], [130, H - 6]]) { R(sx - 1, sy - 1, 3, 3, "d"); P(sx, sy, "g"); }
+  const jx = 30, jy = y0 + 36, tx = ((tick(t) % 12) < 6 ? -4 : 4);                       // the stick leans left and right
+  R(jx - 11, jy - 6, 23, 23, "k"); R(jx - 10, jy - 5, 21, 21, "n"); R(jx - 5, jy, 11, 11, "k"); R(jx - 4, jy + 1, 9, 9, "d");
+  for (let k = 0; k <= 14; k++) R(jx + rd(tx * k / 14) - 1, jy + 5 - k, 3, 1, "g");
+  const bx = jx + tx, by = jy - 13; R(bx - 6, by - 4, 13, 9, "r"); R(bx - 5, by - 5, 11, 11, "r"); R(bx - 4, by - 4, 4, 3, "m"); R(bx + 2, by + 2, 4, 3, "e");
+  const btn = (x, y, c, c2, pressed) => { R(x - 1, y - 1, 17, 17, "k"); R(x, y, 15, 15, "n"); R(x + 1, y + (pressed ? 3 : 1), 13, pressed ? 10 : 12, pressed ? c2 : c); if (!pressed) R(x + 2, y + 2, 4, 2, "w"); };
+  btn(58, y0 + 22, "y", "w", firing); btn(80, y0 + 22, "m", "r", false); btn(102, y0 + 22, "c", "b", false);
+  T("FIRE", 58, y0 + 42, "g"); T("1UP", 8, y0 + 50, tick(t) % 8 < 5 ? "y" : "d"); R(0, H - 3, W, 3, "k");
+}
+function hud(label, value, fill, hot) {                                                   // counter, one bar; starts under the platform-UI rows
+  R(0, 24, W, 30, "k"); R(0, 54, W, 1, "i"); T(label, 6, 29, "g"); TO(String(value), 6, 38, hot ? "r" : "y", 2);
+  R(70, 30, 59, 7, "i"); for (let x = 0; x < rd(59 * fill); x++) if (x % 3 !== 2) R(70 + x, 31, 1, 5, "o");
+}
+
+/* ---------- scene 0: hook, a big number drops in letter by letter over a night sky, hero sprite 3x, neon floor ---------- */
+function sceneHook(t) {
+  R(0, 0, W, H, "k"); ditherBand(30, 74, "k", "n"); ditherBand(74, 150, "n", "i"); stars(t, 120, [2, 5, 10]); neonFloor(t, 150);
+  const s = String(INPUTS.count);
+  for (let i = 0; i < s.length; i++) { const u = clamp((t - 0.1 - i * 0.12) / 0.4); if (u <= 0) continue;
+    const yy = 40 - rd((1 - eo(u)) * 40) + (u > .85 && u < 1 ? 1 : 0), x = rd(W / 2 - (s.length * 18) / 2) + i * 18;
+    for (const [ox, oy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1]]) T(s[i], x + ox * 2, yy + oy * 2, "k", 3);
+    T(s[i], x + 3, yy + 3, "o", 3); T(s[i], x, yy, "y", 3); }
+  TC(INPUTS.title, rd(W / 2), 78, tick(t) % 6 < 3 ? "w" : "g", 2, "k");
+  const bob = [0, -1, -2, -1][tick(t) % 4]; SS(BEE[tick(t) % 2], 49, 104 + bob, 4, BEECOL[0]);
+  R(52, 140, 24, 2, "i"); panel(t, false);
+}
+/* ---------- scene 1: the play field. A swarm crosses in whole-pixel steps, the counter climbs from the inputs ---------- */
+function sceneField(t, t0, t1) {
+  const u = clamp((t - t0) / Math.max(0.5, t1 - t0)), n = rd(INPUTS.count * eo(u));
+  R(0, 0, W, H, "k"); ditherBand(100, 156, "k", "n"); stars(t, 156); R(0, 156, W, 24, "n"); R(0, 156, W, 1, "l");
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) { const x = 8 + c * 15 + ((fl(t * 6) + r * 2) % 7) - 3, y = 66 + r * 17 + [0, 1, 0, -1][(tick(t) + c) % 4]; S(BEE[(tick(t) + c + r) % 2], x, y, BEECOL[r % 3]); }
+  const sx = 60 + rd(Math.sin(t * 1.6) * 40); SS(SHIP, sx - 9, 138, 2); R(sx - 1, 128 - (tick(t) % 5) * 6, 2, 5, "y");
+  hud(INPUTS.unit.split(" ")[0], n, u, false); panel(t, tick(t) % 5 < 2);
+}
+/* ---------- scene 2: payoff. A striped pedestal on the neon grid, the hero 5x, a blinking caption word ---------- */
+function scenePay(t, t0) {
+  R(0, 0, W, H, "k"); ditherBand(40, 150, "k", "n"); stars(t, 130, [2, 5, 10]); neonFloor(t, 150);
+  const rise = eo((t - t0) / 0.6), dy = rd((1 - fl(rise * 8) / 8) * 90), cols = ["o", "y", "m", "o", "y", "m"];
+  for (let i = 0; i < 6; i++) { const w = 70 - i * 4 + 0; R(67 - w / 2, 126 + i * 4 + dy, w, 4, cols[i]); }
+  SS(HEART, 40, 70 + dy + [0, -1, 0, 1][tick(t) % 4], 5); TC("1UP", rd(W / 2), 52 + dy, tick(t) % 6 < 3 ? "y" : "w", 3, "k");
+  for (let k = 0; k < 6; k++) { const a = tick(t) * 0.7 + k * 1.05; P(rd(67 + Math.cos(a) * 36), rd(95 + Math.sin(a) * 26), k % 2 ? "w" : "y"); }
+  panel(t, false);
+}
+const T1 = at(INPUTS.cue1, 0.34) - 0.15, T2 = at(INPUTS.cue2, 0.7) - 0.15;
+const BOUNDS = [T1, T2], KINDS = [ { k: 0, c: "k" }, { k: 2, c: "k" } ];
+const SCENES = [ (t) => sceneHook(t), (t) => sceneField(t, T1, T2), (t) => scenePay(t, T2) ];
+
+const HALF = 0.17;                                                                  // half the wipe length, seconds
+const ovc = document.createElement("canvas"); ovc.width = W; ovc.height = H; const ovx = ovc.getContext("2d");
+function cover(kind, colour, amount, second) {                                      // amount 0..1 of the frame covered
+  const img = ovx.createImageData(W, H), d = img.data, hex = PAL[colour], rgb = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)), cell = 9;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let thr;
+    if (kind === 0) thr = (BAYER[y & 7][x & 7] + .5) / 64;
+    else if (kind === 1) thr = (y % 12) / 12 * 0.85 + ((fl(y / 12) % 2) ? 0.1 : 0);
+    else if (kind === 2) { const cx = fl(x / cell), cy = fl(y / cell), mx = fl(W / cell / 2), my = fl(H / cell / 2); thr = (Math.abs(cx - mx) * 1.7 + Math.abs(cy - my)) / (mx * 1.7 + my) * 0.95 + 0.03; if (second) thr = 1 - thr; }
+    else { const cx = fl(x / cell); thr = (((cx * 37) % 15) / 15) * 0.55 + 0.4 * (second ? 1 - y / H : y / H) + 0.04; }
+    if (thr < amount) { const o = (y * W + x) * 4; d[o] = rgb[0]; d[o + 1] = rgb[1]; d[o + 2] = rgb[2]; d[o + 3] = 255; } }
+  ovx.putImageData(img, 0, 0); ctx.drawImage(ovc, 0, 0);
+}
+function draw(t) {
+  let idx = 0; for (const b of BOUNDS) if (t >= b) idx++;
+  SCENES[idx](t);
+  for (let b = 0; b < BOUNDS.length; b++) { const dist = Math.abs(t - BOUNDS[b]); if (dist < HALF) cover(KINDS[b].k, KINDS[b].c, Math.min(1.01, (1 - dist / HALF) * 1.05), t >= BOUNDS[b]); }
+  captions(t);
+}
+const tl = vfrey.timeline(), clock = { t: 0 };
+tl.to(clock, { t: DUR, duration: DUR, ease: "none", onUpdate: () => draw(clock.t) }, 0);   // live preview only
+vfrey.onFrame((t) => { clock.t = t; draw(t); });   // this is what a render runs: onUpdate does not fire when the film is sought
+draw(0);
+</script>
+</body>
+</html>

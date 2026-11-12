@@ -4,6 +4,86 @@
     "vfrey": {
       "hash": "5c65ff41e0b359eb",
       "files": 29
+    },
+    "vfrey-style-blueprint": {
+      "hash": "0f9224d7710bf713",
+      "files": 8
+    },
+    "vfrey-style-comic-halftone": {
+      "hash": "f4d0386940a24802",
+      "files": 9
+    },
+    "vfrey-style-data-story": {
+      "hash": "bef58949b38b8b43",
+      "files": 10
+    },
+    "vfrey-style-flat-2d": {
+      "hash": "85d6645f7ffa3a59",
+      "files": 8
+    },
+    "vfrey-style-isometric": {
+      "hash": "7131869e348ad1e8",
+      "files": 8
+    },
+    "vfrey-style-kinetic-type": {
+      "hash": "7711884f7a644df3",
+      "files": 9
+    },
+    "vfrey-style-low-poly": {
+      "hash": "4631e017377b19c1",
+      "files": 9
+    },
+    "vfrey-style-map-documentary": {
+      "hash": "ddd1941978fc0717",
+      "files": 9
+    },
+    "vfrey-style-neon-synthwave": {
+      "hash": "8405ce182e3a4cbc",
+      "files": 9
+    },
+    "vfrey-style-noir": {
+      "hash": "2c14a985387fbd71",
+      "files": 8
+    },
+    "vfrey-style-one-line": {
+      "hash": "1fd49d8f4f58be0a",
+      "files": 8
+    },
+    "vfrey-style-paper-cutout": {
+      "hash": "f616cac8424b9f88",
+      "files": 9
+    },
+    "vfrey-style-pixel-art": {
+      "hash": "602c6f94cf921352",
+      "files": 8
+    },
+    "vfrey-style-real-3d": {
+      "hash": "d26c82d75fbeea5e",
+      "files": 10
+    },
+    "vfrey-style-screen-demo": {
+      "hash": "b557cdc03b2c62c5",
+      "files": 8
+    },
+    "vfrey-style-soft-gradient": {
+      "hash": "71337d3f9cde4654",
+      "files": 8
+    },
+    "vfrey-style-storybook": {
+      "hash": "14c11d54a3b402ab",
+      "files": 8
+    },
+    "vfrey-style-terminal": {
+      "hash": "7b407d2ee5b2636d",
+      "files": 8
+    },
+    "vfrey-style-vintage-newspaper": {
+      "hash": "4bd50727c5b1bc05",
+      "files": 8
+    },
+    "vfrey-style-whiteboard-sketch": {
+      "hash": "1eab33fd7f4f6ac4",
+      "files": 9
     }
   }
 }
