@@ -10,16 +10,18 @@ metadata:
   style-name: Screen demo
   style-summary: A clean, light fake app on screen where a cursor clicks and zooms in on the exact detail the voice is explaining.
   style-best-for: tech tips, online safety, how-to, software tutorials, app explainers, product walkthroughs
+  style-poster: screen-demo.jpg
+  style-preview: screen-demo.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Screen demo
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html` plus `scene.js`, HTML + CSS + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Start from `starter.html` next to this file (copy it to `scenes/<idea>/index.html`, replace every PLACEHOLDER and `APP NAME`, keep the structure); code blocks to paste are in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Every name, brand, domain and person in the window is invented (`example.com` domains). Use it for tech tips, online safety, how-to, software tutorials, app explainers and product walkthroughs; not for stories without an interface, not for charts, never for a real product or logo.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html` plus `scene.js`, HTML + CSS + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Start from `starter.html` next to this file (`npx vfrey styles start screen-demo scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (replace every PLACEHOLDER and `APP NAME`, keep the structure); code blocks to paste are in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Every name, brand, domain and person in the window is invented (`example.com` domains). Use it for tech tips, online safety, how-to, software tutorials, app explainers and product walkthroughs; not for stories without an interface, not for charts, never for a real product or logo.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; Kokoro af_heart with lineGap 0.3 speaks about 3 words a second.
+Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -116,6 +118,7 @@ A  List hook           B  Detail + loupe       C  Toast / button      D  Wide pu
 [ plate ]              [ plate ]               [ plate ]              [ plate ]
 E  Typing field: a pill browser bar drops in from y -160 and types a mono URL with a caret.
 F  Click close-up: zoom 1.4 on a small control, ripple, state change (fill, label swap), toast.
+   A close-up frames a control, never a paragraph: text lines the zoom pushes past the frame edge fail `frames.off-frame`; over a text column keep the push-in near 1.1 and centred.
 ```
 
 ## 7. Motion
@@ -143,7 +146,7 @@ A light, modern product-video bed: pad chords on 4.6 s bars, a sparse pluck arpe
 
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` needs only `python3` (standard library) and always writes the same file for the same input.
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (lists of times from the same constants the scene uses; format at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-screen-demo/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (lists of times from the same constants the scene uses; format at the top of `make-bed.py`), then from the project folder: `python3 "$(npx vfrey styles path screen-demo)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey screen demo style)", "volume": -12, "duck": false}` and make it again with `--rerender`.
 One pass instead: `--duration 60` with no `--timing` writes a bed with no accents before the first render. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, install nothing unasked.
 

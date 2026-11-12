@@ -16,10 +16,10 @@ About 30 MB in `node_modules`. This was proven with three.js 0.187; a newer vers
 ## 2. Copy the starter and the shaders
 
 ```
-mkdir -p src/<idea> scenes/<idea>
-cp .agents/skills/vfrey-style-real-3d/scene-starter.js src/<idea>/scene.js
-cp .agents/skills/vfrey-style-real-3d/glsl.js src/<idea>/glsl.js
+npx vfrey styles start real-3d scenes/<idea>
 ```
+
+This copies `starter.html` to `scenes/<idea>/index.html`, `scene-starter.js` to `src/<idea>/scene.js` and `glsl.js` to `src/<idea>/glsl.js`, and prints the bundle commands. It does not install three.js (step 1 does).
 
 The source lives in `src/<idea>/` (outside the scene folder); only the bundle goes into `scenes/<idea>/`. `scene-starter.js` is a working skeleton: a star, a lit world, a sky, bloom, a three-shot camera, two tags. Keep the plumbing, replace the cast, the shots and the cues.
 

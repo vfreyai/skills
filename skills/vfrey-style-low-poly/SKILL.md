@@ -10,16 +10,18 @@ metadata:
   style-name: Low-poly 3D
   style-summary: A bright toy world made of flat coloured triangles, filmed by a camera that glides around a floating diorama.
   style-best-for: nature, animal behaviour, how things work, geography, kids' science, gentle explainers
+  style-poster: low-poly.jpg
+  style-preview: low-poly.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Low-Poly 3D
 
-This file teaches a look, never a topic. The plumbing is the Real 3D style's and is NOT repeated here: read `vfrey-style-real-3d` (its `SKILL.md`, `helpers.md` and `scene-starter.js`) for the one-time `npm install three@0.187 esbuild` (ask the person first), the esbuild bundle into the scene folder, the `modifiers` proxy tween that calls `render(t)` on every seek, `preserveDrawingBuffer`, the on-screen error box and its limits (it needs a graphics chip and never goes to the cloud render). Everything below replaces that style's look: no shaders, no bloom, no star field. Start from `starter.html` and `starter-scene.js` next to this file (the shell and the 3D source: copy them to `scenes/<idea>/index.html` and `src/<idea>/scene.js`, bundle to `scenes/<idea>/scene3d.js`); the music script is `make-bed.py` next to this file. Use it when the subject is a creature, object or place that can be built from simple solids and the idea is spatial; not for faces, photographic looks, flat subjects (charts, interfaces) or a machine without a graphics chip.
+This file teaches a look, never a topic. The plumbing is the Real 3D style's and is NOT repeated here: read `vfrey-style-real-3d` (its `SKILL.md`, `helpers.md` and `scene-starter.js`) for the one-time `npm install three@0.187 esbuild` (ask the person first), the esbuild bundle into the scene folder, the `modifiers` proxy tween that calls `render(t)` on every seek, `preserveDrawingBuffer`, the on-screen error box and its limits (it needs a graphics chip and never goes to the cloud render). Everything below replaces that style's look: no shaders, no bloom, no star field. Start from `starter.html` and `starter-scene.js` next to this file (the shell and the 3D source: `npx vfrey styles start low-poly scenes/<idea>` copies them to `scenes/<idea>/index.html` and `src/<idea>/scene.js`; bundle to `scenes/<idea>/scene3d.js`); the music script is `make-bed.py` next to this file. Use it when the subject is a creature, object or place that can be built from simple solids and the idea is spatial; not for faces, photographic looks, flat subjects (charts, interfaces) or a machine without a graphics chip.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 3 words a second. Set `lineGap` in the script (0.25 to 0.4 is brisk) and write 5 or 6 full lines rather than many short ones.
+Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Set `lineGap` in the script (0.25 to 0.4 is brisk) and write 5 or 6 full lines rather than many short ones.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -118,7 +120,7 @@ A light toy-like bed: kalimba plucks over a soft pad and a round bass, C major, 
 
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` needs only `python3` (standard library) and always writes the same file for the same input.
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (a list; each cue names a sound and a word, line or time, as the top of `make-bed.py` explains), then from the project folder: `python3 .agents/skills/vfrey-style-low-poly/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (a list; each cue names a sound and a word, line or time, as the top of `make-bed.py` explains), then from the project folder: `python3 "$(npx vfrey styles path low-poly)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey low-poly style)", "volume": -14, "duck": true}` and make it again with `--rerender`.
 One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, install nothing unasked.
 
@@ -141,7 +143,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 12. Reference implementation
 
-`starter.html` (shell) and `starter-scene.js` (the 3D source) next to this file render a floating island with pines, blossom trees, rocks, flowers, clouds, a sun, a flapping hero, a gliding four-shot camera and a tag that follows a 3D point. Setup: follow `vfrey-style-real-3d` helpers.md sections 1 and 3, then `cp starter.html scenes/<idea>/index.html` and `cp starter-scene.js src/<idea>/scene.js`, bundle, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png` (rebuild the bundle after every edit). Replace the hero, the props and `SHOTS`.
+`starter.html` (shell) and `starter-scene.js` (the 3D source) next to this file render a floating island with pines, blossom trees, rocks, flowers, clouds, a sun, a flapping hero, a gliding four-shot camera and a tag that follows a 3D point. Setup: follow `vfrey-style-real-3d` helpers.md sections 1 and 3, then `npx vfrey styles start low-poly scenes/<idea>` (it copies `starter.html` to `scenes/<idea>/index.html` and `starter-scene.js` to `src/<idea>/scene.js`, and prints the bundle commands), bundle, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png` (rebuild the bundle after every edit). Replace the hero, the props and `SHOTS`.
 
 ## 13. Do, don't, and the final checklist
 

@@ -10,6 +10,8 @@ metadata:
   style-name: Paper cut-out
   style-summary: Scenes made of layered cut and torn paper, with puppets that move like stop-motion and titles of cut-out letters.
   style-best-for: history, folklore, true stories, explainers, children's topics, culture
+  style-poster: paper-cutout.jpg
+  style-preview: paper-cutout.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -20,7 +22,7 @@ metadata:
 
 Layered scissor-cut and torn paper in muted vintage colours: every picture is a stack of flat paper polygons, each with a pale cut edge and a soft shadow on the sheet below, shot with a parallax camera and moved by jointed stop-motion puppets at 6 to 8 frames a second. Titles are ransom-note lettering, a still paper grain lies over everything, and scenes change by sliding, folding or tearing a sheet. If a frame has a gradient fill, a smooth tween on a puppet, a perfectly round or perfectly straight edge, or a glossy highlight, it is not this style.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file** (copy it to `scenes/<idea>/index.html` together with `papercut.js`, then replace the PLACEHOLDER words, number and colours: it already renders three sheets with `vfrey render --frame`). `papercut.js` next to this file is the toolkit you copy into the scene folder (`helpers.md` lists what is in it); the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start paper-cutout scenes/<idea>` creates the folder with it as `index.html` and the `papercut.js` it loads, whichever agent folder this skill was installed in; without papercut.js the render stops with `scene.page-error`)** (then replace the PLACEHOLDER words, number and colours: it already renders three sheets with `vfrey render --frame`). `papercut.js` next to this file is the toolkit, which `styles start` already copied into the scene folder (`helpers.md` lists what is in it); the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
 ## When to use it, when not
 
@@ -31,7 +33,7 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 1. Write 5 or 6 spoken lines (Kokoro adds a pause at line breaks, so fewer, longer lines are faster), a hook in line 0, one beat per picture, a twist in the last line. Cue scenes from `vfrey.line(i)` and `vfrey.timing.words`, never from fixed seconds. Word regexes are case-insensitive and anchored (`/^one/i`: "anyone" contains "one").
 2. One sheet per beat, one ground colour per sheet, a different transition kind where you can. Decide the map beat, the number beat and the twist beat first.
-3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -158,7 +160,7 @@ Bed: Karplus-Strong plucks over C - Am - F - G at about 104 bpm: a bass on beats
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file needs only `python3` (standard library, no downloads) and always writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 .agents/skills/vfrey-style-paper-cutout/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 "$(npx vfrey styles path paper-cutout)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey paper cut-out style)", "volume": -17, "duck": true}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change, because the times move. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.

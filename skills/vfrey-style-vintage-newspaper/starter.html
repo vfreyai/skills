@@ -23,7 +23,7 @@
   .art{position:absolute;left:60px;width:960px;overflow:hidden;clip-path:inset(0 0 100% 0)}
   .tx{position:absolute;left:0;width:1080px;text-align:center;color:var(--ink)}
   .mast{top:44px;height:240px}
-  .mast h1{margin:0;position:absolute;left:0;right:0;top:-2px;font-weight:900;font-size:206px;line-height:1;letter-spacing:-2px;white-space:nowrap;transform:scaleX(.8);transform-origin:50% 50%}
+  .mast h1{margin:0;position:absolute;left:0;right:0;top:-2px;text-align:center;font-weight:900;font-size:206px;line-height:1;letter-spacing:-2px;white-space:nowrap;transform:scaleX(.8);transform-origin:50% 50%}
   .mast .ear{position:absolute;top:196px;font-size:22px;font-weight:700;letter-spacing:.14em}
   .dateline{top:284px;height:44px;line-height:44px;font-weight:700;font-size:24px;letter-spacing:.2em}
   .hdr{top:34px;height:88px;line-height:88px;font-weight:900;font-size:50px;letter-spacing:.34em;padding-left:.34em}
@@ -265,7 +265,7 @@ PAGES.forEach((p, i) => {
   const mast = front ? `<div class="tx mast"><h1 class="mh">THE GAZETTE</h1>
       <div class="tag" style="left:48px;top:212px;width:154px;text-align:center;font-size:17px;letter-spacing:.12em;line-height:1.1;white-space:normal">FAIR<br>&amp; WARM</div>
       <div class="tag" style="left:878px;top:212px;width:154px;text-align:center;font-size:17px;letter-spacing:.12em;line-height:1.1;white-space:normal">PRICE<br>ONE CENT</div></div>
-      <div class="tx dateline">VOL. XIV &nbsp;&middot;&nbsp; NO. 217 &nbsp;&middot;&nbsp; MONTH 1900 &nbsp;&middot;&nbsp; PLACEHOLDER</div>`
+      <div class="tx dateline">VOL. XIV, NO. 217, MONTH 1900, PLACEHOLDER</div>`
     : `<div class="tx hdr">THE GAZETTE<small style="left:48px">VOL. XIV</small><small style="right:48px">ONE CENT</small></div>`;
   stage.insertAdjacentHTML("beforeend", `<div class="page" id="p${i}"><div class="thump"><div class="cam" id="cam${i}">
     <svg class="bgsvg" viewBox="0 0 1080 1920">${bg}</svg>
@@ -371,6 +371,17 @@ tl.to(CAM[2], { scale: 1.06, y: -36, transformOrigin: "50% 55%", duration: 7.5, 
 tl.fromTo("#yellow", { opacity: .92 }, { opacity: 1, duration: 3, repeat: loopN(3), yoyo: true, ease: "sine.inOut" }, 0);
 
 vfrey.captions("#captions", { style: "color", font: '"Playfair Display", Georgia, serif', size: 64, color: INK, highlight: RED, maxWords: 4, maxChars: 24 });
+vfrey.keepInFrame(".hdr");   // the running head the camera pans away from is hidden at the frame edge, never cut
+/* the masthead is lettered to fit the page: a longer paper name than the demo gets a smaller size, never a cut */
+(function fitMast() {
+  const fit = () => document.querySelectorAll(".mh").forEach((h) => {
+    const r = document.createRange(); r.selectNodeContents(h);
+    const k = h.offsetWidth ? h.getBoundingClientRect().width / h.offsetWidth : 1, w = r.getBoundingClientRect().width / (k || 1);
+    if (w * 0.8 > 980) h.style.fontSize = (parseFloat(getComputedStyle(h).fontSize) * 980 / (w * 0.8)).toFixed(1) + "px";
+  });
+  fit(); if (document.fonts) document.fonts.ready.then(fit);
+})();
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

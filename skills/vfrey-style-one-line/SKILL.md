@@ -10,6 +10,8 @@ metadata:
   style-name: One-line minimal
   style-summary: One unbroken ink line draws each idea in turn on warm paper, then flows on into the next. Calm and hypnotic.
   style-best-for: psychology, self-improvement, philosophy, wellness, productivity, ideas and feelings
+  style-poster: one-line.jpg
+  style-preview: one-line.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -18,7 +20,7 @@ metadata:
 
 # Video style: One Line
 
-This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): copy it to `scenes/<idea>/index.html`, replace the PLACEHOLDER labels, redraw or reorder the objects in the single path, keep the engine (resampled path, tip schedule, camera keys, captions plate, marginalia). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file has the page shell, geometry helpers, tip schedule and camera; `make-bed.py` is the sound script.
+This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start one-line scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the PLACEHOLDER labels, redraw or reorder the objects in the single path, keep the engine (resampled path, tip schedule, camera keys, captions plate, marginalia). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file has the page shell, geometry helpers, tip schedule and camera; `make-bed.py` is the sound script.
 
 ## 1. The look in three sentences
 
@@ -138,14 +140,14 @@ There are no cuts and no wipes: the connector line IS the transition, with the c
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes the bed: slow overlapping pad chords (Am9, Fmaj7, Cmaj7, Gadd9) with tremolo, soft bell plucks as each object arrives, filtered-noise pen scratch while the pen draws, a rising pentatonic arpeggio while the tangle unties, a low resolve and a high bell at the end, with echo and fades. Mix: `volume -16`, `duck: true` (vfrey masters to -14 LUFS). Standard library only, always the same file for the same input.
 
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-one-line/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then from the project folder: `python3 "$(npx vfrey styles path one-line)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey one line style)", "volume": -16, "duck": true}` and make it again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no cues before the first render. No `python3` on the machine: leave `music` out, say the video has no music and why, and do not install anything unasked.
 
 ## 10. Shot plan template (35 to 40 s, 5 lines)
 
-Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`); do not merge lines to hide the pause: the line keeps drawing. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 3 words a second). Facts on screen are only ones you can cite, as the voice says them.
+Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`); do not merge lines to hide the pause: the line keeps drawing. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)). Facts on screen are only ones you can cite, as the voice says them.
 
 | Beat | Time | Shot type | Content |
 |---|---|---|---|
@@ -165,7 +167,7 @@ Four frames of the showcase film, 540 x 960, in this folder (not copied into ins
 
 ## 12. Reference implementation
 
-`starter.html` is a working four-object film (scribble to head, clock, list, a calm line and tick) with the engine: one resampled path, `tipAt`, camera keys, `travelDip`, labels, figure notes and rail, grain and paper, caption plate, and the end card. Start from it: `cp .agents/skills/vfrey-style-one-line/starter.html scenes/<idea>/index.html`, replace the PLACEHOLDER labels, redraw the objects with `addLine / addBez / addCR / addArc / addWave / connect`, keep `mark` names in step with the `segs` and `keys` tables. Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`. A `tick` needs `--scene scenes/<idea>` or it renders the plain default template.
+`starter.html` is a working four-object film (scribble to head, clock, list, a calm line and tick) with the engine: one resampled path, `tipAt`, camera keys, `travelDip`, labels, figure notes and rail, grain and paper, caption plate, and the end card. Start from it: `npx vfrey styles start one-line scenes/<idea>`, replace the PLACEHOLDER labels, redraw the objects with `addLine / addBez / addCR / addArc / addWave / connect`, keep `mark` names in step with the `segs` and `keys` tables. Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`. A `tick` needs `--scene scenes/<idea>` or it renders the plain default template.
 
 ## 13. Do / Don't, and the final checklist
 

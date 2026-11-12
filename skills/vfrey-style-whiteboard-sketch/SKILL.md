@@ -10,14 +10,16 @@ metadata:
   style-name: Whiteboard sketch
   style-summary: A marker draws everything live on a whiteboard, with hand lettering, doodles, arrows and eraser wipes.
   style-best-for: study tips, explainers, how-it-works, finance basics, science and health facts, productivity
+  style-poster: whiteboard-sketch.jpg
+  style-preview: whiteboard-sketch.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Whiteboard sketch
 
-Start from `starter.html` next to this file: copy it to `scenes/<idea>/index.html` together with `sketch.js`, replace the placeholder art, labels and cues, and render a frame. Code to copy is in `helpers.md`; the drawing kit is `sketch.js`; the sound script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
+Start from `starter.html` next to this file (`npx vfrey styles start whiteboard-sketch scenes/<idea>` creates the folder with it as `index.html` and the `sketch.js` it loads, whichever agent folder this skill was installed in; without sketch.js the render stops with `scene.page-error`): then replace the placeholder art, labels and cues, and render a frame. Code to copy is in `helpers.md`; the drawing kit is `sketch.js`; the sound script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
 
 ## Limits: when to use it, when not
 
@@ -30,7 +32,7 @@ Start from `starter.html` next to this file: copy it to `scenes/<idea>/index.htm
 2. Give each ink colour a job and keep it all film: red for the problem, blue for the fix and labels, black for structure.
 3. Decide which scene is the chart (axes, one curve, two or three labels) and what the last picture is (the takeaway in big lettering).
 4. Facts: only things you can cite go on screen. A chart is a sketch with no invented numbers; label the axes in words.
-5. Script pace: 5 lines, 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. The voice also pauses after each full stop inside a line, so keep a full stop only where a page flick or a wipe should fall. The voice is the person's setting: suggest a friendly one (`af_heart`), never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+5. Script pace: 5 lines, 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. The voice also pauses after each full stop inside a line, so keep a full stop only where a page flick or a wipe should fall. The voice is the person's setting: suggest a friendly one (`af_heart`), never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -150,7 +152,7 @@ Forbidden: crossfades, slides, zooms, any cut.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed is a gentle 84 bpm loop in C major (Cmaj7, Am7, Fmaj7, G): soft sine pad, marimba plucks (sine plus a 3.9x partial, `exp(-7t)` decay) on a pentatonic pattern, a quiet brushed shaker on off-beats, a low marimba root. Accents from word times: `scribble` (band-limited noise, 0.07 to 0.3 s bursts, random gaps) during drawing windows, `flick` (paper whoosh) at each page flick, `rub` (noise with six swells) at each wipe, `chime` when an idea lands, `thunk` for a gone or counted thing, `finale` (a rising four-note chime) on the last word. Mix: volume -12, duck, about -14 LUFS. `make-bed.py` needs only `python3` (standard library) and writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 .agents/skills/vfrey-style-whiteboard-sketch/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 "$(npx vfrey styles path whiteboard-sketch)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey whiteboard sketch style)", "volume": -12, "duck": true}` and render again with `--rerender`.
 
 No `python3` on the machine: leave `music` out, say so, install nothing.
@@ -176,7 +178,7 @@ Script: 5 lines; `lineGap` 0.25 to 0.4 (Kokoro's default pause is about a second
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-scene board: a doodle person at a desk, a chart, a calendar strip with a hero word, a page flick and an eraser wipe, the pen, the frame, the sticky note and the hand-written captions. Copy it and `sketch.js` into `scenes/<idea>/` (rename it `index.html`), replace the placeholder art (`PLACEHOLDER TITLE`, `A SMALL NOTE`, `LABEL Y`, `BEFORE`, `AFTER`, `THE POINT`) and cue each scene to the script's lines, then check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`.
+`starter.html` is a working three-scene board: a doodle person at a desk, a chart, a calendar strip with a hero word, a page flick and an eraser wipe, the pen, the frame, the sticky note and the hand-written captions. Start it with `npx vfrey styles start whiteboard-sketch scenes/<idea>` (the starter as `index.html`, with `sketch.js`), replace the placeholder art (`PLACEHOLDER TITLE`, `A SMALL NOTE`, `LABEL Y`, `BEFORE`, `AFTER`, `THE POINT`) and cue each scene to the script's lines, then check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`.
 
 ## 13. Do and Don't, and the final checklist
 

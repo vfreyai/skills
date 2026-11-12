@@ -67,7 +67,7 @@ One big SVG sheet is the whole world; a camera is the `viewBox`. Paste the page 
     <div class="lbl" style="left:36px;top:16px">TITLE</div>
     <div class="tt" style="left:36px;top:42px;font-size:38px;letter-spacing:.04em">YOUR SUBJECT</div>
     <div class="cell" style="left:498px;top:8px;width:558px;height:176px"></div>
-    <div class="lbl" style="left:510px;top:16px">FORCE KEY</div>
+    <div class="lbl" data-vfrey-keep style="left:510px;top:16px">FORCE KEY</div>
     <div id="legend" style="position:absolute;left:498px;top:44px">
       <div class="lg" id="lgT" style="top:0"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#ffd84a" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#ffd84a"/></svg>FIRST QUANTITY</div>
       <div class="lg" id="lgC" style="top:33px"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#ff6fae" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#ff6fae"/></svg>SECOND QUANTITY</div>

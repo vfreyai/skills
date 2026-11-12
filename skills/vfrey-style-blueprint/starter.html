@@ -50,8 +50,8 @@
     <div class="cell" style="left:24px;top:8px;width:560px;height:176px"></div><div class="lbl" style="left:36px;top:16px">TITLE</div>
     <div class="tt" style="left:36px;top:46px;font-size:38px;letter-spacing:.04em">PLACEHOLDER TITLE</div>
     <div class="tt" style="left:36px;top:96px;font-size:25px;letter-spacing:.1em;color:#bdeeff">PLACEHOLDER SUBTITLE</div>
-    <div class="tt" style="left:36px;top:142px;font-size:16px;letter-spacing:.14em;color:#8fdcff">NOT TO SCALE, SCHEMATIC</div>
-    <div class="cell" style="left:584px;top:8px;width:472px;height:176px"></div><div class="lbl" style="left:596px;top:16px">FORCE KEY</div>
+    <div class="tt" data-vfrey-keep style="left:36px;top:142px;font-size:16px;letter-spacing:.14em;color:#8fdcff">NOT TO SCALE, SCHEMATIC</div>
+    <div class="cell" style="left:584px;top:8px;width:472px;height:176px"></div><div class="lbl" data-vfrey-keep style="left:596px;top:16px">FORCE KEY</div>
     <div id="legend" style="position:absolute;left:584px;top:44px">
       <div class="lg" id="lgW" style="top:0"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#6dffb0" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#6dffb0"/></svg>WEIGHT</div>
       <div class="lg" id="lgT" style="top:33px"><svg width="52" height="14"><line x1="2" y1="7" x2="40" y2="7" stroke="#ffd84a" stroke-width="5"/><path d="M36,0 L52,7 L36,14z" fill="#ffd84a"/></svg>TENSION</div>
@@ -147,5 +147,6 @@ tl.fromTo("#tsq", { y: -160 }, { y: 1480, duration: 1.1, ease: "power2.inOut", i
 
 vfrey.captions("#captions", { style: "color", font: '"JetBrains Mono"', size: 58, color: "#f2fbff", highlight: "#ffd84a", maxWords: 3 });
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Paper cut-out: how to use the toolkit
 
-`papercut.js` next to this file is the toolkit: copy it into your scene folder (`cp .agents/skills/vfrey-style-paper-cutout/papercut.js scenes/<idea>/`) and write your scenes in a second file. This page is the shell around it and a worked scene. Coordinates are in a 1080x1920 stage that is scaled to the frame, so numbers below are stage units, not frame pixels.
+`papercut.js` next to this file is the toolkit: `npx vfrey styles start paper-cutout scenes/<idea>` copies it into your scene folder with the starter. Write your scenes in a second file. This page is the shell around it and a worked scene. Coordinates are in a 1080x1920 stage that is scaled to the frame, so numbers below are stage units, not frame pixels.
 
 ## What is in `papercut.js`
 

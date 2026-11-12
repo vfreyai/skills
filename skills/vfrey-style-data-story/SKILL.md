@@ -10,14 +10,16 @@ metadata:
   style-name: Data story
   style-summary: Animated maps and charts like a newspaper data desk, with counting numbers and dots that regroup into bars.
   style-best-for: geography, economics, population, science facts, history by the numbers, comparisons
+  style-poster: data-story.jpg
+  style-preview: data-story.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Data story
 
-Start from `starter.html` next to this file (with `datadesk.js` and `land.js`): copy the three files into `scenes/<idea>/`, replace its placeholders and cues, and render a frame. Code to copy is also in `helpers.md` and `datadesk.js`; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
+Start from `starter.html` next to this file (`npx vfrey styles start data-story scenes/<idea>` creates the folder with it as `index.html` and the `datadesk.js` and `land.js` it loads, whichever agent folder this skill was installed in; without them the render stops with `scene.page-error`): then replace its placeholders and cues, and render a frame. Code to copy is also in `helpers.md` and `datadesk.js`; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
 
 ## Limits: when to use it, when not
 
@@ -30,7 +32,7 @@ Start from `starter.html` next to this file (with `datadesk.js` and `land.js`): 
 2. Compute, never type: every number the scene shows (counters, bar lengths, dot counts, percentages) is calculated in the scene from those inputs. A figure you derive (a share, a total) is derived in code, and rounded the way its source rounds.
 3. Mark what is not exact. A map drawn from simplified outlines, or dots placed in plausible spots, is schematic: say so on screen (a legend such as `1 DOT = <unit>, POSITIONS SCHEMATIC`) so the picture never implies precision it lacks. Print the sources in the footer.
 4. Split the script into 3 or 4 chapters (one per line), each a camera move, a build or a morph of the same dots. Pick the hook picture (the whole thing drawn at once), the count, the comparison and the catch.
-5. Script pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Write 4 to 6 lines for about 37 seconds and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+5. Script pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Write 4 to 6 lines for about 37 seconds and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -144,14 +146,14 @@ Forbidden: fades to another picture, wipes, slides, zoom blurs, a page flip.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed: 96 bpm, a sine pad per chord (A minor, F, C, G) with a soft plucked 8th-note arpeggio (decaying sines) and quiet noise ticks on the beat, a calm data-desk feel. Accents at cues: filtered-noise whooshes at each camera move or morph, a low blip when the main shape completes, rising blip runs under counters and pours, tick bursts under a counting number. Peak-normalise to 0.9, fade in 0.4 s and out 2 s; volume -14, duck on, about -14 LUFS. `make-bed.py` next to this file writes it with `python3` and `ffmpeg` only.
 
 1. Make the video once without music, so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 .agents/skills/vfrey-style-data-story/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 "$(npx vfrey styles path data-story)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey data story style, ffmpeg)", "volume": -14, "duck": true}` and render again with `--rerender`.
 
 No `python3` on the machine: leave `music` out, say so, install nothing.
 
 ## 10. Shot plan template (32 to 38 s)
 
-Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 3 words a second.
+Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 2.8 words a second.
 
 | Time | Chapter | Shot type | Camera and build | Scoreboard |
 | --- | --- | --- | --- | --- |
@@ -171,7 +173,7 @@ Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 3 words a 
 
 ## 12. Reference implementation
 
-`starter.html` is a working scene: a dot-matrix globe built from `land.js`, a geodesic circle that grows, one leader-line tag, 80 unit dots that pour onto the map and regroup into a bar, three scoreboard counters, a four-segment rail and captions on the ink plate. Copy it, `datadesk.js` and `land.js` into `scenes/<idea>/`, rename it `index.html`, replace `INPUTS` (value and source for every number), the kicker and topic, the tag text, the labels, the circle's centre (`CENTRE`) and radius, and cue each chapter to a script line or word (`lineAt(i)`, or `at("word")` from `helpers.md`). Check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 6 out.png`.
+`starter.html` is a working scene: a dot-matrix globe built from `land.js`, a geodesic circle that grows, one leader-line tag, 80 unit dots that pour onto the map and regroup into a bar, three scoreboard counters, a four-segment rail and captions on the ink plate. Start it with `npx vfrey styles start data-story scenes/<idea>` (the starter as `index.html`, with `datadesk.js` and `land.js`), replace `INPUTS` (value and source for every number), the kicker and topic, the tag text, the labels, the circle's centre (`CENTRE`) and radius, and cue each chapter to a script line or word (`lineAt(i)`, or `at("word")` from `helpers.md`). Check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 6 out.png`.
 
 ## 13. Do and Don't, and the final checklist
 

@@ -111,6 +111,7 @@ The timeline is `vfrey.timeline()`, one paused GSAP timeline. Cue with `vfrey.on
 - Draw art as inline SVG or SVG files in the scene folder (`<img src="octopus.svg">`) and the supplied `vfrey/assets/` stick figures and glyphs. Nothing from the network; no remote image, font or script.
 - To animate inline SVG art, put the position on a parent `<g transform>` and animate the child; animating a group that has a `transform` attribute throws it to the origin. The `scene.svg-transform` check warns when a tween in index.html moves an element with that attribute.
 - Prefix ids by area (`#hero-title`, `#cmp-left`) so selectors do not collide with a block's ids.
+- After the render vfrey opens the scene at a dozen moments and fails the run, with a Fix that names the element, when: `#root` is not the frame's size (`frames.root-size`: a root fixed at 1920x1080 in a 9:16 video), text runs off the frame on two or more of those moments (`frames.off-frame`), another text covers the caption words (`frames.caption-covered`), the captions are under 3:1 contrast against the pixels behind them (`frames.caption-contrast`), the script's words hardly appear on screen as captions or text (`frames.script-words`, skipped with `"captions": "off"`), or a style starter's demo text or a PLACEHOLDER is still on screen (`frames.starter-text`; the list is read from each style's starter.html). Text in the platform margins (`frames.safe-area`) is a warning. These are decided by the scene, so a failed one is not rendered again: fix the scene and run the tick with `--rerender`.
 - When a scene is long, build it as functions per beat (`function beat3(t) { ... }`) called from `vfrey.onLine`, so each beat reads on its own.
 
 ## 8. Mistakes that make a scene look generated
@@ -142,5 +143,54 @@ npx vfrey scene inspect my-scene --at 2.5 --text "the title words"      # or --s
 It loads the scene in the same headless Chrome as `render --frame` (network blocked), seeks the timeline to `--at`, and prints for each match: the selector path, the opening tag at `file:line:col`, its box in the frame, computed color, background, font, opacity and transform, the CSS declarations behind them (`*` marks the one that wins; a value inherited from an ancestor says so) and the GSAP tweens that move it, each with start, duration, end, ease, properties, the line that wrote it and the `vfrey.at`, `onLine`, `onWord`, `block` or `transition` cue that ran it. Pick `--at` where the problem shows.
 
 Then edit only what it names: "red" is that one declaration (or the winning one, if two rules fight, or the tween if GSAP sets `color`); "too late" is the tween's position argument or the `onLine`/`at` time of its cue; "too slow" is its duration. Do not touch other rules, tweens or elements. Then check with `render --frame` at the same `--at` (and `scene inspect` again if you moved timing). HTML scenes only: for a Remotion scene it prints a `Fix:` line; use `--frame` and edit `index.tsx`.
+
+## 11. 3D and canvas scenes
+
+A three.js, WebGL or `<canvas>` scene draws with code, not with CSS, so the picture must be a pure function of the time. Three rules make a frame the same on every render and on every render worker, and a fourth lets the checks read it.
+
+1. **Draw from `vfrey.onFrame`, not from GSAP's `onUpdate`.** The renderer seeks the paused timeline to each frame with events suppressed, so a tween's `onUpdate` does not fire on a seek and a render loop driven from it freezes (the preview then looks right and the film does not). `vfrey.onFrame((t) => draw(t))` runs after every seek, once for each frame a render or `render --frame` draws, with `t` in seconds. Make `draw` depend on `t` only: no `Date.now()`, no `requestAnimationFrame`, no state carried over from the last frame (it may run twice for one time, and a worker starts in the middle of the video). Animate with GSAP as usual on a plain object (`tl.to(state, { x: 1, duration: 4 }, 0)`), then read `state` inside `onFrame`.
+2. **Keep the drawing buffer.** `new THREE.WebGLRenderer({ canvas, preserveDrawingBuffer: true })`, or the screenshot can be blank.
+3. **Bundle your libraries into one classic script.** A scene runs with the network blocked and from files, so `import ... from "three"` or a CDN tag does not load. Put the bundle in the scene folder and load it with a plain `<script>`.
+
+4. **Say what text you draw yourself.** vfrey's checks read text from the DOM and from a 2D canvas's `fillText`. Text you draw any other way (a pixel font of rects, letters drawn one at a time, SVG strokes) is invisible to them, so the captions say nothing (`frames.script-words` fails) and leftover demo text slips through: call `vfrey.drew("THE WORDS")` from the draw call for each string a frame shows, or put `data-vfrey-text="the words"` on the SVG group that letters them.
+
+Two more helpers keep the frame checks honest without fighting a style. Fixed chrome a style shows in every video (a "FORCE KEY" cell, a "SIMPLIFIED MAP" note) carries `data-vfrey-keep` in its starter, so it is not taken for leftover demo text; keep the attribute when you keep the element, and never put it on text that should say something about this video. Text on a moving plane (map lettering, a masthead the camera pans away from) goes in `vfrey.keepInFrame(elements)`: it is hidden while it runs past the frame edge instead of being cut (which fails `frames.off-frame`).
+
+```html
+<canvas id="gl" width="1080" height="1920"></canvas>
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<script src="dist/scene.js"></script>   <!-- built from src/scene.js below -->
+```
+
+```js
+// src/scene.js  (this file is yours; vfrey/vfrey.js already ran, so `vfrey` is a global)
+import * as THREE from "three";
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("gl"), preserveDrawingBuffer: true, antialias: true });
+renderer.setSize(vfrey.frame.width, vfrey.frame.height, false);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, vfrey.frame.width / vfrey.frame.height, 0.1, 100);
+camera.position.z = 6;
+const cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial());
+scene.add(cube);
+
+const tl = vfrey.timeline();
+const state = { spin: 0 };
+tl.to(state, { spin: Math.PI * 2, duration: vfrey.timing.durationSec, ease: "none" }, 0);
+vfrey.onFrame(() => {
+  cube.rotation.y = state.spin;
+  renderer.render(scene, camera);
+});
+vfrey.captions("#captions");
+```
+
+Build it once, and again after every edit, before `render --frame` or `tick` (vfrey does not bundle your code):
+
+```sh
+npm i --save-dev three esbuild          # in the scene folder
+npx esbuild src/scene.js --bundle --format=iife --target=es2020 --outfile=dist/scene.js
+```
+
+If the page cannot start WebGL, throws, or a file does not load, `render` and `render --frame` print it as a warning that names the scene file (`Scene my-scene/index.html: the page reported ...`); read those lines first when a frame looks wrong. A scene that needs a GPU renders slowly or fails on a machine without one, and vfrey's cloud render has none.
 
 More: `motion.md` (recipes for GSAP moves, transitions, count-ups, draw-on lines), `blocks.md` (ready-made pieces such as lower thirds, charts, code and overlays to restyle).

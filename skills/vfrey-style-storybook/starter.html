@@ -330,6 +330,15 @@ const PA = buildPage("A", "A", { z: 0, heading: heads.A, tint: "#b0703c" });
 const PB = buildPage("B", "C", { z: 1, heading: heads.B, tint: "#a8774a" });
 const PC = buildPage("C", "E", { z: 2, heading: heads.C, tint: "#7a5c86" });
 const pages = [PA, PB, PC];
+/* a lettered line never runs past the painted window: one that is wider than 940 px (a longer title than the demo) is lettered smaller */
+function fitLettering(max = 940) {
+  document.querySelectorAll(".lt").forEach((el) => {
+    const r = document.createRange(); r.selectNodeContents(el);
+    const scale = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1, w = r.getBoundingClientRect().width / (scale || 1);
+    if (w > max) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * max / w).toFixed(1) + "px";
+  });
+}
+fitLettering(); if (document.fonts) document.fonts.ready.then(() => fitLettering());
 
 /* --- page flips: the old page turns on its left edge, the next is already there --- */
 [b1, b2].forEach((b, i) => {
@@ -393,5 +402,6 @@ const pages = [PA, PB, PC];
 })();
 
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

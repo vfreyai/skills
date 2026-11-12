@@ -161,14 +161,22 @@ const ink = (L, pts, { c = INK, w = 8, t = 0, d = 0.4, ease = "power1.inOut", pe
   if (pen) PS.push({ t0: t, d, ease: gsap.parseEase(ease), pts, cum, len, c });
 };
 const I = (pts, c = INK, w = 7) => ({ pts, c, w });
-const TI = (s, x, y, h, c = INK, o = {}) => TXT(s, x, y, h, o).strokes.map((p) => ({ pts: p, c, w: o.w || Math.max(4.5, h * 0.085) }));
+/* TI: hand-lettered text as strokes. Its first stroke carries the words, so build() can tell vfrey's checks what is on the board (vfrey.drew). */
+const TI = (s, x, y, h, c = INK, o = {}) => { const out = TXT(s, x, y, h, o).strokes.map((p) => ({ pts: p, c, w: o.w || Math.max(4.5, h * 0.085) })); if (out[0]) out[0].said = s; return out; };
+const SAID = []; let saidHooked = false;
+function said(L, text, at) {
+  SAID.push({ L, text, at });
+  if (saidHooked || !window.vfrey || !vfrey.drew) return;
+  saidHooked = true;
+  vfrey.onFrame((t) => { for (const s of SAID) if (t >= s.at && s.L.svg.style.display !== "none") vfrey.drew(s.text); });
+}
 const TWID = (s, h, o = {}) => TXT(s, 0, 0, h, o).width;
 /* lay a list of items out in time [t0,t1]; marker speed in px/s */
 function build(L, items, t0, t1, { speed = 1500, maxK = 1.7, gap = 0.015, minD = 0.05, g } = {}) {
   const raw = items.map((it) => clamp(plen(it.pts) / speed, minD, 1.3)); const tot = raw.reduce((a, b) => a + b, 0) + gap * items.length;
   const k = Math.min(maxK, (t1 - t0) / tot); let t = t0;
   if ((t1 - t0) / tot < 0.55) console.warn("dense scene", L.svg.id, "needs k", ((t1 - t0) / tot).toFixed(2));
-  items.forEach((it, i) => { const d = Math.max(0.035, raw[i] * k); ink(L, it.pts, { c: it.c, w: it.w, t, d, g }); t += d + gap * k; });
+  items.forEach((it, i) => { const d = Math.max(0.035, raw[i] * k); if (it.said) said(L, it.said, t); ink(L, it.pts, { c: it.c, w: it.w, t, d, g }); t += d + gap * k; });
   return t;
 }
 const grp = (L) => el("g", {}, L.g);

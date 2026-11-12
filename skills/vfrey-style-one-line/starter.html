@@ -154,7 +154,7 @@ T.pullE = T.pullS + 2.6;
 
 const segs = [];
 const seg = (t0, t1, i0, i1, e) => segs.push({ t0, t1, i0, i1, e: e || eSine });
-seg(0.15, T.scrEnd, 0, mk.scrE, (u) => u);
+seg(0, T.scrEnd, Math.round(mk.scrE * 0.5), mk.scrE, (u) => u);   // the first frame already shows half the scribble: an empty page is not a hook (frames.opening)
 seg(T.scrEnd, T.headEnd, mk.scrE, mk.headE, eSine);
 seg(T.headEnd, T.c1e, mk.headE, mk.clkS, eCub);
 seg(T.c1e, T.clkEnd, mk.clkS, mk.clkE, eSine);
@@ -186,8 +186,8 @@ const addLabel = (txt, x, y, size, anchor, t0) => { const el = document.createEl
   tl.to(el, { attr: { opacity: 1 }, duration: 0.6, ease: "power2.out" }, t0); return el; };
 addLabel("1927", O_CLK[0] + 215, O_CLK[1] - 335, 64, "start", ls(1) + 1.0);
 addLabel("PLACEHOLDER", -330, O_FIN[1] - 160, 58, "start", ls(3) + 0.4);
-const figTxt = ["I \u00b7 PLACEHOLDER the problem", "II \u00b7 PLACEHOLDER the clue", "III \u00b7 PLACEHOLDER the list", "IV \u00b7 PLACEHOLDER one line", "V \u00b7 quiet"];
-const figAt = [0.35, ls(1) + 0.15, ls(2) + 0.15, ls(3) + 0.15, T.pullS + 0.3, DUR + 1];
+const figTxt = ["I, PLACEHOLDER the problem", "II, PLACEHOLDER the clue", "III, PLACEHOLDER the list", "IV, PLACEHOLDER one line", "V, quiet"];
+const figAt = [0, ls(1) + 0.15, ls(2) + 0.15, ls(3) + 0.15, T.pullS + 0.3, DUR + 1];
 const figs = $("#figs");
 figTxt.forEach((txt, i) => { const d = document.createElement("div"); d.className = "fig"; d.textContent = txt; figs.appendChild(d);
   tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, figAt[i]);
@@ -239,5 +239,6 @@ const capGroups = vfrey.captions("#captions", { style: "color", size: 70, color:
     if (nextStart - x.e > 0.3) tl.to("#capplate", { opacity: 0, duration: 0.2 }, x.e + 0.02); });
 })();
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

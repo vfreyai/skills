@@ -10,14 +10,16 @@ metadata:
   style-name: Comic halftone
   style-summary: A comic page that comes alive, with bold ink outlines, dotted shading, panels that smash in and loud sound-effect lettering.
   style-best-for: animal facts, science and how-it-works, sports and action, gaming, product demos, trivia
+  style-poster: comic-halftone.jpg
+  style-preview: comic-halftone.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Comic halftone
 
-Start from `starter.html` next to this file (with `comic.js`): copy both into `scenes/<idea>/`, rename it `index.html`, replace the hero, labels, numbers and cues, and render a frame. `helpers.md` shows the page around the kit and the choreography patterns; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Characters are original: never a known comic character, logo or trade dress.
+Start from `starter.html` next to this file (`npx vfrey styles start comic-halftone scenes/<idea>` creates the folder with it as `index.html` and the `comic.js` it loads, whichever agent folder this skill was installed in; without comic.js the render stops with `scene.page-error`): then replace the hero, labels, numbers and cues, and render a frame. `helpers.md` shows the page around the kit and the choreography patterns; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Characters are original: never a known comic character, logo or trade dress.
 
 ## Limits: when to use it, when not
 
@@ -30,7 +32,7 @@ Start from `starter.html` next to this file (with `comic.js`): copy both into `s
 2. Split the script into 5 to 8 pages. A page is one or two big panels above the caption plate and one to three smaller ones below it. Give each page its own ground colour (cyan, yellow, red, navy, magenta) so the film has chapters. Plan at least one gauge, counter or trace for a number.
 3. For each page write its sound word (`ZIP!`, `KRAK!`, `DING!`: short, invented, in capitals) and at most two label boxes of 4 words.
 4. Numbers and claims: only what you can cite. A diagram that is not data (a spike drawing, a metaphor dial) is labelled as an illustration or carries no figures.
-5. Script pace: 6 lines for 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sound effects can fill the gaps. The voice is the person's setting: suggest a voice, never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+5. Script pace: 6 lines for 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sound effects can fill the gaps. The voice is the person's setting: suggest a voice, never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -149,7 +151,7 @@ Never fade, never crossfade, never a page flip.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed is pure-Python synthesis at 32 kHz: kick, snare and hat, a saw bass riff, off-beat saw stabs and a pulse lead at 126 bpm over Am, F, G, E7. The arrangement follows the pages: thinner under explanations, a low-passed underwater feel, a snare roll and riser into the hero hit, then a 0.4 s total silence and a boom on the hit. Accents (a whoosh per page change, a pop per burst, a zip and thwack per strike, bubble blips, a boom, a bell, ticks) sit on word times and are mixed hotter than the music because vfrey ducks the whole bed under the voice. `make-bed.py` needs only `python3` and `ffmpeg`.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 .agents/skills/vfrey-style-comic-halftone/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.mp3`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then: `python3 "$(npx vfrey styles path comic-halftone)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.mp3`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.mp3", "source": "generated:make-bed.py (vfrey comic halftone style)", "volume": -14, "duck": true}` and render again with `--rerender`.
 
 No `python3` on the machine: leave `music` out, say so, install nothing.
@@ -176,7 +178,7 @@ Script: 6 lines for 35 seconds; `lineGap` 0.25 to 0.4; sound effects fill the pa
 
 ## 12. Reference implementation
 
-`starter.html` (with `comic.js`) is a working two-page film: an original green hero built with `P`, a dot-gradient sky and sand strip, a burst with a number, a label box, a sound effect, an eye close-up and a dial (page 1), then an impact page with a flash, a shake, a burst, "KRAK!" and a counter (page 2), on the caption plate. Copy both into `scenes/<idea>/`, rename the starter `index.html`, replace `hero()`, `HONEY`-style placeholders (`PLACEHOLDER LABEL!`, `TIMES PLACEHOLDER`, the numbers) and cue each page to a script line, then check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`.
+`starter.html` (with `comic.js`) is a working two-page film: an original green hero built with `P`, a dot-gradient sky and sand strip, a burst with a number, a label box, a sound effect, an eye close-up and a dial (page 1), then an impact page with a flash, a shake, a burst, "KRAK!" and a counter (page 2), on the caption plate. Start it with `npx vfrey styles start comic-halftone scenes/<idea>` (both files, the starter as `index.html`), replace `hero()`, `HONEY`-style placeholders (`PLACEHOLDER LABEL!`, `TIMES PLACEHOLDER`, the numbers) and cue each page to a script line, then check with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`.
 
 ## 13. Do and Don't, and the final checklist
 

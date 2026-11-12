@@ -50,7 +50,7 @@ if (CAPS.mode !== "off") {
   groups.forEach((gw, gi) => {
     let h = 78; const measure = (hh) => gw.reduce((a, w) => a + TWID(w.t, hh), 0) + 36 * hh / 100 * (gw.length - 1);
     if (measure(h) > 860) h = h * 860 / measure(h);
-    const total = measure(h); let x = 540 - total / 2; const g = el("g", { opacity: 0 }, capSvg); const base = ny + nh / 2 + h * 0.5;
+    const total = measure(h); let x = 540 - total / 2; const g = el("g", { opacity: 0, "data-vfrey-text": gw.map((w) => w.raw).join(" ") }, capSvg); /* data-vfrey-text: the words these strokes letter, for vfrey's checks */ const base = ny + nh / 2 + h * 0.5;
     gw.forEach((w) => {
       const T_ = TXT(w.t, x, base, h, { amp: 0.7 }); x += T_.width + 36 * h / 100;
       T_.strokes.forEach((p, si) => {
@@ -178,4 +178,5 @@ tl.fromTo("#cam", { scale: 1, x: 0 }, { scale: 1.05, duration: 4.4, ease: "sine.
 tl.to("#cam", { scale: 1.0, duration: 0.6, ease: "sine.inOut" }, 4.4);            // back to 1 at a page change
 tl.to("#cam", { scale: 1.08, x: 40, duration: 3.2, ease: "sine.inOut" }, 6.0);   // push in with a small drift
 
-</script></body></html>
+</script><script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
+</body></html>

@@ -32,7 +32,7 @@ Default: 9:16, 1080x1920, 30 fps. Choose per run with flags, or keep a choice in
 
 ## Long videos
 
-Speech may run 6 to 180 s (about 2.6 words a second: 16 to 468 words); a script allows 4 to 30 lines of up to 220 characters. A 172 s video was rendered on the default engine in 77 s with about 3 GB of memory, the same as a 20 s one, so length costs time (about 0.45 s per second of video) and not memory. For a long video write more lines, not longer ones, and give each section its own picture change.
+Speech may run 6 to 180 s (the script check counts a voice nobody measured at 2.6 words a second, so 16 to 468 words; the default natural voice reads 2.8, and the `series kit` Pace line has yours); a script allows 4 to 30 lines of up to 220 characters. A 172 s video was rendered on the default engine in 77 s with about 3 GB of memory, the same as a 20 s one, so length costs time (about 0.45 s per second of video) and not memory. For a long video write more lines, not longer ones, and give each section its own picture change.
 
 ## Voice
 

@@ -10,16 +10,18 @@ metadata:
   style-name: Soft gradient
   style-summary: Drifting pastel colour fields with frosted glass cards and glossy icons that float in gently.
   style-best-for: health, wellness, sleep, mindfulness, lifestyle, finance basics, app explainers
+  style-poster: soft-gradient.jpg
+  style-preview: soft-gradient.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Soft gradient
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + CSS + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (mesh-gradient moods, a glass card with a glossy sun, a dial, a dock, beads, the glass caption plate; replace PLACEHOLDER text and the beat times, keep the structure); more code is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for calm, reassuring subjects (health, wellness, sleep, mindfulness, lifestyle, beauty, money basics, apps and product explainers); not for loud, gritty, urgent or data-dense topics. Rounded forms are right here.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + CSS + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start soft-gradient scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (mesh-gradient moods, a glass card with a glossy sun, a dial, a dock, beads, the glass caption plate; replace PLACEHOLDER text and the beat times, keep the structure); more code is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for calm, reassuring subjects (health, wellness, sleep, mindfulness, lifestyle, beauty, money basics, apps and product explainers); not for loud, gritty, urgent or data-dense topics. Rounded forms are right here.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 3 words a second.
+Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -139,7 +141,7 @@ Warm and slow: a detuned-sine pad (Fmaj9, Cmaj7, Am9, Dm9, 6 s a chord), a spars
 
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` needs only `python3` (standard library), is deterministic and takes about 20 s.
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. From the project folder (there is no cue sheet; accents come from the sentence times): `python3 .agents/skills/vfrey-style-soft-gradient/make-bed.py --timing scenes/<idea>/vfrey/timing.json --out music/<idea>-bed.wav`
+2. From the project folder (there is no cue sheet; accents come from the sentence times): `python3 "$(npx vfrey styles path soft-gradient)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey soft gradient style)", "volume": -14, "duck": false}` and make it again with `--rerender`.
 One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, install nothing unasked.
 
@@ -163,7 +165,7 @@ Each sentence gets one new widget or one change; dock icon follows the mood.
 
 ## 12. Reference implementation
 
-`starter.html` next to this file (about 9 to 12 s): dawn to day to night moods, glass hero card with a glossy sun and meter, dial with a counting hub and ring sweep, dock, beads, bokeh, grain, vignette and the glass caption plate. Copy it to `scenes/<idea>/index.html`, replace the PLACEHOLDER text, the moods and the beat times (use `S(i)` and `WD(/re/)`), and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Stacking needs `#bg{isolation:isolate;z-index:0}`, `#bokeh{z-index:1}`, `#stage{z-index:2}`, `#fore{z-index:3}`.
+`starter.html` next to this file (about 9 to 12 s): dawn to day to night moods, glass hero card with a glossy sun and meter, dial with a counting hub and ring sweep, dock, beads, bokeh, grain, vignette and the glass caption plate. Start it with `npx vfrey styles start soft-gradient scenes/<idea>`, replace the PLACEHOLDER text, the moods and the beat times (use `S(i)` and `WD(/re/)`), and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Stacking needs `#bg{isolation:isolate;z-index:0}`, `#bokeh{z-index:1}`, `#stage{z-index:2}`, `#fore{z-index:3}`.
 
 ## 13. Do, don't, and the final checklist
 

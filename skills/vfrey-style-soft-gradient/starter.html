@@ -54,7 +54,7 @@
 <script>
 const tl = vfrey.timeline();
 const WORDS = vfrey.timing.words, DUR = vfrey.timing.durationSec;
-document.getElementById("frame").style.transform = `scale(${vfrey.frame.width / 1080})`;
+vfrey.fitStage("#frame"); // the 1080x1920 design, fitted whole and centred into any frame (16:9 too), never stretched
 
 /* ---------- timing: sentences and words (S(i) = start of sentence i, WD(/re/) = start of a word) ---------- */
 const sents = []; { let cur = null; WORDS.forEach(w => { if (!cur) { cur = { start: w.start, end: w.end }; sents.push(cur); } cur.end = w.end; if (/[.!?]["')]?$/.test(w.text)) cur = null; }); }
@@ -166,7 +166,7 @@ const tSweep = t2 + 1.4, sweepDur = 2.6;
 tl.fromTo(hand, { rotation: -90 }, { rotation: 270, duration: sweepDur, ease: "power2.inOut", immediateRender: false }, tSweep);
 tl.fromTo(ringmask, { "--p": 0 }, { "--p": 360, duration: sweepDur, ease: "power2.inOut", immediateRender: false }, tSweep);
 const ease2 = gsap.parseEase("power2.inOut");
-vfrey.onFrame(() => { const f = Math.min(1, Math.max(0, (tl.time() - tSweep) / sweepDur)); hubnum.textContent = Math.round(24 * ease2(f)); });   // a counter is a function of time, drawn from vfrey.onFrame
+vfrey.onFrame(() => { const f = Math.min(1, Math.max(0, (tl.time() - tSweep) / sweepDur)); hubnum.textContent = Math.round(24 * ease2(f)).toLocaleString(document.documentElement.lang || "en"); });   // a counter is a function of time, drawn from vfrey.onFrame
 tl.to(kids(dial), { opacity: 0, duration: .5, ease: "power2.in" }, DUR - 2.2);
 tl.set(dial.o, { visibility: "hidden" }, DUR - 1.7);
 phase("night", DUR - 2.4);
