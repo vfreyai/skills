@@ -47,7 +47,7 @@
   <div id="planeWrap"><div id="plane"><svg id="planeSvg" width="1" height="1" style="overflow:visible"></svg></div></div>
   <div id="labels"></div>
   <div id="vigT"></div><div id="vigB"></div><div id="vig"></div>
-  <div class="hud mono" style="top:214px;font-size:25px;color:var(--gold)">SIMPLIFIED MAP</div>
+  <div class="hud mono" data-vfrey-keep style="top:214px;font-size:25px;color:var(--gold)">SIMPLIFIED MAP</div>
   <div class="hud mono" style="top:252px;font-size:21px;color:rgba(246,234,208,.8)">HAND-DRAWN COASTLINES</div>
   <div class="hud mono" id="hudC" style="top:288px;font-size:22px;color:rgba(246,234,208,.75)"></div>
   <svg class="hud" id="compass" width="170" height="170" style="left:850px;top:200px"></svg>
@@ -157,8 +157,10 @@ lowerThird("lt1", 0.8, 4.6); lowerThird("lt2", 6.4, 11.0);
 
 /* ---- caption plate (same place all film): the plate is at the caption band, vfrey draws the words ---- */
 { const cb = vfrey.captionBox, top = cb.top + cb.height - 200; const p = $("plate").style; p.top = top + "px"; p.height = "192px"; const c = $("captions").style; c.top = top + "px"; c.height = "192px"; }
-vfrey.captions("#captions", { style: "box", color: "#f6ead0", highlight: "#efc063", maxWords: 4 });
+vfrey.captions("#captions", { style: "box", color: "#f6ead0", highlight: "#efc063", highlightText: "#1b1408", maxWords: 4 });   // dark ink on the gold chip (white on gold is 1.8:1)
+vfrey.keepInFrame(Array.from(lettr.querySelectorAll("text"))); vfrey.keepInFrame(".lab");   // map lettering the camera carries past the frame edge is hidden, never cut
 draw();
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

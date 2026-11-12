@@ -180,7 +180,7 @@ PAGES.forEach((p, i) => {
     hl += `<span class="ln" style="font-size:${ln[1]}px;height:${Math.round(ln[1] * .96)}px;line-height:${Math.round(ln[1] * .96)}px">${words}</span>`; y += Math.round(ln[1] * .96); });
   const hh = y - headTop;
   const mast = front ? `<div class="tx" style="top:44px;height:240px"><h1 class="mh" style="margin:0;position:absolute;left:0;right:0;top:-2px;font-weight:900;font-size:206px;line-height:1;letter-spacing:-2px;white-space:nowrap;transform:scaleX(.8)">${MASTHEAD}</h1></div>
-      <div class="tx" style="top:284px;height:44px;line-height:44px;font-weight:700;font-size:24px;letter-spacing:.2em">VOL. I &nbsp;&middot;&nbsp; NO. 1 &nbsp;&middot;&nbsp; A DATE YOU CAN SOURCE</div>`
+      <div class="tx" style="top:284px;height:44px;line-height:44px;font-weight:700;font-size:24px;letter-spacing:.2em">VOL. I, NO. 1, A DATE YOU CAN SOURCE</div>`
     : `<div class="tx" style="top:34px;height:88px;line-height:88px;font-weight:900;font-size:50px;letter-spacing:.34em;padding-left:.34em">${MASTHEAD}</div>`;
   stage.insertAdjacentHTML("beforeend", `<div class="page" id="p${i}"><div class="thump"><div class="cam" id="cam${i}">
     <svg class="bgsvg" viewBox="0 0 1080 1920">${bg}</svg>${mast}

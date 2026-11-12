@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Paper cut-out starter: three sheets (title with a walking puppet, a counted number on a torn plate, a dusk ending), parallax layers, ransom-letter lettering, torn foreground strata, paper transitions.
-     Copy papercut.js next to this file in the scene folder (cp .agents/skills/vfrey-style-paper-cutout/papercut.js scenes/<idea>/). Replace the PLACEHOLDER words, number and colours; keep the structure.
+     Copy papercut.js next to this file in the scene folder (cp "$(npx vfrey styles path paper-cutout)/papercut.js" scenes/<idea>/). Replace the PLACEHOLDER words, number and colours; keep the structure.
      Sample script: four lines, any length; scenes are cued from the line starts. -->
 <html lang="en">
 <head>
@@ -71,7 +71,7 @@ const DUR = vfrey.timing.durationSec;
   const num = H("div", "", txt.div, { left: "130px", top: "270px", width: "820px", textAlign: "center", font: "400 250px 'Titan One', 'Baloo 2', sans-serif", color: C.ink, lineHeight: "1" });
   const lab = ransom(txt.div, INPUTS.numLabel, { x: 190, y: 520, w: 700, size: 52, seed: 12 });
   tl.set([pl, num], { autoAlpha: 0 }, 0); tl.set([pl, num], { autoAlpha: 1, scale: 1.3 }, t0 + 0.5).set([pl, num], { scale: 1 }, t0 + 0.6);
-  tl.to(o, { n: INPUTS.num, duration: 1.4, ease: "steps(14)" }, t0 + 0.6); vfrey.onFrame(() => { num.textContent = Math.round(o.n); });
+  tl.to(o, { n: INPUTS.num, duration: 1.4, ease: "steps(14)" }, t0 + 0.6); vfrey.onFrame(() => { num.textContent = Math.round(o.n).toLocaleString(document.documentElement.lang || "en"); });
   popChips(lab.chips, t0 + 1.2, 0.04);
   fore(sc, { c1: "#4c6b52", c2: "#34503e", fence: "#2b3d31", seed: 21, y1: CAP_TOP + 80, y2: CAP_TOP + 280 });
   cam(sc, t0, t1 - t0, { x: 0, y: 0, z: 0 }, { x: 70, y: -12, z: 0.06 }); })();

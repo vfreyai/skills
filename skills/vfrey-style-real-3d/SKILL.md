@@ -10,9 +10,11 @@ metadata:
   style-name: Real 3D
   style-summary: A real 3D camera flying between glowing, lit objects in deep space, like a science documentary.
   style-best-for: space, science, scale and distance, astronomy, big numbers, product objects
+  style-poster: real-3d.jpg
+  style-preview: real-3d.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Real 3D
@@ -142,14 +144,14 @@ Forbidden: crossfades, wipes, slides, any 2D transition.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed is a deep drone (41, 55, 82 Hz sines with slow LFOs) over brown-noise rumble with an echo: no beat, open low register, A-minor feel. Accents: a pink-noise `whoosh` (highpass/lowpass, fade in then exponential out, echo) on each fly-by and a sine-sweep `boom` at a cut. Mix: bed volume -9, duck under the voice, result about -14 LUFS. `make-bed.py` next to this file writes it with `python3` and `ffmpeg` only and no downloads.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`; times are the same key words the camera uses), then from the project folder: `python3 .agents/skills/vfrey-style-real-3d/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`; times are the same key words the camera uses), then from the project folder: `python3 "$(npx vfrey styles path real-3d)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey real 3D style, ffmpeg)", "volume": -9, "duck": true}` and render again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the drone alone. No `python3` on the machine: leave `music` out, say so, install nothing.
 
 ## 10. Shot plan template (32 to 38 s)
 
-Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (about 3 words a second at lineGap 0.3). Write numbers from sourced values and compute them in code; the HUD shows the computed number. Cue shots to spoken words, in increasing time order.
+Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure) at lineGap 0.3). Write numbers from sourced values and compute them in code; the HUD shows the computed number. Cue shots to spoken words, in increasing time order.
 
 | Time | Beat | Shot type | Camera | HUD |
 | --- | --- | --- | --- | --- |
@@ -169,7 +171,7 @@ Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about
 
 ## 12. Reference implementation
 
-`starter.html` is the page; `scene-starter.js` (with `glsl.js`) is a working film skeleton: a star, a lit world, a sky, bloom, a three-shot camera and two tags. Copy `scene-starter.js` and `glsl.js` to `src/<idea>/`, copy `starter.html` to `scenes/<idea>/index.html`, change the cast, shots and cues, bundle (`helpers.md` step 3) and check with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 4 out.png`. Keep the plumbing: renderer, `modifiers` loop, error box, sky, bloom, tags.
+`starter.html` is the page; `scene-starter.js` (with `glsl.js`) is a working film skeleton: a star, a lit world, a sky, bloom, a three-shot camera and two tags. Run `npx vfrey styles start real-3d scenes/<idea>`: it copies `starter.html` to `scenes/<idea>/index.html`, `scene-starter.js` (as `scene.js`) and `glsl.js` to `src/<idea>/`, and prints the bundle commands (it never installs three.js), then change the cast, shots and cues, bundle (`helpers.md` step 3) and check with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 4 out.png`. Keep the plumbing: renderer, `modifiers` loop, error box, sky, bloom, tags.
 
 ## 13. Do and Don't, and the final checklist
 

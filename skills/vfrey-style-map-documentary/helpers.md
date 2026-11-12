@@ -61,7 +61,7 @@ Paste the page shell, then the blocks as one `scene.js` (the shell loads it). Ru
   <svg class="full" id="clouds"></svg>
   <div id="labels"></div>
   <div id="vigT"></div><div id="vigB"></div><div id="vig"></div>
-  <div id="hudT" class="mono">SIMPLIFIED MAP</div>
+  <div id="hudT" class="mono" data-vfrey-keep>SIMPLIFIED MAP</div>
   <div id="hudS" class="mono">HAND-DRAWN COASTLINES</div>
   <div id="lt1" class="lt"><div class="bar"></div><div class="box"><div class="k">KICKER IN CAPS</div><div class="v">A line <i>of serif</i></div></div></div>
   <div id="grain"></div>

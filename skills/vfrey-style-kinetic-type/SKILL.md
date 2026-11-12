@@ -10,14 +10,16 @@ metadata:
   style-name: Kinetic type
   style-summary: Huge words that fill the screen and move with the voice, like the opening titles of a film.
   style-best-for: motivation, quotes, philosophy, poetry, book summaries, opinion, speeches
+  style-poster: kinetic-type.jpg
+  style-preview: kinetic-type.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Kinetic type
 
-Start from `starter.html` next to this file: copy it to `scenes/<idea>/index.html`, replace its placeholder words, render one frame, run `measure-type.cjs`, then build the shots. Code to copy is in `helpers.md`; the type-measuring script is `measure-type.cjs`; the sound script is `make-bed.py`. This file teaches a look, never a topic: apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`). The vfrey skill's `scenes/craft.md` still holds for everything not said here. Use it for ideas that live in the sentence (a quote, a principle, an opinion, a speech, a book's argument; six to ten words a shot). Not for anything that needs a picture of a thing, a chart, a map, a product or a face.
+Start from `starter.html` next to this file (`npx vfrey styles start kinetic-type scenes/<idea>` creates the folder with it as `index.html`{W}): replace its placeholder words, render one frame, run `measure-type.cjs`, then build the shots. Code to copy is in `helpers.md`; the type-measuring script is `measure-type.cjs`; the sound script is `make-bed.py`. This file teaches a look, never a topic: apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`). The vfrey skill's `scenes/craft.md` still holds for everything not said here. Use it for ideas that live in the sentence (a quote, a principle, an opinion, a speech, a book's argument; six to ten words a shot). Not for anything that needs a picture of a thing, a chart, a map, a product or a face.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -140,7 +142,7 @@ Never crossfade, never a zoom blur, never a page flip.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). The bed: a low D-minor drone (73.4, 73.9, 110, 146.8 Hz, lowpass 420 Hz, tremolo .2 Hz), a quiet pad (146.8 / 174.6 / 220 / 293.7 Hz with an echo), pink-noise air, about 70 bpm feel (nothing metrical). Accents: a `slam` (55 Hz thud 0.9 s, 140 Hz click, brown-noise burst) on each landing word, a `whoosh` (band-passed noise starting 0.3 s early) on each wipe, a `tick` (1760 Hz) on each mono tag. Mix: bed volume -12, duck under the voice; result about -14 LUFS, true peak under -1 dBTP. `make-bed.py` next to this file writes it with `python3` and `ffmpeg` only and no downloads.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (format at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-kinetic-type/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (format at the top of `make-bed.py`), then from the project folder: `python3 "$(npx vfrey styles path kinetic-type)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey kinetic type style, ffmpeg)", "volume": -12, "duck": true}` and render again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render. No `python3` on the machine: leave `music` out, say so, install nothing.
@@ -157,7 +159,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 | 30 to 36 s | Payoff in 2 to 4 words | STACK | red or bone | big slam, longest hold, source tag |
 | last 2 s | Hold | any | last ground | push only |
 
-Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; use each pause for a second motion. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; about 3 words a second at lineGap 0.3. Set `"captions": "off"`. Words on screen are the script's words; a source, name or date goes in a mono tag only if you can cite it; never invent a quote or statistic.
+Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; use each pause for a second motion. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure) at lineGap 0.3. Set `"captions": "off"`. Words on screen are the script's words; a source, name or date goes in a mono tag only if you can cite it; never invent a quote or statistic.
 
 ## 11. Reference frames
 
@@ -168,7 +170,7 @@ Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a seco
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-shot scene (stack, numeral with marble and band, wall) with the slab wipes and grain, built from the showcase film. Copy it to `scenes/<idea>/index.html`, replace the placeholder strings (`FIRST`, `SECOND`, `THIRD`, `SMALL TAG`, `2000`, `YEARS AGO`, `WALL`, `echo`, the source line) with the script's words, add shots by copying a block, and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`. After the first render, run `node .agents/skills/vfrey-style-kinetic-type/measure-type.cjs scenes/<idea>` (and again whenever a string changes); strings that reach `W()` from a list go in a `/* meas U: A | B */` comment. The starter reads `vfrey.timing.words` through `ws(i)`; it clamps indices, but cue each shot to the real word numbers.
+`starter.html` is a working three-shot scene (stack, numeral with marble and band, wall) with the slab wipes and grain, built from the showcase film. Start it with `npx vfrey styles start kinetic-type scenes/<idea>`, replace the placeholder strings (`FIRST`, `SECOND`, `THIRD`, `SMALL TAG`, `2000`, `YEARS AGO`, `WALL`, `echo`, the source line) with the script's words, add shots by copying a block, and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`. After the first render, run `node "$(npx vfrey styles path kinetic-type)/measure-type.cjs" scenes/<idea>` (and again whenever a string changes); strings that reach `W()` from a list go in a `/* meas U: A | B */` comment. The starter reads `vfrey.timing.words` through `ws(i)`; it clamps indices, but cue each shot to the real word numbers.
 
 ## 13. Do and Don't, and the final checklist
 

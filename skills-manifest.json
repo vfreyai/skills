@@ -2,88 +2,88 @@
   "source": "vfreyai/skills",
   "skills": {
     "vfrey": {
-      "hash": "5c65ff41e0b359eb",
-      "files": 29
+      "hash": "e983e17a9534d140",
+      "files": 30
     },
     "vfrey-style-blueprint": {
-      "hash": "0f9224d7710bf713",
-      "files": 8
+      "hash": "512f3a438b0c9b9a",
+      "files": 10
     },
     "vfrey-style-comic-halftone": {
-      "hash": "f4d0386940a24802",
-      "files": 9
+      "hash": "17c89103b4028a66",
+      "files": 11
     },
     "vfrey-style-data-story": {
-      "hash": "bef58949b38b8b43",
-      "files": 10
+      "hash": "598786a83322ee1a",
+      "files": 12
     },
     "vfrey-style-flat-2d": {
-      "hash": "85d6645f7ffa3a59",
-      "files": 8
-    },
-    "vfrey-style-isometric": {
-      "hash": "7131869e348ad1e8",
-      "files": 8
-    },
-    "vfrey-style-kinetic-type": {
-      "hash": "7711884f7a644df3",
-      "files": 9
-    },
-    "vfrey-style-low-poly": {
-      "hash": "4631e017377b19c1",
-      "files": 9
-    },
-    "vfrey-style-map-documentary": {
-      "hash": "ddd1941978fc0717",
-      "files": 9
-    },
-    "vfrey-style-neon-synthwave": {
-      "hash": "8405ce182e3a4cbc",
-      "files": 9
-    },
-    "vfrey-style-noir": {
-      "hash": "2c14a985387fbd71",
-      "files": 8
-    },
-    "vfrey-style-one-line": {
-      "hash": "1fd49d8f4f58be0a",
-      "files": 8
-    },
-    "vfrey-style-paper-cutout": {
-      "hash": "f616cac8424b9f88",
-      "files": 9
-    },
-    "vfrey-style-pixel-art": {
-      "hash": "602c6f94cf921352",
-      "files": 8
-    },
-    "vfrey-style-real-3d": {
-      "hash": "d26c82d75fbeea5e",
+      "hash": "aeecced6bdcb6edd",
       "files": 10
     },
+    "vfrey-style-isometric": {
+      "hash": "46709e8973cb196c",
+      "files": 10
+    },
+    "vfrey-style-kinetic-type": {
+      "hash": "21f7ebdd6d4fc773",
+      "files": 11
+    },
+    "vfrey-style-low-poly": {
+      "hash": "6ba6cf936b0cb8ad",
+      "files": 11
+    },
+    "vfrey-style-map-documentary": {
+      "hash": "d43db84a58675f3e",
+      "files": 11
+    },
+    "vfrey-style-neon-synthwave": {
+      "hash": "e561baf56628246a",
+      "files": 11
+    },
+    "vfrey-style-noir": {
+      "hash": "11007af7075cbf82",
+      "files": 10
+    },
+    "vfrey-style-one-line": {
+      "hash": "369d969c78409925",
+      "files": 10
+    },
+    "vfrey-style-paper-cutout": {
+      "hash": "3857ea6b0c644129",
+      "files": 11
+    },
+    "vfrey-style-pixel-art": {
+      "hash": "8a9a316f3d88fcf4",
+      "files": 10
+    },
+    "vfrey-style-real-3d": {
+      "hash": "8de9515033d8fb7c",
+      "files": 12
+    },
     "vfrey-style-screen-demo": {
-      "hash": "b557cdc03b2c62c5",
-      "files": 8
+      "hash": "8dab35c519d38836",
+      "files": 10
     },
     "vfrey-style-soft-gradient": {
-      "hash": "71337d3f9cde4654",
-      "files": 8
+      "hash": "d10f23ca3e046fdb",
+      "files": 10
     },
     "vfrey-style-storybook": {
-      "hash": "14c11d54a3b402ab",
-      "files": 8
+      "hash": "759e4fa89b811bb8",
+      "files": 10
     },
     "vfrey-style-terminal": {
-      "hash": "7b407d2ee5b2636d",
-      "files": 8
+      "hash": "8bdc4fd04608a58a",
+      "files": 10
     },
     "vfrey-style-vintage-newspaper": {
-      "hash": "4bd50727c5b1bc05",
-      "files": 8
+      "hash": "2a643a29a15d0a67",
+      "files": 10
     },
     "vfrey-style-whiteboard-sketch": {
-      "hash": "1eab33fd7f4f6ac4",
-      "files": 9
+      "hash": "d49808bdf1e01de5",
+      "files": 11
     }
   }
 }

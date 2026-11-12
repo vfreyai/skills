@@ -10,6 +10,8 @@ metadata:
   style-name: Neon synthwave
   style-summary: Glowing neon line drawings on a purple night sky with a striped sun, a drifting grid floor and VHS glitches.
   style-best-for: tech history, gaming, music, science, retro culture, product explainers
+  style-poster: neon-synthwave.jpg
+  style-preview: neon-synthwave.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -18,7 +20,7 @@ metadata:
 
 # Video style: Neon synthwave
 
-This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): copy it to `scenes/<idea>/index.html`, replace the PLACEHOLDER words and the three scenes, keep the world (sky, striped sun, mountains, grid, VHS layers, captions plate). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. The drawing toolkit is `neon.js` next to this file, the page shell and a scene skeleton are in `helpers.md`, and the sound script is `make-bed.py`.
+This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start neon-synthwave scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the PLACEHOLDER words and the three scenes, keep the world (sky, striped sun, mountains, grid, VHS layers, captions plate). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. The drawing toolkit is `neon.js` next to this file, the page shell and a scene skeleton are in `helpers.md`, and the sound script is `make-bed.py`.
 
 ## 1. The look in three sentences
 
@@ -137,14 +139,14 @@ One kind, the glitch cut, 0.36 s, centred 0.16 s before the next line (`glitchCu
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes a bed for this look: 100 bpm, Am F C G, a 16th-note plucked saw arpeggio through a one-pole low-pass, sub bass on 8ths, a soft pad, kick on beats, light snare and hats. Cue sounds: `glitch` on every cut (noise burst, 5 random plucks, low thump), `zap` (downward sweep) on the key reveal, `ping` when a label or tape lands, `rise` for the finale, `thump` for a heavy landing. Mix: bed at `volume -14`, `duck: true` (vfrey masters to about -14 LUFS). It needs only `python3` (standard library, no downloads, no ffmpeg) and always writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene cuts on), then from the project folder: `python3 .agents/skills/vfrey-style-neon-synthwave/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene cuts on), then from the project folder: `python3 "$(npx vfrey styles path neon-synthwave)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey neon synthwave style)", "volume": -14, "duck": true}` and make it again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no cues before the first render; vfrey trims it. Run it again after any script change. No `python3` on the machine: leave `music` out, say the video has no music and why, and do not install anything unasked.
 
 ## 10. Shot plan template (35 to 40 s, 6 lines)
 
-Pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md`) and do not merge lines to avoid it; keep the previous picture moving through the gap. The voice is the person's setting: suggest, never switch. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 3 words a second).
+Pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md`) and do not merge lines to avoid it; keep the previous picture moving through the gap. The voice is the person's setting: suggest, never switch. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)).
 
 | Beat | Time | Shot type | Content | Accent |
 |---|---|---|---|---|
@@ -167,7 +169,7 @@ Four frames of the showcase film, 540 x 960, in this folder (not copied into ins
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-scene film (title + skyline, diagram, big number) with the whole world: sky, stars, striped sun, mountains, grid drift, `neon`/`draw` tube helpers, props, chrome titles, HUD, glitch cuts, tracking band, flicker and the captions plate. Start from it: `cp .agents/skills/vfrey-style-neon-synthwave/starter.html scenes/<idea>/index.html`, replace each PLACEHOLDER, redraw the heroes, add scenes (`mk`, `M`, `gridCol`, the cut loop). Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
+`starter.html` is a working three-scene film (title + skyline, diagram, big number) with the whole world: sky, stars, striped sun, mountains, grid drift, `neon`/`draw` tube helpers, props, chrome titles, HUD, glitch cuts, tracking band, flicker and the captions plate. Start from it: `npx vfrey styles start neon-synthwave scenes/<idea>`, replace each PLACEHOLDER, redraw the heroes, add scenes (`mk`, `M`, `gridCol`, the cut loop). Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
 
 ## 13. Do / Don't, and the final checklist
 

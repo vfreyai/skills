@@ -162,5 +162,6 @@ tl.fromTo("#world", { y: 0 }, { y: -4, duration: 2.2, ease: "sine.inOut", yoyo: 
 vfrey.captions("#captions", { style: "box", font: '"Google Sans Flex", sans-serif', color: "#ffffff", highlight: "#ffbf3c", highlightText: "#0a0f20", maxWords: 4, stroke: "#0a0f20" });
 
 </script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. For a wide video, lay the stage out wide: vfrey.fitStage("#root", { width: 1920, height: 1080 }). */</script>
 </body>
 </html>

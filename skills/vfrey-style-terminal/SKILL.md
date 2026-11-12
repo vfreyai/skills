@@ -10,6 +10,8 @@ metadata:
   style-name: Terminal / ASCII
   style-summary: A glowing old-school computer screen where everything is typed and drawn from text characters.
   style-best-for: coding, cyber-security, developer tips, maths and numbers, tech explainers, how it works
+  style-poster: terminal.jpg
+  style-preview: terminal.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -18,7 +20,7 @@ metadata:
 
 # Video style: Terminal / ASCII
 
-This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (see section 12): copy it to `scenes/<idea>/index.html`, replace the PLACEHOLDER text and the three screens, keep the engine (grid, glyphs, chrome, CRT finish, transitions). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Helpers to copy are in `helpers.md` next to this file; the sound script is `make-bed.py` next to this file and reads the same `cues.js` as the picture.
+This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (see section 12): `npx vfrey styles start terminal scenes/<idea>` creates the folder with it as `index.html`, then replace the PLACEHOLDER text and the three screens, keep the engine (grid, glyphs, chrome, CRT finish, transitions). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Helpers to copy are in `helpers.md` next to this file; the sound script is `make-bed.py` next to this file and reads the same `cues.js` as the picture.
 
 ## 1. The look in three sentences
 
@@ -141,14 +143,14 @@ put(0, row - .5, "█".repeat(52), { c: "h" }); put(0, row - 1.5, "▓".repeat(5
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes a quiet bed: A-minor drone (root, fifth, octave, slow LFO), a slow pad, a dark square-wave 8th-note arpeggio and soft hats at 96 bpm, plus cue sounds: `type` (a click per typed character), `tick`, `beep` (880 Hz square), `ok` (two rising squares), `alert` (two low saw pulses, once, on the red beat), `boom` (sine 70 to 34 Hz plus noise, on each big number), `whoosh` (on every transition) and `roll` (dice). Mix: bed at `volume -14` with `duck: true`; accents are in the same file at their own gain (`"gain"` per cue). It needs only `python3` (standard library) and writes the same file for the same input.
 
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the same sheet as `cues.js`, with `"gain"` per cue and `"at"` for absolute times), then from the project folder: `python3 .agents/skills/vfrey-style-terminal/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the same sheet as `cues.js`, with `"gain"` per cue and `"at"` for absolute times), then from the project folder: `python3 "$(npx vfrey styles path terminal)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey terminal style)", "volume": -14, "duck": true}` and make it again with `--rerender`. If the run warns `audio.voice-clear`, lower `volume`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.
 
 ## 10. Shot plan template (35 to 40 s, 5 lines)
 
-Pace: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 3 words a second). Set `lineGap` 0.25 to 0.4 in the script (see `voice.md`); do not merge lines to hide the pause, fill it with ambient motion. vfrey needs the `--about` subject words in the script: use two distinctive nouns.
+Pace: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)). Set `lineGap` 0.25 to 0.4 in the script (see `voice.md`); do not merge lines to hide the pause, fill it with ambient motion. vfrey needs the `--about` subject words in the script: use two distinctive nouns.
 
 | Beat | Time | Shot type | Content | Sound cues |
 |---|---|---|---|---|
@@ -168,7 +170,7 @@ Four frames of the showcase film, 540 x 960, in this folder (not copied into ins
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-screen scene (hero object, list and dice, big number) with the full engine: grid, glyph renderer, `put`, `frame`, `scram`, `big`, `bar`, `rain`, `lock`, `die`, chrome, captions, three transitions and the CRT finish, with an inline cue sheet. Start from it: `cp .agents/skills/vfrey-style-terminal/starter.html scenes/<idea>/index.html`, replace each PLACEHOLDER, add or remove screens (`SCENES`, `TR`, `TABS`, `LOG`), keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png` (silent, estimated timing).
+`starter.html` is a working three-screen scene (hero object, list and dice, big number) with the full engine: grid, glyph renderer, `put`, `frame`, `scram`, `big`, `bar`, `rain`, `lock`, `die`, chrome, captions, three transitions and the CRT finish, with an inline cue sheet. Start from it: `npx vfrey styles start terminal scenes/<idea>`, replace each PLACEHOLDER, add or remove screens (`SCENES`, `TR`, `TABS`, `LOG`), keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png` (silent, estimated timing).
 
 ## 13. Do / Don't, and the final checklist
 

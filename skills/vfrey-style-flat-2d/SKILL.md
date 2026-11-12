@@ -10,6 +10,8 @@ metadata:
   style-name: 2D flat
   style-summary: Friendly cartoon people, bold flat colours and charts that grow as the voice explains.
   style-best-for: explainer, personal finance, business, education, how-to
+  style-poster: flat-2d.jpg
+  style-preview: flat-2d.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -20,7 +22,7 @@ metadata:
 
 Flat vector illustration with no gradients, blurs or outlines on characters: big simple people, chunky ink-stroked props and charts in a handful of solid colours, on a ground colour that changes with each act. Everything pops, hops and wipes in time with the voice, like a friendly animated explainer. If a frame has a gradient, a blur, a thin line or a photo-real detail, it is not this style.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file** (copy it to `scenes/<idea>/index.html`, then replace the PLACEHOLDER content: it already renders three acts with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start flat-2d scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER content: it already renders three acts with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
 ## When to use it, when not
 
@@ -32,7 +34,7 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 1. Cast it: one or two characters (one colour each) and one "value" object the topic is about (a coin, a leaf, a battery). Every act shows a character doing something with that object, or a chart of it.
 2. Split the script into 5 to 8 acts, one per idea, and give each a ground colour from the palette so neighbours differ. Decide which act is the chart and which is the payoff.
 3. Write the numbers down first. Charts and counters are computed in the scene from real inputs (a formula in JS), never typed in or invented, and an assumption (a rate, a date) is shown on screen as a chip.
-4. Pace the script for the voice and avoid colons. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+4. Pace the script for the voice and avoid colons. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -170,7 +172,7 @@ Bed: 96 bpm, Am - F - C - G, a soft pad, a bass on beats 1 and 3, a plucked 8th-
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file needs only `python3` (standard library, no downloads) and always writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 .agents/skills/vfrey-style-flat-2d/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 "$(npx vfrey styles path flat-2d)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey 2D flat style)", "volume": -17, "duck": true}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change, because the times move. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.

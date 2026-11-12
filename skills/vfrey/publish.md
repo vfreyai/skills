@@ -2,6 +2,10 @@
 
 vfrey posts through the platforms' official APIs, from the person's own machine, to accounts the person connected. Nothing posts by itself except a **live** series on autopilot. Every post carries the platform's AI label.
 
+## What posting needs
+
+`npx vfrey push` works; it is not disabled. It needs two things: the person's own YouTube developer app connected with `npx vfrey connect youtube --own-app` (vfrey's own apps are off for now), and a series that is **live** (`desk series live --id <id> --confirm <channel id>`: a new series is a dry run and uploads nothing). `push` itself asks before it posts: it prints the plan and exits 2 until you rerun it with `--yes` after the person says yes to that video. Posting from the person's machine costs no credits.
+
 ## The rule
 
 **Never push, schedule or unpublish without the person's explicit yes for that specific video.** A yes to one video is not a yes to the next. Run `--dry-run` first, show them the plan it prints (where, how visible, when, the AI label), ask, and only after they say yes run the same command with `--yes`. Never add `--yes` on your own, and never set a video public (`--public`) unless they asked for public.

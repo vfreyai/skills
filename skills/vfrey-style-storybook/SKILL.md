@@ -10,6 +10,8 @@ metadata:
   style-name: Storybook watercolour
   style-summary: A hand-painted picture book with soft watercolour pages that turn, a paper caption strip and a gentle lullaby.
   style-best-for: bedtime stories, fables, kids' education, folk tales, nature, cosy history
+  style-poster: storybook.jpg
+  style-preview: storybook.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -18,7 +20,7 @@ metadata:
 
 # Video style: Storybook watercolour
 
-This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): copy it to `scenes/<idea>/index.html`, replace the PLACEHOLDER headings, swap the bird for the topic's character and keep the engine (washes, filters, paper grain, painted page window, parallax pages, page turns, caption strip). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file holds the full drawing library and `make-bed.py` is the sound script.
+This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start storybook scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the PLACEHOLDER headings, swap the bird for the topic's character and keep the engine (washes, filters, paper grain, painted page window, parallax pages, page turns, caption strip). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file holds the full drawing library and `make-bed.py` is the sound script.
 
 ## 1. The look in three sentences
 
@@ -136,14 +138,14 @@ The signature is a PAGE TURN, the only transition: the old page (opaque paper ba
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes a lullaby in 3/4 at about 60 bpm: music-box tines (sine, a soft octave and a short inharmonic tink), a warm pad, a tiny room tail. Accents are placed from cues by spoken word or line (`{"type":"plop","word":"plop"}`): a page-turn whisper on every turn, plop or drip, a chime for an idea, a wing flap, a hop, a sip, a twinkle on glints. Mix: `volume -15`, `duck: false` as the showcase (the bed is quiet), vfrey masters to about -14 LUFS. Standard library only, always the same file for the same input.
 
 1. Make the video once without music so `vfrey/timing.json` holds the real word times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`: each cue has a `type` and a word, line or absolute time), then from the project folder: `python3 .agents/skills/vfrey-style-storybook/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`: each cue has a `type` and a word, line or absolute time), then from the project folder: `python3 "$(npx vfrey styles path storybook)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey storybook style)", "volume": -15, "duck": false}` and make it again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no cues before the first render. No `python3` on the machine: leave `music` out, say the video has no music and why, and do not install anything unasked.
 
 ## 10. Shot plan template (34 to 40 s, 5 or 6 lines)
 
-Pace: write 5 or 6 lines of one or two sentences; set `lineGap` in the script (0.25 to 0.4, `voice.md`) and do not merge lines to hide the pause: put page turns inside the gaps and keep ambient motion running. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 3 words a second).
+Pace: write 5 or 6 lines of one or two sentences; set `lineGap` in the script (0.25 to 0.4, `voice.md`) and do not merge lines to hide the pause: put page turns inside the gaps and keep ambient motion running. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)).
 
 | Beat | Time | Shot type | Content | Mood |
 |---|---|---|---|---|
@@ -164,7 +166,7 @@ Four frames of the showcase film, 540 x 960, in this folder (not copied into ins
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-page book (opening page, action page with a sound word, night closing page) with the full engine: filters, `blob`, `cr`, `W`, `I`, paper grain, painted window mask and border, sky, hills, ground and foreground builders, a bird character with rig (`crowRig`, `blink`, `flap`, `headTo`), `spark`, `motes`, `camera`, `reveal`, page turns and the caption strip. Start from it: `cp .agents/skills/vfrey-style-storybook/starter.html scenes/<idea>/index.html`, replace each PLACEHOLDER, redraw the character, edit `buildPage` moods and the three page blocks. Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
+`starter.html` is a working three-page book (opening page, action page with a sound word, night closing page) with the full engine: filters, `blob`, `cr`, `W`, `I`, paper grain, painted window mask and border, sky, hills, ground and foreground builders, a bird character with rig (`crowRig`, `blink`, `flap`, `headTo`), `spark`, `motes`, `camera`, `reveal`, page turns and the caption strip. Start from it: `npx vfrey styles start storybook scenes/<idea>`, replace each PLACEHOLDER, redraw the character, edit `buildPage` moods and the three page blocks. Keep `data-composition-id` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
 
 ## 13. Do / Don't, and the final checklist
 

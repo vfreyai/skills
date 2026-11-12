@@ -44,12 +44,12 @@
 const tl = vfrey.timeline(), $ = (id) => document.getElementById(id), DD = window.DD;
 const WD = vfrey.timing.words, DUR = vfrey.timing.durationSec, LN = vfrey.timing.lines;
 const lineAt = (i) => LN[Math.min(i, LN.length - 1)].start;                   // cue a chapter to the start of a script line (or find a word by text, see helpers.md)
-const sc = vfrey.frame.width / 1080; $("stage").style.transform = `scale(${sc})`;
+const fit = vfrey.fitStage("#stage"), sc = fit.scale; // the 1080x1920 design, fitted whole and centred into any frame (16:9 too), never stretched
 $("hdr").textContent = vfrey.script.title;                                    // never typed
 // INPUTS: every number the film shows, with its source. Derived values come from these.
 const INPUTS = { total: { v: 100, src: "<publisher, table, year>" }, part: { v: 42, src: "<publisher, table, year>" } };
 const share = INPUTS.part.v / INPUTS.total.v;
-const CAP_TOP = vfrey.captionBox.top / sc, CAP_H = vfrey.captionBox.height / sc, HERO_TOP = 322;
+const CAP_TOP = (vfrey.captionBox.top - fit.y) / sc, CAP_H = vfrey.captionBox.height / sc, HERO_TOP = 322;
 const bottom = vfrey.captionBox.position === "bottom";
 const HERO_H = Math.round(bottom ? CAP_TOP - 30 - HERO_TOP : 988), CELL_TOP = Math.round(bottom ? CAP_TOP + CAP_H + 30 : 1566);
 $("hero").style.height = HERO_H + "px"; $("cv").height = HERO_H;
@@ -90,8 +90,8 @@ function draw() {
   { const q = DD.project(CENTRE, cm); if (S.a1 > 0.01) { DD.leader(ctx, [[q[0], q[1]], [q[0] - 150, q[1] + 230]], DD.clamp(S.a1 * 1.5), "#15171C", 3);
       ctx.fillStyle = "#15171C"; ctx.beginPath(); ctx.arc(q[0], q[1], 6, 0, 6.2832); ctx.fill(); setLab("tag1", q[0] - 150, q[1] + 200, DD.clamp(S.a1 * 1.6 - .6)); } else setLab("tag1", 0, 0, 0); }
   setLab("legend", 40, CH - 56, S.aLeg); setLab("lbBar", 60, 24, S.aBar);
-  $("vBar").textContent = Math.round(S.v1); $("vTot").textContent = INPUTS.total.v;
-  [[0, S.v0, S.on0, 0], [1, S.v1, S.on1, 0], [2, S.v2, S.on2, 1]].forEach(([n, v, on, pct]) => { $("v" + n).textContent = on > 0.01 ? (pct ? Math.round(v) + "%" : Math.round(v)) : "-"; $("v" + n).style.opacity = (0.25 + 0.75 * on).toFixed(2); });
+  $("vBar").textContent = Math.round(S.v1).toLocaleString(document.documentElement.lang || "en"); $("vTot").textContent = Number(INPUTS.total.v).toLocaleString(document.documentElement.lang || "en");
+  [[0, S.v0, S.on0, 0], [1, S.v1, S.on1, 0], [2, S.v2, S.on2, 1]].forEach(([n, v, on, pct]) => { $("v" + n).textContent = on > 0.01 ? (pct ? Math.round(v) + "%" : Math.round(v).toLocaleString(document.documentElement.lang || "en")) : "-"; $("v" + n).style.opacity = (0.25 + 0.75 * on).toFixed(2); });
   document.querySelectorAll("#rail i").forEach((el, k, all) => { const a = k * DUR / all.length, b = (k + 1) * DUR / all.length; el.style.width = (DD.clamp((S.prog - a) / (b - a)) * 100).toFixed(1) + "%"; });
 }
 tl.eventCallback("onUpdate", draw); vfrey.onFrame(draw); to({ prog: DUR }, 0, DUR, "none");

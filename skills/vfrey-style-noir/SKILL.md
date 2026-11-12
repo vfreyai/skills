@@ -10,6 +10,8 @@ metadata:
   style-name: Silhouette noir
   style-summary: Dark, foggy scenes of black shapes lit by one warm light, like the opening of a mystery film.
   style-best-for: mystery, true crime, eerie history, unsolved cases, suspense stories
+  style-poster: noir.jpg
+  style-preview: noir.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -20,7 +22,7 @@ metadata:
 
 Near-black layered SVG silhouettes against a cold blue-teal night, lit by exactly one warm amber source: a lamp, a lantern, a window of light. Fog, rain, dust, film grain and a faint flicker sit over every shot, a slow camera creeps in, and the words arrive as typewriter evidence lines and big cream serif subtitles with the spoken word in amber. If a frame has a second accent colour, a flat well-lit scene, a visible face, or a pure black void, it is not this style.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + a canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file** (copy it to `scenes/<idea>/index.html`, then replace the PLACEHOLDER silhouettes and evidence text: it already renders three shots with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + a canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start noir scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER silhouettes and evidence text: it already renders three shots with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
 ## When to use it, when not
 
@@ -31,7 +33,7 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 1. Write 6 or 7 lines for 40 s (one or two sentences each; the music bed fills the gaps between lines). Cue shots at line starts minus 0.1 s and story events at spoken words found by text.
 2. One shot per beat, each with one clear focal light (lamp, lantern, moon break behind a silhouette, lit ship windows, a window shaft). Decide where the evidence lines and the one tally or underline go.
-3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second. A gritty free voice such as am_fenrir suits this style.
+3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). A gritty free voice such as am_fenrir suits this style.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -145,7 +147,7 @@ Bed (ffmpeg filters only, no downloads): continuous wind (brown noise low-passed
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file needs only `python3` (standard library, no downloads, ffmpeg for the filters) and always writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 .agents/skills/vfrey-style-noir/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 "$(npx vfrey styles path noir)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey noir style)", "volume": -10, "duck": true}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change, because the times move. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.

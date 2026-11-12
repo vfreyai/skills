@@ -3,7 +3,7 @@
 // The scene loads that table with <script src="meas.js"></script>, so type can be fitted to the frame while the timeline is
 // built (fonts load later than the scene script runs, so the scene must never measure at run time).
 //
-//   node .agents/skills/vfrey-style-kinetic-type/measure-type.cjs scenes/<idea>
+//   node "$(npx vfrey styles path kinetic-type)/measure-type.cjs" scenes/<idea>
 //
 // It reads <scene>/index.html and collects the strings of every  W(parent, "TEXT", "U" | "I" | "M", ...)  call. Words that
 // reach W() from a variable or a list are named in a comment instead:  /* meas U: LET | THE | REST */  (also I and M).

@@ -134,7 +134,7 @@ decoIn("s1", T1 - 0.1);
 const st = { a: 0, b: 0 };
 const draw = () => { for (const [k, v, x] of [["A", st.a, barX[0]], ["B", st.b, barX[1]]]) { const h = v / K;
   for (const id of ["bar" + k, "bar" + k + "s"]) { $("#" + id).setAttribute("y", BASE - h); $("#" + id).setAttribute("height", Math.max(0, h)); }
-  $("#val" + k).setAttribute("y", BASE - h - 22); $("#val" + k).textContent = Math.round(v) + INPUTS.unit; } };
+  $("#val" + k).setAttribute("y", BASE - h - 22); $("#val" + k).textContent = Math.round(v).toLocaleString(document.documentElement.lang || "en") + INPUTS.unit; } };
 draw();
 tl.from("#chipA", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.05); tl.from("#chipB", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.2);
 tl.to(st, { a: INPUTS.aVal, duration: 1.4, ease: "power2.out", onUpdate: draw }, T1 + 0.3);

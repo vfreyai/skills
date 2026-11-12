@@ -10,16 +10,18 @@ metadata:
   style-name: Map documentary
   style-summary: A hand-inked atlas the camera glides over, where a route draws itself and the flat map folds into a globe.
   style-best-for: geography, travel, history, logistics, science of the Earth, stories about places or routes
+  style-poster: map-documentary.jpg
+  style-preview: map-documentary.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Map documentary
 
-This file teaches a look, never a topic. Apply it to any subject that happens at places or along a route. The scene is HTML + inline SVG + GSAP (`scenes/<idea>/index.html`, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (a working atlas with a route, plane, labels, lower third, HUD and caption plate; replace PLACE A/B and the text, keep the structure). Code to copy for the rest (the camera projection and the globe fold) is in `helpers.md` next to this file; the optional texture script is `make-textures.py` next to this file; the music script is `make-bed.py` next to this file.
+This file teaches a look, never a topic. Apply it to any subject that happens at places or along a route. The scene is HTML + inline SVG + GSAP (`scenes/<idea>/index.html`, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start map-documentary scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (a working atlas with a route, plane, labels, lower third, HUD and caption plate; replace PLACE A/B and the text, keep the structure). Code to copy for the rest (the camera projection and the globe fold) is in `helpers.md` next to this file; the optional texture script is `make-textures.py` next to this file; the music script is `make-bed.py` next to this file.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 3 words a second. Write 4 to 6 long lines (each line break costs about 1.2 s of silence); put colons and commas, not periods, where a short pause is wanted.
+Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Write 4 to 6 long lines (each line break costs about 1.2 s of silence); put colons and commas, not periods, where a short pause is wanted.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -133,7 +135,7 @@ An orchestral-feeling documentary bed, about 70 BPM, minor to modal mood: a stri
 
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` needs only `python3` (standard library) and always writes the same file for the same input.
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (format at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-map-documentary/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (format at the top of `make-bed.py`), then from the project folder: `python3 "$(npx vfrey styles path map-documentary)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey map documentary style)", "volume": -14, "duck": true}` and make it again with `--rerender`.
 One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, install nothing unasked.
 
@@ -156,7 +158,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 12. Reference implementation
 
-`starter.html` next to this file renders a London to Singapore route (about 11 s): Mercator atlas with the full land stack (halo, shadow, paper, tint, inner shade, lakes, hachures, coast), graticule, lettering, great-circle route with plane and shadow, ground markers, perspective camera, floating labels, compass, coordinates readout, two lower thirds, caption plate. Copy it to `scenes/<idea>/index.html`, change `A` and `B`, the lower-third texts and camera states, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Add the globe from `helpers.md` (and clouds as radial-gradient sprites) when the story needs them.
+`starter.html` next to this file renders a London to Singapore route (about 11 s): Mercator atlas with the full land stack (halo, shadow, paper, tint, inner shade, lakes, hachures, coast), graticule, lettering, great-circle route with plane and shadow, ground markers, perspective camera, floating labels, compass, coordinates readout, two lower thirds, caption plate. Start it with `npx vfrey styles start map-documentary scenes/<idea>`, change `A` and `B`, the lower-third texts and camera states, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Add the globe from `helpers.md` (and clouds as radial-gradient sprites) when the story needs them.
 
 ## 13. Do, don't, and the final checklist
 

@@ -64,7 +64,7 @@ Y:"10001|10001|01010|00100|00100|00100|00100", Z:"11111|00001|00010|00100|01000|
 "+":"00000|00100|00100|11111|00100|00100|00000", " ":"00000|00000|00000|00000|00000|00000|00000" };
 const FONT = {}; for (const k in FONT_SRC) FONT[k] = FONT_SRC[k].split("|");
 const tw = (s, sc = 1) => s.length * 6 * sc - sc;                       // width of a string
-function T(s, x, y, c, sc = 1) { let cx = rd(x); for (const ch of s) { const g = FONT[ch] || FONT[" "];
+function T(s, x, y, c, sc = 1) { vfrey.drew(s); let cx = rd(x); for (const ch of s) { const g = FONT[ch] || FONT[" "];
   for (let j = 0; j < 7; j++) for (let i = 0; i < 5; i++) if (g[j][i] === "1") R(cx + i * sc, y + j * sc, sc, sc, c); cx += 6 * sc; } }
 function TO(s, x, y, c, sc = 1, oc = "k") { for (const [ox, oy] of [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[-1,1],[1,-1]]) T(s, x + ox * sc, y + oy * sc, oc, sc); T(s, x, y, c, sc); }   // outlined
 const TC = (s, cx, y, c, sc = 1, oc) => (oc ? TO : T)(s, rd(cx - tw(s, sc) / 2), y, c, sc, oc);                                                         // centred

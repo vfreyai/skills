@@ -66,7 +66,7 @@ const tl = vfrey.timeline();
 const LN = i => vfrey.line(i).start;
 const WD = (i, re, nth = 0) => { const rx = new RegExp(re.source, "i"), ws = vfrey.timing.words.filter(w => w.line === i && rx.test(w.text)); return ws.length ? ws[Math.min(nth, ws.length - 1)].start : LN(i); };
 const DUR = vfrey.timing.durationSec;
-document.getElementById("frame").style.transform = `scale(${vfrey.frame.width / 1080})`;
+vfrey.fitStage("#frame"); // the 1080x1920 design, fitted whole and centred into any frame (16:9 too), never stretched
 const world = document.getElementById("world");
 const C = { mag: "#ff2bd6", cya: "#27f0ff", pink: "#ff4f9a", yel: "#ffe14a", pur: "#a66bff", red: "#ff3b5c", ink: "#0b0224", white: "#ffffff" };
 const HY = 1010; /* horizon y */

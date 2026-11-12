@@ -10,16 +10,18 @@ metadata:
   style-name: Blueprint
   style-summary: A drafted engineering sheet on blueprint blue, drawn line by line, with colour-coded arrows showing how it works.
   style-best-for: engineering, how it's built, science, physics, architecture, mechanics
+  style-poster: blueprint.jpg
+  style-preview: blueprint.mp4
 ---
-
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
+
 <!-- style-bible: v2 -->
 
 # Video style: Blueprint
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, one SVG sheet plus HTML strips, GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (a wall bracket drawn on a sheet with a viewBox camera, flowing force arrows, legend, title block, caption strip and a T-square transition; replace the drawing, the labels and the keys, keep the structure); more code (fold creases, registration marks, exploded view, set square, compass) is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for engineering, how it is built, science, physics, architecture, mechanics and explainers on any subject.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, one SVG sheet plus HTML strips, GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start blueprint scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (a wall bracket drawn on a sheet with a viewBox camera, flowing force arrows, legend, title block, caption strip and a T-square transition; replace the drawing, the labels and the keys, keep the structure); more code (fold creases, registration marks, exploded view, set square, compass) is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for engineering, how it is built, science, physics, architecture, mechanics and explainers on any subject.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 3 words a second.
+Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -134,7 +136,7 @@ A slow technical bed: a three-voice pad over A, F, C, G, a soft sine pluck pulse
 
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` needs only `python3` (standard library) and always writes the same file for the same input.
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (a list; each cue names a sound and a word, line, sentence or time, as the top of `make-bed.py` explains), then from the project folder: `python3 .agents/skills/vfrey-style-blueprint/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (a list; each cue names a sound and a word, line, sentence or time, as the top of `make-bed.py` explains), then from the project folder: `python3 "$(npx vfrey styles path blueprint)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey blueprint style)", "volume": -14, "duck": true}` and make it again with `--rerender`.
 One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --version` fails): leave `music` out, say the video has no music and why, install nothing unasked.
 
@@ -157,7 +159,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 12. Reference implementation
 
-`starter.html` next to this file renders about 11 s: the sheet (grid, creases, frame, zone letters, sheet title), a hatched wall, beam, brace and weight that draw on, a dimension, a DETAIL bubble, three force arrows that flow and light the legend, a viewBox camera with five stations, a T-square transition, the caption strip and the title block. Copy it to `scenes/<idea>/index.html`, replace the drawing (world coordinates), the labels, the legend and the stations, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. A label placed for one station can land off-screen at another: write each label's world position from that station's viewBox.
+`starter.html` next to this file renders about 11 s: the sheet (grid, creases, frame, zone letters, sheet title), a hatched wall, beam, brace and weight that draw on, a dimension, a DETAIL bubble, three force arrows that flow and light the legend, a viewBox camera with five stations, a T-square transition, the caption strip and the title block. Start it with `npx vfrey styles start blueprint scenes/<idea>`, replace the drawing (world coordinates), the labels, the legend and the stations, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. A label placed for one station can land off-screen at another: write each label's world position from that station's viewBox.
 
 ## 13. Do, don't, and the final checklist
 

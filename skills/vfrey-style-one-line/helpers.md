@@ -207,7 +207,7 @@ const labels = $("#labels");
 const addLabel = (txt, x, y, size, anchor, t0) => { const el = document.createElementNS(NS, "text"); el.textContent = txt; el.setAttribute("x", x); el.setAttribute("y", y); el.setAttribute("font-size", size); el.setAttribute("text-anchor", anchor || "middle"); el.setAttribute("opacity", 0); labels.appendChild(el);
   tl.to(el, { attr: { opacity: 1 }, duration: 0.6, ease: "power2.out" }, t0); return el; };
 // one figure note per beat under the rail ("I . the idea"), fading in and out; they stand in for words when the sound is off and captions are off
-const figTxt = ["I. first idea", "II. second idea", "III. the turn", "IV. the quiet end"];
+const figTxt = ["I, first idea", "II, second idea", "III, the turn", "IV, the quiet end"];
 const figAt = [0.35, ls(1) + 0.15, ls(2) + 0.15, T.pullS + 0.3, DUR];
 const figs = $("#figs");
 figTxt.forEach((txt, i) => { const d = document.createElement("div"); d.className = "fig"; d.textContent = txt; d.style.top = NOTE_Y / VB + "px"; figs.appendChild(d);

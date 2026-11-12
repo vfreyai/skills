@@ -30,7 +30,8 @@ The track loops or trims to the film, fades in over 0.5 s and out over 1.5 s, an
 ## Checks
 
 - `music.source` (compliance, before the render): the source must be `own`, `licensed:<where>` or `generated:<tool>`, and the file must exist. The run record keeps the file, its source and its sha256.
-- `audio.loudness` (warning, after): outside -16 to -12 LUFS. Fix: use a steadier track, or raise `volume` toward 0.
+- `audio.loudness` (after, every video, with or without music): the finished sound must be -14 LUFS within 1 LU (-15 to -13). vfrey normalises every video to -14 before it signs it, so a miss means that step did not run; Fix: run the tick again with `--rerender`.
+- `audio.voice` (after, every video): a voice track that is silent or nearly so fails (Fix: hear it with `npx vfrey voice sample`, pick a voice that speaks the script's language). With `TTS_PROVIDER=none` and no sound at all it is a warning.
 - `audio.voice-clear` (warning, after): the voice is less than 10 dB above the music while someone speaks. Fix: lower `volume`, leave `duck` on.
 
 Relay a warning's Fix line to the person. The numbers (loudness, true peak, voice over music) are on the run page and in `npx vfrey tick --json`.

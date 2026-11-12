@@ -10,6 +10,8 @@ metadata:
   style-name: Isometric miniature world
   style-summary: A tiny model world seen from above, with a glowing dot that travels through it as the voice explains.
   style-best-for: how it works, explainer, technology, science, logistics
+  style-poster: isometric.jpg
+  style-preview: isometric.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -20,7 +22,7 @@ metadata:
 
 A tiny pastel diorama built from cubes, pyramids and slabs on a night-navy ground, seen from a fixed isometric angle, with one glowing amber marker travelling a lit route from model to model while a camera glides, pulls out and dives in. Light comes from the upper left, shadows are soft and filter-free, every tile shows its earth in cross-section. If a frame has perspective, a flat 2D object, a second saturated colour or a hard black shadow, it is not this style.
 
-This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file** (copy it to `scenes/<idea>/index.html`, then replace the PLACEHOLDER objects, labels and cue words: it already renders a three-tile route with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start isometric scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER objects, labels and cue words: it already renders a three-tile route with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
 ## When to use it, when not
 
@@ -29,7 +31,7 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 ## Plan before coding
 
-1. Write the script as 4 to 6 lines of one or two sentences. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; key the picture to sentences, not lines. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 3 words a second.
+1. Write the script as 4 to 6 lines of one or two sentences. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; key the picture to sentences, not lines. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
 2. Pick 4 to 6 dioramas along one route, in a row along +x on a shared tile depth, with one hero object each. Add one "macro" shot at another scale (a cut-away, a close-up, a size comparison) reached through an iris.
 3. The marker (a glowing dot) carries the idea. One sentence is one diorama: one camera move and one marker leg.
 4. Open on the hook: the hero object close up with the starting action, a spark races the whole route while the camera pulls out to the wide shot, then the camera dives back to the first diorama.
@@ -151,7 +153,7 @@ Bed: pad chords Am9 - Fmaj7 - Cmaj7 - G6, 5.33 s each (three detuned sines, slow
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file needs only `python3` (standard library, no downloads) and always writes the same file for the same input.
 
 1. Make the video once without music, so the scene's `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 .agents/skills/vfrey-style-isometric/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` with the accents (the format is at the top of `make-bed.py`; times are words or lines, the same ones the scene uses), then from the project folder: `python3 "$(npx vfrey styles path isometric)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey isometric style)", "volume": -15, "duck": false}` and make it again with `--rerender`. vfrey ducks it under the voice, fades it and sets the loudness.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render; vfrey trims it. Run it again after any script change, because the times move. No `python3` on the machine (`python3 --version` fails): leave `music` out, say the video has no music and why, and do not install anything unasked.

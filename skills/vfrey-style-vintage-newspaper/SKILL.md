@@ -10,6 +10,8 @@ metadata:
   style-name: Vintage newspaper
   style-summary: A yellowed old newspaper page where headlines are stamped in and the engraved pictures come alive, story by story.
   style-best-for: strange-but-true history, true crime, science and discovery, news explainers, on-this-day stories
+  style-poster: vintage-newspaper.jpg
+  style-preview: vintage-newspaper.mp4
 ---
 
 > **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
@@ -18,7 +20,7 @@ metadata:
 
 # Video style: Vintage newspaper
 
-This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): copy it to `scenes/<idea>/index.html`, replace the masthead name, the PLACEHOLDER headlines and decks and redraw the engravings; keep the page engine (patterns, filters, page builder, press reveal, three transitions, caption strip). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file holds the full toolkit and `make-bed.py` is the sound script.
+This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start vintage-newspaper scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the masthead name, the PLACEHOLDER headlines and decks and redraw the engravings; keep the page engine (patterns, filters, page builder, press reveal, three transitions, caption strip). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file holds the full toolkit and `make-bed.py` is the sound script.
 
 ## 1. The look in three sentences
 
@@ -152,14 +154,14 @@ Forbidden: cross-fade, zoom, any wipe that is not ink, a transition over 1.1 s.
 vfrey has no built-in music; it mixes a track you give it (the vfrey skill's `music.md`). `make-bed.py` next to this file writes the bed: an A-minor waltz at 84 bpm (plucked piano bass on beat 1, chord on beats 2 and 3, a music-box bell melody from bar 3) plus accents synced to the scene: a low thump and noise tick per headline word, band-limited noise whooshes for page turns and slides, a low rumble for the ink flood, 2.3 kHz 12 ms clicks in Morse-like patterns for telegraph or typing shots, crackle bursts for sparks, a falling-pitch zap and a 48 Hz boom at a flash, shimmering glissandi for a glow, thump and noise at each stamp. Mix: `volume -12`, `duck: true` (vfrey masters to about -14 LUFS). Standard library only, always the same file for the same input, about 10 s to run.
 
 1. Make the video once without music so `vfrey/timing.json` holds the real voice times.
-2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then from the project folder: `python3 .agents/skills/vfrey-style-vintage-newspaper/make-bed.py --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
+2. Write `scenes/<idea>/cues.json` (the format is at the top of `make-bed.py`), then from the project folder: `python3 "$(npx vfrey styles path vintage-newspaper)/make-bed.py" --timing scenes/<idea>/vfrey/timing.json --cues scenes/<idea>/cues.json --out music/<idea>-bed.wav`
 3. Add to the script: `"music": {"file": "music/<idea>-bed.wav", "source": "generated:make-bed.py (vfrey vintage newspaper style)", "volume": -12, "duck": true}` and make it again with `--rerender`.
 
 One pass instead: `--duration 60` with no `--timing` writes the bed with no accents before the first render. No `python3` on the machine: leave `music` out, say the video has no music and why, and do not install anything unasked.
 
 ## 10. Shot plan template (38 to 40 s, 7 lines)
 
-Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`) and do not merge lines to hide the pause: keep the page moving. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_fenrir suits news; af_heart with lineGap 0.3 is about 3 words a second).
+Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`) and do not merge lines to hide the pause: keep the page moving. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_fenrir suits news; af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)).
 
 | Beat | Time | Shot type | Content | Transition into it |
 |---|---|---|---|---|
@@ -180,7 +182,7 @@ Four frames of the showcase film, 540 x 960, in this folder (not copied into ins
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-page film (front page with sun and rooftops, portrait page, object page with a stamp) with the whole engine: patterns, filters, `hatch`, `greek`, `city`, `spark`, `star4`, page builder, press headlines, `turn` and `slide` and `flood`, cameras and thump, paper overlay, caption strip. Start from it: `cp .agents/skills/vfrey-style-vintage-newspaper/starter.html scenes/<idea>/index.html`, replace the masthead name and each PLACEHOLDER, redraw `ART[n]` per beat, edit `PAGES`. Keep `data-composition-id="main" data-start="0"` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
+`starter.html` is a working three-page film (front page with sun and rooftops, portrait page, object page with a stamp) with the whole engine: patterns, filters, `hatch`, `greek`, `city`, `spark`, `star4`, page builder, press headlines, `turn` and `slide` and `flood`, cameras and thump, paper overlay, caption strip. Start from it: `npx vfrey styles start vintage-newspaper scenes/<idea>`, replace the masthead name and each PLACEHOLDER, redraw `ART[n]` per beat, edit `PAGES`. Keep `data-composition-id="main" data-start="0"` on `#root`. Check a frame with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 3 out.png`.
 
 ## 13. Do / Don't, and the final checklist
 

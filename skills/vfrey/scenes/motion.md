@@ -81,6 +81,7 @@ One smooth motion, 40 to 50 % shorter than the entrance: blur-and-fade 0.13 to 0
 | Symptom | Usual cause |
 | --- | --- |
 | Blank first frame, then pop | initial state not in CSS; tween built after the page loaded |
+| A canvas or three.js scene is frozen in the render but moves in the preview | it is drawn from a tween's `onUpdate`, which a seek does not fire: draw from `vfrey.onFrame((t) => ...)` (`craft.md` section 11) |
 | Jitter or drift between renders | layout measured in `onUpdate`; two tweens on the same property; `left/top` animated |
 | Text clipped at the edge after it scales | `overflow: hidden` on a parent, or `translateX(-50%)` centering |
 | Everything lands at once | every cue uses the same `t`; stagger or use different lines |
