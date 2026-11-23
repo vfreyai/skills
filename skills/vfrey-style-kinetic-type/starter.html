@@ -1,6 +1,9 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Kinetic type starter</title>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-kinetic-type): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["FIRST", "SECOND", "THIRD", "SMALL TAG", "echo", "2000", "YEARS AGO", "WALL", "SOURCE, PLACEHOLDER LINE"] -->
 <link rel="stylesheet" href="vfrey/fonts/fonts.css" />
-<script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script><script src="meas.js" data-optional></script><!-- written by measure-type.cjs; without it W() guesses widths (data-optional: vfrey does not stop the render when it is missing) -->
+<script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script><script src="meas.js" data-optional></script><!-- written by npx vfrey styles measure; without it W() guesses widths (data-optional: vfrey does not stop the render when it is missing) -->
 <style>
   html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0e0d0c}
   #root{position:relative;width:100%;height:100%;overflow:hidden;background:#0e0d0c}
@@ -55,7 +58,7 @@ const TEX = { red: marble(RED, "#5a0f06", "#ff8a6a", 11), ink: marble("#14110f",
 // W(parent, text, "U" caps | "I" italic lowercase | "M" mono tag, { w: target width, h: target cap height, x, y, rot, c: colour, tex, stroke, sw, fs, sy })
 // x, y is the centre of the word. h stretches it vertically (sy = h / cap height); stretch up to about 3x is the look.
 function W(parent, text, st, o){
-  const base = MEAS[st + "|" + text]; if (!base) console.warn("no meas", st, text);   // add the string to meas.js with measure-type.cjs
+  const base = MEAS[st + "|" + text]; if (!base) console.warn("no meas", st, text);   // add the string to meas.js: npx vfrey styles measure scenes/<idea>
   const b = base || text.length * 70, fs = o.fs || (o.w / b * 100);
   const capH = (st === "M" ? 0.73 : 0.708) * fs, sy = o.sy || (o.h ? o.h / capH : 1);
   const d = document.createElement("div"); d.className = "wd"; const s = document.createElement("span"); s.className = "in st" + st; s.textContent = text;

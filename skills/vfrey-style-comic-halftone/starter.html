@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-comic-halftone): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["PLACEHOLDER LABEL!", "50", "ZIP!", "KRAK!", "1,000", "TIMES PLACEHOLDER"] -->
 <!-- starter.html for vfrey-style-comic-halftone: two comic pages (a hero with a burst, a label box, a sound effect, a dial; then an impact with a counter). Copy to scenes/<idea>/index.html with comic.js; replace the hero, labels, numbers and cues. -->
 <html lang="en"><head><meta charset="UTF-8" /><link rel="stylesheet" href="vfrey/fonts/fonts.css" />
 <script src="vfrey/gsap.min.js"></script>
@@ -48,7 +51,7 @@ html += panel("a1", A.x, A.y, A.w, A.h, [[0, 0], [1, 0], [1, 1], [0, 0.985]],
   `<rect y="${A.h * 0.82}" width="${A.w}" height="${A.h * 0.18}" fill="${YEL}"/><path d="${ht(A.w, A.h * 0.18, 18, 0.3, 10, () => 0.6)}" transform="translate(0 ${A.h * 0.82})" fill="${ORG}"/>` +
   `<g id="hero1w"><g transform="translate(${A.w * 0.46} ${A.h * 0.6}) scale(1.35)">${hero()}</g></g>` +
   `<g id="burst1"><g transform="translate(${A.w * 0.76} ${A.h * 0.2})">${burst(0, 0, 215)}<text x="0" y="40" text-anchor="middle" font-size="120" fill="${RED}" stroke="${INK}" stroke-width="20" paint-order="stroke" transform="rotate(-6)">50</text></g></g>` +
-  box("PLACEHOLDER LABEL!", 60, 80, 560, 100, 58, YEL, INK, "title1", -4) + sfx("ZIP!", A.w * 0.24, A.h * 0.36, 160, -10, RED, "zip1"), { z: 12 });
+  box("PLACEHOLDER LABEL!", 60, 80, 560, 100, 58, YEL, INK, "title1", -4) + sfx("ZIP!", A.w * 0.24, A.h * 0.52, 160, -10, RED, "zip1"), { z: 12 });
 html += panel("b1a", B.x, B.y, half, B.h, [[0, 0.07], [1, 0], [1, 1], [0, 1]], `<rect width="${half}" height="${B.h}" fill="${YEL}"/>` + speedRadial(half / 2, B.h / 2, 110, 380, 28, INK, 0.2, 0.03) +
   `<g transform="translate(${half / 2} ${B.h / 2})">${P(E(0, 0, 110, 110), WH, { sw: 8 })}<circle cx="16" cy="6" r="48" fill="${INK}"/><circle cx="34" cy="-12" r="14" fill="${WH}"/></g>`, { z: 12 });
 const dr = Math.min(150, B.h / 2 - 24);
@@ -85,7 +88,7 @@ tl.to("#hero2w", { x: -50, duration: 0.14, ease: "power2.out" }, T.beat); tl.to(
 pop("#burst2", T.beat, { at: [A.w * 0.7, A.h * 0.42], d: 0.4 });
 pop("#krak2", T.beat + 0.02, { at: [A.w * 0.5, A.h * 0.2], d: 0.3 });
 pop("#lab2", T.beat + 0.5, { at: [B.w * 0.77, B.h * 0.42], d: 0.3 });
-const g = { v: 0 }; tl.fromTo(g, { v: 0 }, { v: 1000, duration: 0.9, ease: "power3.out" }, T.beat + 0.1);
+const g = { v: 0 }; tl.set(g, { v: 1000 }, T.beat + 0.1);   // the figure the line says, whole: no counting through other numbers
 ambient.push((t) => { $("#num2").textContent = Math.round(g.v).toLocaleString("en-US"); });
 push("a2", T.p2, DUR, 1.0, 1.05, A.w / 2, A.h / 2);
 ticker();

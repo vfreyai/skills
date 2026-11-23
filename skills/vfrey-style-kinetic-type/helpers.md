@@ -1,6 +1,6 @@
 # Kinetic type: code to copy
 
-Paste what you need into `scenes/<idea>/index.html`. Positions are in a 1080 by 1920 stage (9:16; scale them for another ratio); `tl` is `vfrey.timeline()`. `measure-type.cjs` next to this file writes the `meas.js` table the scene loads (see "Fitting type" in `SKILL.md`). The script has `"captions": "off"`, so nothing here draws a caption.
+Paste what you need into `scenes/<idea>/index.html`. Positions are in a 1080 by 1920 stage (9:16; scale them for another ratio); `tl` is `vfrey.timeline()`. `npx vfrey styles measure scenes/<idea>` writes the `meas.js` table the scene loads (see "Fitting type" in `SKILL.md`). The script has `"captions": "off"`, so nothing here draws a caption.
 
 ## Page shell
 
@@ -63,7 +63,7 @@ const TEX = { red: marble(RED, "#5a0f06", "#ff8a6a", 11), ink: marble("#14110f",
 // W(parent, text, "U" caps | "I" italic lowercase | "M" mono tag, { w: target width, h: target cap height, x, y, rot, c: colour, tex, stroke, sw, fs, sy })
 // x, y is the centre of the word. h stretches it vertically (sy = h / cap height); stretch up to about 3x is the look.
 function W(parent, text, st, o){
-  const base = MEAS[st + "|" + text]; if (!base) console.warn("no meas", st, text);   // add the string to meas.js with measure-type.cjs
+  const base = MEAS[st + "|" + text]; if (!base) console.warn("no meas", st, text);   // add the string to meas.js: npx vfrey styles measure scenes/<idea>
   const b = base || text.length * 70, fs = o.fs || (o.w / b * 100);
   const capH = (st === "M" ? 0.73 : 0.708) * fs, sy = o.sy || (o.h ? o.h / capH : 1);
   const d = document.createElement("div"); d.className = "wd"; const s = document.createElement("span"); s.className = "in st" + st; s.textContent = text;

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-low-poly
 description: "Use when the chosen video style is Low-poly 3D (vfrey-style-low-poly), or the person asks for a low-poly, faceted, toy-like, diorama or 'paper-craft 3D' look. Teaches how to model, light, compose, animate and score that look in a vfrey three.js scene, for any topic, on top of the Real 3D style's setup (vfrey-style-real-3d): flat-shaded triangles with one colour each, a floating island, soft pastel light, diagrams drawn in the 3D world, a caption plate around vfrey's caption band and a generated sound bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -13,15 +13,25 @@ metadata:
   style-poster: low-poly.jpg
   style-preview: low-poly.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Low-Poly 3D
 
 This file teaches a look, never a topic. The plumbing is the Real 3D style's and is NOT repeated here: read `vfrey-style-real-3d` (its `SKILL.md`, `helpers.md` and `scene-starter.js`) for the one-time `npm install three@0.187 esbuild` (ask the person first), the esbuild bundle into the scene folder, the `modifiers` proxy tween that calls `render(t)` on every seek, `preserveDrawingBuffer`, the on-screen error box and its limits (it needs a graphics chip and never goes to the cloud render). Everything below replaces that style's look: no shaders, no bloom, no star field. Start from `starter.html` and `starter-scene.js` next to this file (the shell and the 3D source: `npx vfrey styles start low-poly scenes/<idea>` copies them to `scenes/<idea>/index.html` and `src/<idea>/scene.js`; bundle to `scenes/<idea>/scene3d.js`); the music script is `make-bed.py` next to this file. Use it when the subject is a creature, object or place that can be built from simple solids and the idea is spatial; not for faces, photographic looks, flat subjects (charts, interfaces) or a machine without a graphics chip.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Set `lineGap` in the script (0.25 to 0.4 is brisk) and write 5 or 6 full lines rather than many short ones.
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACEHOLDER TAG", "PLACEHOLDER TITLE". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
+Script pace: as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); write 5 or 6 full lines rather than many short ones.
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -136,6 +146,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: hero close-up. Copy the faceted hero at 55% width, soft pastel focus, plum caption plate with yellow highlight.
 - `ref-2.jpg`: enclosed interior. Copy the plum/honey lighting, hexagon facets, a yellow tag plate and the coral label.
 - `ref-3.jpg`: panel shot. Copy the picture-in-picture map with a square cream border and the coral tags.

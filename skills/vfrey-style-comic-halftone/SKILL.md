@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-comic-halftone
 description: "Use when the chosen video style is Comic halftone (vfrey-style-comic-halftone), or the person asks for a comic book, pop art, halftone, speed-lines or 'panels that smash in' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: ink-outlined panels, halftone dots, off-register print colour, speed lines, impact bursts, hand-lettered sound effects, full-frame layout around the caption band and a generated punchy music bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
@@ -13,13 +13,14 @@ metadata:
   style-poster: comic-halftone.jpg
   style-preview: comic-halftone.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Comic halftone
 
 Start from `starter.html` next to this file (`npx vfrey styles start comic-halftone scenes/<idea>` creates the folder with it as `index.html` and the `comic.js` it loads, whichever agent folder this skill was installed in; without comic.js the render stops with `scene.page-error`): then replace the hero, labels, numbers and cues, and render a frame. `helpers.md` shows the page around the kit and the choreography patterns; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Characters are original: never a known comic character, logo or trade dress.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACEHOLDER LABEL!", "50", "ZIP!", "KRAK!", "1,000", "TIMES PLACEHOLDER". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
 
 ## Limits: when to use it, when not
 
@@ -29,10 +30,17 @@ Start from `starter.html` next to this file (`npx vfrey styles start comic-halft
 ## Plan before coding
 
 1. Pick the hero: one original character or object drawn from rounded rects and ellipses, and the thing it acts on. Plan one hero beat (the strike, the reveal, the number) that gets the slow-motion freeze.
-2. Split the script into 5 to 8 pages. A page is one or two big panels above the caption plate and one to three smaller ones below it. Give each page its own ground colour (cyan, yellow, red, navy, magenta) so the film has chapters. Plan at least one gauge, counter or trace for a number.
+2. Split the script into 5 to 8 pages, one per line (a page never spans several lines). A page is one or two big panels above the caption plate and one to three smaller ones below it. Give each page its own ground colour (cyan, yellow, red, navy, magenta) so the film has chapters. Plan at least one gauge, counter or trace for a number.
 3. For each page write its sound word (`ZIP!`, `KRAK!`, `DING!`: short, invented, in capitals) and at most two label boxes of 4 words.
 4. Numbers and claims: only what you can cite. A diagram that is not data (a spike drawing, a metaphor dial) is labelled as an illustration or carries no figures.
-5. Script pace: 6 lines for 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sound effects can fill the gaps. The voice is the person's setting: suggest a voice, never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second.
+5. Script pace: 6 lines for 35 seconds, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); sound effects can fill the gaps. The voice is the person's setting: suggest a voice, never switch it.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -171,6 +179,7 @@ Script: 6 lines for 35 seconds; `lineGap` 0.25 to 0.4; sound effects fill the pa
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the opening hero page. Copy the cyan ground with the blue dot gradient, the yellow sand strip, the off-register hero with dot shading, the red burst with a number, the label box and the pink SFX.
 - `ref-2.jpg`: the impact page. Copy the red-and-ink radial speed lines on a yellow burst, the cream SFX lettering and the hero's limb smear.
 - `ref-3.jpg`: the freeze. Copy the slanted panels, the red inner burst with the yellow burst, "KRAK!" breaking the panel edge and the "SLOW-MO" tag.

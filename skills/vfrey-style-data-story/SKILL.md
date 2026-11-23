@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-data-story
 description: "Use when the chosen video style is Data story (vfrey-style-data-story), or the person asks for a data-journalism, infographic, 'the world in numbers' or 'charts and maps that build' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: warm paper ground, one red accent, dot-matrix maps and charts, dots that regroup into bars, big mono counters, leader-line labels, a scoreboard, full-frame layout around the caption band and a generated data-desk bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
@@ -13,13 +13,14 @@ metadata:
   style-poster: data-story.jpg
   style-preview: data-story.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Data story
 
 Start from `starter.html` next to this file (`npx vfrey styles start data-story scenes/<idea>` creates the folder with it as `index.html` and the `datadesk.js` and `land.js` it loads, whichever agent folder this skill was installed in; without them the render stops with `scene.page-error`): then replace its placeholders and cues, and render a frame. Code to copy is also in `helpers.md` and `datadesk.js`; the music script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "THE WORLD IN NUMBERS", "KICKER", "TOPIC", "PLACEHOLDER TAG", "small note", "1 DOT = 1 UNIT OF PLACEHOLDER, POSITIONS SCHEMATIC", "LABEL OF THE BAR", "100", "42", "42%". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "TOTAL", "INSIDE", "SHARE".
 
 ## Limits: when to use it, when not
 
@@ -31,8 +32,15 @@ Start from `starter.html` next to this file (`npx vfrey styles start data-story 
 1. Write the numbers down first, in a table: each value, its source (publisher, table, year) and whether it is rounded. Only numbers you can name a source for go on screen or in the voice. Drop a claim you cannot source.
 2. Compute, never type: every number the scene shows (counters, bar lengths, dot counts, percentages) is calculated in the scene from those inputs. A figure you derive (a share, a total) is derived in code, and rounded the way its source rounds.
 3. Mark what is not exact. A map drawn from simplified outlines, or dots placed in plausible spots, is schematic: say so on screen (a legend such as `1 DOT = <unit>, POSITIONS SCHEMATIC`) so the picture never implies precision it lacks. Print the sources in the footer.
-4. Split the script into 3 or 4 chapters (one per line), each a camera move, a build or a morph of the same dots. Pick the hook picture (the whole thing drawn at once), the count, the comparison and the catch.
-5. Script pace: Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Write 4 to 6 lines for about 37 seconds and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second.
+4. Split the script into 3 or 4 chapters (one per line), each a camera move, a build or a morph of the same dots. Lines after the last chapter still need motion (the starter keeps the small globe turning and breathing to the end): a picture that holds still 8 s under the voice fails `frames.still`. Pick the hook picture (the whole thing drawn at once), the count, the comparison and the catch.
+5. Script pace: write 4 to 6 lines for about 37 seconds, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice), and use the gaps for morphs; the caption plate fades out in silences longer than about 0.45 s, so a gap near that is where the plate blinks. The voice is the person's setting: suggest, never switch.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -153,7 +161,7 @@ No `python3` on the machine: leave `music` out, say so, install nothing.
 
 ## 10. Shot plan template (32 to 38 s)
 
-Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 2.8 words a second.
+Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; size it by the pace your voice sample prints.
 
 | Time | Chapter | Shot type | Camera and build | Scoreboard |
 | --- | --- | --- | --- | --- |
@@ -166,6 +174,7 @@ Script: 4 to 6 lines (one chapter each); `lineGap` 0.25 to 0.4; about 2.8 words 
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the opening globe. Copy the rail, headline and rule, the pale sphere with grey dots, the red circle and the empty scoreboard dashes.
 - `ref-2.jpg`: zoom with a radius label. Copy the tint fill inside the circle, the red radius line with its 58 px tag and the ink caption plate.
 - `ref-3.jpg`: unit dots on the map. Copy the red and dark dots with paper rings, the legend line and the counter cells filling.

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-terminal
 description: "Use when the chosen video style is Terminal / ASCII (vfrey-style-terminal), or the person asks for a hacker-terminal, ASCII, retro CRT, command-line or green-screen look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one canvas of monospace cells, typed commands, block-letter numbers, tmux-style panes, CRT glow and scanlines, a voice pane at vfrey's caption band, and a cue sheet shared with the generated sound."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,13 +14,23 @@ metadata:
   style-preview: terminal.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Terminal / ASCII
 
 This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (see section 12): `npx vfrey styles start terminal scenes/<idea>` creates the folder with it as `index.html`, then replace the PLACEHOLDER text and the three screens, keep the engine (grid, glyphs, chrome, CRT finish, transitions). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Helpers to copy are in `helpers.md` next to this file; the sound script is `make-bed.py` next to this file and reads the same `cues.js` as the picture.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "audit --topic placeholder", "k7#Qp$2m", "PLACEHOLDER label", "PLACEHOLDER second row", "PLACEHOLDER one-line takeaway", "one-line takeaway", "roll --dice 4", "list.txt", "alpha", "bravo", "cedar", "delta", "ember", "fable", "gamma", "harbor", "indigo", "juniper", "PLACEHOLDER tally", "compute --years", "42,000", "YEARS", "PLACEHOLDER caption for the number", "PLACEHOLDER STATED ASSUMPTION", "PLACEHOLDER where the number comes from", "read value (PLACEHOLDER)", "check failed: ALERT", "second value ok", "list loaded", "4 items picked", "compute started", "result: 42,000", "PLACE", "HOLDER", "WORDS", "HERE", and the two bar figures in `BARS` (65 and 90). Replace each with words and figures from your script, or remove it; every figure on screen must be one the voice says (`frames.numbers`). vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "tty1: session open", "ASSUMPTION", "ALERT", "voice", "log", "load", "term", "unit", "one", "two", "three".
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences
 
@@ -150,7 +160,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 10. Shot plan template (35 to 40 s, 5 lines)
 
-Pace: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)). Set `lineGap` 0.25 to 0.4 in the script (see `voice.md`); do not merge lines to hide the pause, fill it with ambient motion. vfrey needs the `--about` subject words in the script: use two distinctive nouns.
+Pace: as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); fill the pause with ambient motion. vfrey needs the `--about` subject words in the script: use two distinctive nouns.
 
 | Beat | Time | Shot type | Content | Sound cues |
 |---|---|---|---|---|
@@ -162,7 +172,7 @@ Pace: sample the script with `npx vfrey voice sample <voice> --script <file> --n
 
 ## 11. Reference frames
 
-Four frames of the showcase film, 540 x 960, in this folder (not copied into installed projects):
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the hero object with typed value and bars; copy the object scale, the red alert shackle and the row rhythm.
 - `ref-2.jpg`: a grid of 94 keys with a big block number; copy the density and the inverse-video highlights.
 - `ref-3.jpg`: the split race with the assumption box; copy the framed title and two-pane layout.

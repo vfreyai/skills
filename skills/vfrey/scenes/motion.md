@@ -70,7 +70,7 @@ vfrey.transition("#shot-a", "#shot-b", { type: "cross-warp-morph", at: 3.2, dura
 vfrey.transition("#shot-b", "#shot-c", { type: "glitch", at: 7.5, duration: 0.5 });
 ```
 
-Place `at` with `vfrey.line(i).start` to cut on a spoken line. Animate each shot's contents as usual on `tl` (both shots keep playing through the seam). Use a type per seam with a cause, about 0.4 to 0.8 s, never every beat; `crossfade` is the quiet one. A `--frame` of a scene with transitions renders the clip up to that frame, so it takes about as long as a short render. Remotion scenes cannot use them (`✗` with a Fix); use `interpolate()` there.
+The runtime paints a status panel ("Sampling animated scene frames...") over the page while it prepares the transitions. While vfrey checks a scene the runtime does not build it at all (it reads a read-only flag vfrey sets), so no check has anything of the runtime's to skip: every element and every shadow root a scene draws is read, and a Fix about text you did not write is about your own scene. Place `at` with `vfrey.line(i).start` to cut on a spoken line. Animate each shot's contents as usual on `tl` (both shots keep playing through the seam). Use a type per seam with a cause, about 0.4 to 0.8 s, never every beat; `crossfade` is the quiet one. A `--frame` of a scene with transitions renders the clip up to that frame, so it takes about as long as a short render. Remotion scenes cannot use them (`✗` with a Fix); use `interpolate()` there.
 
 ## Exits
 

@@ -114,9 +114,16 @@ function paperUrl() {
 // The caption plate and the captions follow vfrey's band (--vf-caption-at, --vf-caption-h). VB turns frame pixels into 1080x1920 units.
 const VB = 1920 / vfrey.frame.height, CAP_TOP = vfrey.captionBox.top * VB, CAP_H = vfrey.captionBox.height * VB, CAP_BOTTOM = CAP_TOP + CAP_H;
 const M = 36;   // paper margin
-// rows of panels above (row A) and below (row B) the plate; row A is null when the plate is near the top
-const ROW_A = CAP_TOP - 32 - 64 > 260 ? { x: M, y: 64, w: 1080 - 2 * M, h: Math.round(CAP_TOP - 32 - 64) } : null;
-const ROW_B = { x: M, y: Math.round(CAP_BOTTOM + 38), w: 1080 - 2 * M, h: Math.round(1882 - (CAP_BOTTOM + 38)) };
+// Rows of panels around the plate. The platforms cover the bottom fifth of the frame (frames.safe-area warns about text there), so row B
+// ends at SAFE_BOTTOM. With the plate low (the default, captions at the bottom) there is no room for a row below it: both rows stack
+// above the plate, A the big picture and B the small panels. With the plate higher, row A is above it and row B below, down to SAFE_BOTTOM.
+const SAFE_BOTTOM = Math.round(1920 * 0.8);
+const BELOW = { x: M, y: Math.round(CAP_BOTTOM + 38), w: 1080 - 2 * M, h: Math.round(SAFE_BOTTOM - (CAP_BOTTOM + 38)) };
+const TOP = 120;   // the platforms cover the top 200 px too: the label box in panel A starts below it
+const ROOM = CAP_TOP - 32 - TOP;
+const STACK = BELOW.h < 300 && ROOM > 640;
+const ROW_A = STACK ? { x: M, y: TOP, w: 1080 - 2 * M, h: Math.round(ROOM * 0.62) } : ROOM > 260 ? { x: M, y: TOP, w: 1080 - 2 * M, h: Math.round(ROOM) } : null;
+const ROW_B = STACK ? { x: M, y: TOP + ROW_A.h + 28, w: 1080 - 2 * M, h: Math.round(ROOM - ROW_A.h - 28) } : BELOW;
 // panel(id, x, y, w, h, poly, body, {z}): a div with a slanted clip polygon (poly = [[u,v],...] in 0..1), 13 px ink border, hard shadow.
 // body is SVG in panel units. Groups sk-<id> (shake) and in-<id> (slow push-in) wrap the body: animate those, never one group for both.
 function panel(id, x, y, w, h, poly, body, o = {}) {

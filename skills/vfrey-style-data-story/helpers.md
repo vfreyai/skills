@@ -59,7 +59,7 @@ const bottom = vfrey.captionBox.position === "bottom";
 const HERO_H = Math.round(bottom ? CAP_TOP - 30 - HERO_TOP : 988);           // hero art stops above the plate
 const CELL_TOP = Math.round(bottom ? CAP_TOP + CAP_H + 30 : 1566);           // scoreboard fills the space below the plate to the bottom edge
 $("hero").style.height = HERO_H + "px"; $("cv").height = HERO_H;
-$("src").style.top = Math.min(1822, CELL_TOP + 256) + "px"; $("src").textContent = "SOURCES: " + Object.values(INPUTS).map((i) => i.src).join("; ").toUpperCase();
+$("src").style.top = Math.min(1822, CELL_TOP + 256) + "px"; $("src").textContent = "SOURCES: " + [...new Set(Object.values(INPUTS).map((i) => i.src))].join("; ").toUpperCase();
 for (const id of ["capplate", "captions"]) { $(id).style.top = CAP_TOP + "px"; $(id).style.height = CAP_H + "px"; }
 $("cells").innerHTML = ["LABEL A", "LABEL B", "LABEL C"].map((k, n) => `<div class="cell" style="left:${60 + n * 320}px;top:${CELL_TOP}px"><div class="k mono">${k}</div><div class="v mono" id="v${n}">-</div></div>`).join("");
 ```

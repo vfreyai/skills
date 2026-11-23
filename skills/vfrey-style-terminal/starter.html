@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-terminal): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["audit --topic placeholder", "k7#Qp$2m", "PLACEHOLDER label", "PLACEHOLDER second row", "PLACEHOLDER one-line takeaway", "one-line takeaway", "roll --dice 4", "list.txt", "alpha", "bravo", "cedar", "delta", "ember", "fable", "gamma", "harbor", "indigo", "juniper", "PLACEHOLDER tally", "compute --years", "42,000", "YEARS", "PLACEHOLDER caption for the number", "PLACEHOLDER STATED ASSUMPTION", "PLACEHOLDER where the number comes from", "read value (PLACEHOLDER)", "check failed: ALERT", "second value ok", "list loaded", "4 items picked", "compute started", "result: 42,000", "PLACE", "HOLDER", "WORDS", "HERE", "65", "90"] -->
+<!-- vfrey-keep (vfrey-style-terminal): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["tty1: session open", "ASSUMPTION", "ALERT", "voice", "log", "load", "term", "unit", "one", "two", "three"] -->
 <!-- Terminal / ASCII: the whole film is one text-mode screen. A canvas draws a monospace character grid every frame as a
      pure function of timeline time: typed commands, ASCII-art objects, block-letter numbers, scrambling text, tmux-style panes.
      Box-drawing and block glyphs are drawn as rectangles (like a real terminal emulator does) so frames and bars join cleanly.
@@ -13,7 +17,7 @@
 // Cue sheet: the scene reads it (cue("id") -> seconds) and make-bed.py reads the same file. "line": i anchors on a script line,
 // "word": [line, "prefix"] on a spoken word; "off" shifts in seconds. sfx: type, tick, beep, ok, alert, boom, whoosh, roll.
 window.CUES = [
-  { "id": "s1cmd",  "line": 0, "off": 0.03, "sfx": "type", "text": "audit --topic placeholder", "cps": 34 },
+  { "id": "s1cmd",  "line": 0, "off": 0.03, "sfx": "type", "text": "audit --topic placeholder", "cps": 34, "whole": true },
   { "id": "s1val",  "line": 0, "off": 0.5,  "sfx": "type", "text": "k7#Qp$2m", "cps": 9 },
   { "id": "s1alert","line": 0, "off": 1.6,  "sfx": "alert" },
   { "id": "s1num",  "line": 0, "off": 2.4,  "sfx": "tick", "n": 5, "every": 0.16 },
@@ -143,7 +147,8 @@ function scram(str, p, t, seed = 0) {
   return chars.map((c, i) => (c === " " || i < k - 1.5) ? c : noiseCh(i * 7.3 + seed + Math.floor(t * 18) * 1.7)).join("");
 }
 const blink = (t, hz = 2.2) => Math.floor(t * hz * 2) % 2 === 0;
-function typedCue(id, t) { const c = CUE[id], n = t < c.t ? 0 : clamp(Math.floor((t - c.t) * c.cps) + 1, 0, c.text.length); return { n, txt: c.text.slice(0, n), done: t >= c.t + c.text.length / c.cps }; }
+function typedCue(id, t) { const c = CUE[id]; if (c.whole) return { n: c.text.length, txt: c.text, done: true };   // "whole": already typed at frame 0, not half typed
+  const n = t < c.t ? 0 : clamp(Math.floor((t - c.t) * c.cps) + 1, 0, c.text.length); return { n, txt: c.text.slice(0, n), done: t >= c.t + c.text.length / c.cps }; }
 
 // block-letter ("figlet") numbers: 5x7 pixel font, each pixel one square block with a drop shadow
 const PX = {
@@ -151,17 +156,30 @@ const PX = {
   "3": "11110,00001,00001,01110,00001,00001,11110", "4": "00010,00110,01010,10010,11111,00010,00010", "5": "11111,10000,11110,00001,00001,10001,01110",
   "6": "00110,01000,10000,11110,10001,10001,01110", "7": "11111,00001,00010,00100,01000,01000,01000", "8": "01110,10001,10001,01110,10001,10001,01110",
   "9": "01110,10001,10001,01111,00001,00010,01100", ".": "00,00,00,00,00,11,11", ",": "00,00,00,00,11,01,10",
-  "Y": "10001,10001,01010,00100,00100,00100,00100", "E": "11111,10000,10000,11110,10000,10000,11111", "A": "01110,10001,10001,11111,10001,10001,10001",
-  "R": "11110,10001,10001,11110,10100,10010,10001", "S": "01111,10000,10000,01110,00001,00001,11110"
+  "A": "01110,10001,10001,11111,10001,10001,10001", "B": "11110,10001,10001,11110,10001,10001,11110", "C": "01110,10001,10000,10000,10000,10001,01110",
+  "D": "11110,10001,10001,10001,10001,10001,11110", "E": "11111,10000,10000,11110,10000,10000,11111", "F": "11111,10000,10000,11110,10000,10000,10000",
+  "G": "01110,10001,10000,10111,10001,10001,01111", "H": "10001,10001,10001,11111,10001,10001,10001", "I": "111,010,010,010,010,010,111",
+  "J": "00111,00010,00010,00010,00010,10010,01100", "K": "10001,10010,10100,11000,10100,10010,10001", "L": "10000,10000,10000,10000,10000,10000,11111",
+  "M": "10001,11011,10101,10101,10001,10001,10001", "N": "10001,10001,11001,10101,10011,10001,10001", "O": "01110,10001,10001,10001,10001,10001,01110",
+  "P": "11110,10001,10001,11110,10000,10000,10000", "Q": "01110,10001,10001,10001,10101,10010,01101", "R": "11110,10001,10001,11110,10100,10010,10001",
+  "S": "01111,10000,10000,01110,00001,00001,11110", "T": "11111,00100,00100,00100,00100,00100,00100", "U": "10001,10001,10001,10001,10001,10001,01110",
+  "V": "10001,10001,10001,10001,10001,01010,00100", "W": "10001,10001,10001,10101,10101,10101,01010", "X": "10001,10001,01010,00100,01010,10001,10001",
+  "Y": "10001,10001,01010,00100,00100,00100,00100", "Z": "11111,00001,00010,00100,01000,10000,11111", " ": "000,000,000,000,000,000,000",
+  "%": "11001,11010,00010,00100,01000,01011,10011", "$": "00100,01111,10100,01110,00101,11110,00100", "+": "00000,00100,00100,11111,00100,00100,00000",
+  "-": "0000,0000,0000,1111,0000,0000,0000", ":": "00,11,11,00,11,11,00", "!": "1,1,1,1,1,0,1",
+  "?": "01110,10001,00001,00010,00100,00000,00100", "/": "00001,00010,00010,00100,01000,01000,10000", "'": "1,1,0,0,0,0,0"
 };
 for (const k in PX) PX[k] = PX[k].split(",");
-const bigW = (str, p) => Array.from(str).reduce((a, c) => a + (PX[c][0].length + 1) * p, -p);
+// A character the font has no glyph for is drawn as its capital, else as a space: never an error.
+const pxGlyph = (c) => PX[c] || PX[c.toUpperCase()] || PX[" "];
+const bigW = (str, p) => Array.from(str).reduce((a, c) => a + (pxGlyph(c)[0].length + 1) * p, -p);
 // x in px (left), y in base rows. o: p pixel px, c colour, rows 0..7 revealed, a alpha
 function big(xpx, y, str, o = {}) {
   const p = o.p || 30, col = C[o.c || "h"], rows = o.rows == null ? 7 : o.rows, y0 = Math.round(y * CH);
   let x = Math.round(xpx);
+  if (window.vfrey && vfrey.drew) vfrey.drew(str);   // block letters are rectangles: name the words, so vfrey's checks can read them
   for (const ch of Array.from(str)) {
-    const gl = PX[ch];
+    const gl = pxGlyph(ch);
     for (let pass = 0; pass < 2; pass++) for (let j = 0; j < 7; j++) {
       if (j >= rows) break;
       for (let i = 0; i < gl[j].length; i++) if (gl[j][i] === "1") {
@@ -231,6 +249,8 @@ function prompt(t, id) {
   put(4, 2.6, ty.txt, { s: 1.5, c: "h" });
   if (!ty.done || blink(t)) put(4 + ty.n * 1.5, 2.6, "█", { s: 1.5, c: "g" });
 }
+// The two bar readouts settle on these figures: they are content, so take them from the script (the voice must say them: frames.numbers).
+const BARS = { a: 65, b: 90 };
 function s1(t) {                                   // shot "hero object": object + typed value + bar
   prompt(t, "s1cmd");
   const tw = cue("s1alert"), tn = cue("s1num"), alert = t >= tw;
@@ -244,13 +264,14 @@ function s1(t) {                                   // shot "hero object": object
   put(6, 21.8, val.txt, { s: 2, c: alert ? "r" : "h" });
   if (!val.done && blink(t, 4)) put(6 + val.n * 2, 21.8, "█", { s: 2, c: "g" });
   if (alert && (t - tw > 0.5 || blink(t, 6))) putR(50, 21.8, " ALERT ", { s: 2, c: "r", inv: true });
-  const pa = eo((t - cue("s1val")) / 1.1) * 0.65;
+  const pa = eo((t - cue("s1val")) / 1.1) * BARS.a / 100;
   bar(2, 24.1, 22, pa, { s: 1.5, c: alert ? "r" : "g", tc: alert ? "rd" : "k" });
-  put(36, 24.1, (pa * 100).toFixed(1).padStart(4, " ") + " unit", { s: 1.5, c: alert ? "r" : "g" });
+  // the readout shows the figure whole once the bar has settled, never counting up through other values (rule 2 of the three rules)
+  if (t - cue("s1val") >= 1.1) put(36, 24.1, BARS.a.toFixed(1).padStart(4, " ") + " unit", { s: 1.5, c: alert ? "r" : "g" });
   put(2, 26.2, "PLACEHOLDER second row", { c: "g" });
-  const pb = eo((t - tn) / 1.0) * 0.9;
+  const pb = eo((t - tn) / 1.0) * BARS.b / 100;
   bar(2, 27.3, 22, pb, { s: 1.5, c: "g" });
-  put(36, 27.3, (pb * 100).toFixed(1).padStart(4, " ") + " unit", { s: 1.5, c: t > tn ? "h" : "d" });
+  if (t - tn >= 1.0) put(36, 27.3, BARS.b.toFixed(1).padStart(4, " ") + " unit", { s: 1.5, c: "h" });
   putC(30.4, "PLACEHOLDER one-line takeaway", { c: t > tn + 1 ? "g" : "d" });
 }
 function s2(t) {                                   // shot "list + dice": framed pane, scrolling list, dice
@@ -288,7 +309,7 @@ function s3(t) {                                   // shot "big number": figlet 
   putC(21, "PLACEHOLDER caption for the number", { c: "d" });
   frame(1, 23, 50, 7, { c: "g", tc: "h" }, "ASSUMPTION");
   putC(24.4, scram("PLACEHOLDER STATED ASSUMPTION", on ? pr * 1.3 : 0, t, 4), { s: 1.5, c: on ? "h" : "k" });
-  putC(27.6, "state every assumed number on screen", { c: "g" });
+  putC(27.6, "PLACEHOLDER where the number comes from", { c: "g" });
 }
 
 // ---------------------------------------------------------------- chrome: tabs, caption prompt, system pane, status line

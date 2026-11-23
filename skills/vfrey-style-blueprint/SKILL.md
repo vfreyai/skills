@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-blueprint
 description: "Use when the chosen video style is Blueprint (vfrey-style-blueprint), or the person asks for a blueprint, technical drawing, engineering drawing, drafting sheet or 'how it's built' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: a white-on-blue drafted sheet drawn line by line, a viewBox camera, colour-coded force arrows, a title block, drafting tools as transitions, a note strip at vfrey's caption band and a generated drafting sound bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -13,15 +13,25 @@ metadata:
   style-poster: blueprint.jpg
   style-preview: blueprint.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Blueprint
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, one SVG sheet plus HTML strips, GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start blueprint scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (a wall bracket drawn on a sheet with a viewBox camera, flowing force arrows, legend, title block, caption strip and a T-square transition; replace the drawing, the labels and the keys, keep the structure); more code (fold creases, registration marks, exploded view, set square, compass) is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for engineering, how it is built, science, physics, architecture, mechanics and explainers on any subject.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACEHOLDER TITLE", "PLACEHOLDER SUBTITLE", "1080 [PLACEHOLDER]", "00-XX-001", "BEAM", "BRACE", "WEIGHT", "LOAD", "DETAIL A". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "SECTION VIEW, FIG. 01", "NOT TO SCALE, SCHEMATIC", "FORCE KEY", "TITLE", "SHEET", "1 OF 1", "DRAWING NO.", "UNITS", "MM", "NOTE", "TENSION", "COMPRESSION".
+
+Script pace: size the script from a voice sample, as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice).
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -152,6 +162,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the opening wide sheet. Copy the big sheet title, the grid, construction marks and the framed note strip with the title block.
 - `ref-2.jpg`: the hangers close-up. Copy the cable and dashed force arrows in their colours, the DETAIL bubble and the hatched deck.
 - `ref-3.jpg`: the exploded view. Copy the section B-B grid, the wireframe cuboid with dashed projection lines and the pink arrows.

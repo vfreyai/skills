@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-whiteboard-sketch): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["A SMALL NOTE", "PLACEHOLDER TITLE", "LABEL Y", "TIME", "BEFORE", "AFTER", "FAST!", "SLOW", "DAY 1", "DAY 4", "DAY 7", "THE POINT"] -->
 <html lang="en"><head><meta charset="UTF-8" />
 <script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script>
 <style>
@@ -47,20 +50,29 @@ if (CAPS.mode !== "off") {
   const flush = () => { if (cur.length) groups.push(cur); cur = []; ch = 0; };
   words.forEach((w) => { if (cur.length && (cur.length >= 3 || ch + w.t.length > 15)) flush(); cur.push(w); ch += w.t.length + 1; if (/[.,?!]$/.test(w.raw)) flush(); });
   flush();
+  // The note's inner box. Every caption is laid out inside it from the hand font's measured width, and every word is whole while it is
+  // spoken (QA explorer 1: "BECAU" and "APAR" were hidden mid-word when the next line came fast).
+  const NOTE_X0 = 100, NOTE_X1 = 980, painted = [];
   groups.forEach((gw, gi) => {
     let h = 78; const measure = (hh) => gw.reduce((a, w) => a + TWID(w.t, hh), 0) + 36 * hh / 100 * (gw.length - 1);
-    if (measure(h) > 860) h = h * 860 / measure(h);
+    if (measure(h) > NOTE_X1 - NOTE_X0) h = h * (NOTE_X1 - NOTE_X0) / measure(h);
     const total = measure(h); let x = 540 - total / 2; const g = el("g", { opacity: 0, "data-vfrey-text": gw.map((w) => w.raw).join(" ") }, capSvg); /* data-vfrey-text: the words these strokes letter, for vfrey's checks */ const base = ny + nh / 2 + h * 0.5;
-    gw.forEach((w) => {
-      const T_ = TXT(w.t, x, base, h, { amp: 0.7 }); x += T_.width + 36 * h / 100;
-      T_.strokes.forEach((p, si) => {
-        const len = plen(p), path = el("path", { d: "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L"), fill: "none", stroke: INK, "stroke-width": Math.max(6, h * 0.1), "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-dasharray": `${len + 4} ${len + 4}` }, g);
-        path.style.strokeDashoffset = len + 4; tl.to(path, { strokeDashoffset: 0, duration: 0.16 + len / 2400, ease: "power1.out" }, Math.max(0, w.s - 0.04 + si * 0.035));
-      });
-    });
+    if (x < NOTE_X0 - 1 || x + total > NOTE_X1 + 1 || base - h < ny || base > ny + nh) throw new Error(`caption_outside_note: "${gw.map((w) => w.raw).join(" ")}" does not fit inside the note`);
     const gs = gw[0].s - 0.06, nextS = groups[gi + 1] ? groups[gi + 1][0].s - 0.06 : 1e9, ge = Math.min(gw[gw.length - 1].e + 0.35, nextS);
-    tl.set(g, { opacity: 1 }, Math.max(0, gs)); tl.set(g, { opacity: 0 }, ge);
+    // The note shows each whole word from the moment it is spoken until the line goes: nothing is written stroke by stroke here, since a
+    // half-lettered word ("YOU C", "FAST A") is what the viewer would read. The pen draws the diagram, never the caption.
+    gw.forEach((w) => {
+      const wg = el("g", { opacity: 0 }, g), T_ = TXT(w.t, x, base, h, { amp: 0.7 }); x += T_.width + 36 * h / 100;
+      T_.strokes.forEach((p) => el("path", { d: "M" + p.map((q) => q[0].toFixed(1) + " " + q[1].toFixed(1)).join("L"), fill: "none", stroke: INK, "stroke-width": Math.max(6, h * 0.1), "stroke-linecap": "round", "stroke-linejoin": "round" }, wg));
+      tl.set(wg, { opacity: 1 }, gi === 0 && w === gw[0] ? 0 : Math.max(0, w.s - 0.04));   // frame 0 already shows the first whole word
+    });
+    painted.push(...gw.map((w) => w.t));
+    tl.set(g, { opacity: 1 }, gi === 0 ? 0 : Math.max(0, gs)); tl.set(g, { opacity: 0 }, ge);
   });
+  // The painted caption must be the spoken line, word for word: a missing or changed word stops the render instead of shipping.
+  const key = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().replace(/[^A-Z0-9]+/g, "");
+  const lines = (vfrey.script && Array.isArray(vfrey.script.lines) ? vfrey.script.lines : null);
+  if (painted.length && lines && lines.length && key(painted.join(" ")) !== key(lines.join(" "))) throw new Error(`caption_not_script: the note letters "${painted.join(" ").slice(0, 80)}" but the script says "${lines.join(" ").slice(0, 80)}"`);
 }
 
 const eraSvg = el("svg", { viewBox: "0 0 1080 1920", width: W, height: H, class: "layer" }, $("#cam")); eraSvg.style.zIndex = 70;
@@ -130,7 +142,8 @@ build(LB, [
 build(LB, [ ...TI("BEFORE", 270, 1500, 64, RED, { anchor: "middle" }), ...TI("AFTER", 810, 1500, 64, BLUE, { anchor: "middle" }), I(LN(540, 1440, 540, 1690), INK, 6) ], tAB + 2.4, Math.max(tAB + 3.4, tBC - 0.4), { speed: 1800 });
 
 // ---- scene C: a calendar strip with ticks and one hero word
-const strip0 = []; [0, 1, 2].forEach((k) => { const x = 140 + k * 270; strip0.push(I(RECT(x, 600, 220, 260, 0.01 * (k - 1)), INK, 7), ...TI("DAY " + (1 + k * 3), x + 110, 680, 50, INK, { anchor: "middle" }), I(CR([[x + 70, 770], [x + 100, 800], [x + 160, 730]]), BLUE, 7)); });
+const DAYS = ["DAY 1", "DAY 4", "DAY 7"];   // demo: the three steps of your idea
+const strip0 = []; [0, 1, 2].forEach((k) => { const x = 140 + k * 270; strip0.push(I(RECT(x, 600, 220, 260, 0.01 * (k - 1)), INK, 7), ...TI(DAYS[k], x + 110, 680, 50, INK, { anchor: "middle" }), I(CR([[x + 70, 770], [x + 100, 800], [x + 160, 730]]), BLUE, 7)); });
 const strip = [...strip0, ...ARROW(370, 730, 410, 730, 0.1).map((p) => I(p, INK, 6)), ...ARROW(640, 730, 680, 730, 0.1).map((p) => I(p, INK, 6))].map(down(300));
 build(LC, strip, tBC + 0.3, Math.max(tBC + 3, DUR - 5), { speed: 1800 });
 build(LC, [...TI("THE POINT", 540, 1560, 150, RED, { anchor: "middle", w: 12 }), I(LN(120, 1600, 960, 1596), RED, 8)], Math.max(tBC + 3.2, DUR - 4.2), Math.max(tBC + 4.5, DUR - 1.5), { speed: 1800 });

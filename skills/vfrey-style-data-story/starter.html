@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-data-story): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["THE WORLD IN NUMBERS", "KICKER", "TOPIC", "PLACEHOLDER TAG", "small note", "1 DOT = 1 UNIT OF PLACEHOLDER, POSITIONS SCHEMATIC", "LABEL OF THE BAR", "100", "42", "42%"] -->
+<!-- vfrey-keep (vfrey-style-data-story): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["TOTAL", "INSIDE", "SHARE"] -->
 <!-- starter.html for vfrey-style-data-story: a dot-matrix globe, one circle, 80 unit dots that regroup into a bar, mono counters. Copy to scenes/<idea>/index.html with datadesk.js and land.js; replace every PLACEHOLDER, INPUTS and cue. -->
 <html lang="en"><head><meta charset="UTF-8" /><link rel="stylesheet" href="vfrey/fonts/fonts.css" />
 <script src="vfrey/gsap.min.js"></script><script src="vfrey/vfrey.js"></script><script src="datadesk.js"></script><script src="land.js"></script>
@@ -53,7 +57,7 @@ const CAP_TOP = (vfrey.captionBox.top - fit.y) / sc, CAP_H = vfrey.captionBox.he
 const bottom = vfrey.captionBox.position === "bottom";
 const HERO_H = Math.round(bottom ? CAP_TOP - 30 - HERO_TOP : 988), CELL_TOP = Math.round(bottom ? CAP_TOP + CAP_H + 30 : 1566);
 $("hero").style.height = HERO_H + "px"; $("cv").height = HERO_H;
-$("src").style.top = Math.min(1822, CELL_TOP + 256) + "px"; $("src").textContent = "SOURCES: " + Object.values(INPUTS).map((i) => i.src).join("; ").toUpperCase();
+$("src").style.top = Math.min(1822, CELL_TOP + 256) + "px"; $("src").textContent = "SOURCES: " + [...new Set(Object.values(INPUTS).map((i) => i.src))].join("; ").toUpperCase();
 for (const id of ["capplate", "captions"]) { $(id).style.top = CAP_TOP + "px"; $(id).style.height = CAP_H + "px"; }
 $("top").innerHTML = "<span>THE WORLD IN NUMBERS</span><span>TOPIC</span>";
 $("cells").innerHTML = ["TOTAL", "INSIDE", "SHARE"].map((k, n) => `<div class="cell" style="left:${60 + n * 320}px;top:${CELL_TOP}px"><div class="k mono">${k}</div><div class="v mono${n === 1 ? " acc" : ""}" id="v${n}">-</div></div>`).join("");
@@ -98,13 +102,17 @@ tl.eventCallback("onUpdate", draw); vfrey.onFrame(draw); to({ prog: DUR }, 0, DU
 
 // chapters, cued to script lines. Nothing cuts: the same globe and dots persist and change role.
 to({ lon0: CENTRE.lon, lat0: CENTRE.lat }, 0, lineAt(1) + 1, "power2.inOut");                           // 1 spin the globe to the subject
-to({ on0: 1 }, lineAt(0) + .3, .3, "none"); to({ v0: INPUTS.total.v }, lineAt(0) + .3, 1.3, "power2.out");
+to({ on0: 1 }, lineAt(0) + .3, .3, "none"); to({ v0: INPUTS.total.v }, lineAt(0) + .3, 0.01, "none");   // the figure appears whole on its line, never counting up through other values
 to({ rKm: 4000, a1: 1 }, lineAt(1) - .1, 1.6, "power2.inOut");                // 2 a circle grows, a leader and a tag annotate it
 to({ R: 640 }, lineAt(1) - .1, 1.5, "power3.inOut");
 to({ aLeg: 1, arr: 1 }, lineAt(2) - .1, 1.2, "none");                         // 3 the unit dots pour onto the map
-to({ on1: 1 }, lineAt(2) + .2, .3, "none"); to({ v1: INPUTS.part.v }, lineAt(2) + .2, 1.3, "power2.out");
+to({ on1: 1 }, lineAt(2) + .2, .3, "none"); to({ v1: INPUTS.part.v }, lineAt(2) + .2, 0.01, "none");
 to({ a1: 0, aLeg: 0, R: 170, cy: HERO_H - 150, L: 2, aBar: 1 }, lineAt(3) - .25, 1.7, "power2.inOut");   // 4 the dots regroup into a bar, the globe shrinks to the corner
-to({ on2: 1 }, lineAt(3) + .5, .3, "none"); to({ v2: share * 100 }, lineAt(3) + .5, 1.2, "power2.out");
+to({ on2: 1 }, lineAt(3) + .5, .3, "none"); to({ v2: share * 100 }, lineAt(3) + .5, 0.01, "none");
+// 5 the last lines: the small globe keeps turning and breathing until the voice ends, so the picture never holds still under it (frames.still)
+{ const t5 = lineAt(3) + 1.9, rest = Math.max(0, DUR - t5);
+  if (rest > 0.5) { to({ lon0: CENTRE.lon + rest * 9 }, t5, rest, "none");
+    tl.to(S, { R: 196, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.ceil(rest / 1.4) - 1) }, t5); } }
 
 // captions on the plate (same style in the script: "color")
 const groups = vfrey.captions("#captions", { style: "color", size: 62, color: "#F2EEE4", highlight: "#FF7358", maxWords: 4 });

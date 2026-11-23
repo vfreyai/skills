@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-pixel-art
 description: "Use when the chosen video style is Pixel art (vfrey-style-pixel-art), or the person asks for a pixel art, 8-bit, 16-bit, retro game, arcade or chiptune look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one real low-resolution canvas, a strict palette, text sprites, stepped animation, parallax, pixel-font captions on a plate in the caption band, pixel wipes and a generated chiptune bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,8 +14,6 @@ metadata:
   style-preview: pixel-art.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Pixel art
@@ -23,6 +21,9 @@ metadata:
 Real pixel art: the whole film is drawn on one tiny canvas, an eighth of the frame each way (135 x 240), scaled up with hard edges, in 21 fixed colours. Sprites move in whole pixels at ten frames a second over scrolling backgrounds, with a faint scanline over everything, so it looks like a game from 1985 rather than a filter. If a frame has an anti-aliased edge, a colour outside the palette, a half-pixel position or a smooth tween, it is not this style.
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start pixel-art scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER sprites, `INPUTS` and cue words: it already renders three scenes with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "WING BEATS", "230", "BEATS A SECOND". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "FIRE", "1UP".
 
 ## When to use it, when not
 
@@ -34,7 +35,14 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 1. Turn the idea into a game screen: who is the sprite, what is the counter, what fills the HUD. A sentence of the script is a scene or a change of state in one.
 2. Plan 4 to 6 scenes with different grounds (space, a city skyline, a circuit board, a room, a neon grid) so the contact sheet does not look like one screen.
 3. Anything simulated (a march, a race, a count) is computed once at load into per-frame arrays and looked up by frame number; never stepped from the previous frame.
-4. Join sentences with `;` inside a line where a full stop is not needed: the free Kokoro voice pauses at each full stop, and under half a second at a semicolon. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Cue pictures to sentences (words ending `.`, `!`, `?` or `;`), not to lines. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+4. Join sentences with `;` inside a line where a full stop is not needed: the free Kokoro voice pauses at each full stop, and under half a second at a semicolon. Pace the script as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice). Cue pictures to sentences (words ending `.`, `!`, `?` or `;`), not to lines.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -180,7 +188,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 11. Reference frames
 
-Saved in this style's package folder (not installed into projects): look at them before drawing.
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg` the hook: copy the big stepped-in title digits with the orange offset shadow, the arcade cabinet, the pink-horizon grid floor and the plate with a yellow active word.
 - `ref-2.jpg` the play field: copy the HUD (grey label, yellow 2x number, orange and cyan tick bars), the alien rows with whole-pixel marching, the 2x ship and the joystick panel below the plate.
 - `ref-3.jpg` a room cutaway: copy the night window with a skyline, the brick wall and wooden desk below the plate, 16x24 person sprite and the background cat; foreground never empty.

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-paper-cutout
 description: "Use when the chosen video style is Paper cut-out (vfrey-style-paper-cutout), or the person asks for a paper, collage, cut-out, scrapbook, craft, stop-motion, storybook or 'ransom note letters' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: layered cut and torn paper with shadows between layers, parallax, jointed stop-motion puppets, cut-out letter titles, full-frame layout around the caption band, paper transitions and a generated music bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,8 +14,6 @@ metadata:
   style-preview: paper-cutout.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Paper cut-out
@@ -24,6 +22,9 @@ Layered scissor-cut and torn paper in muted vintage colours: every picture is a 
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start paper-cutout scenes/<idea>` creates the folder with it as `index.html` and the `papercut.js` it loads, whichever agent folder this skill was installed in; without papercut.js the render stops with `scene.page-error`)** (then replace the PLACEHOLDER words, number and colours: it already renders three sheets with `vfrey render --frame`). `papercut.js` next to this file is the toolkit, which `styles start` already copied into the scene folder (`helpers.md` lists what is in it); the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "YOUR TITLE", "A SHORT STORY", "986", "THINGS COUNTED", "THE END". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
 ## When to use it, when not
 
 - Use it for history, folklore, true stories with a twist, "the story of", timelines, and explainers that want a hand-made, slightly irreverent tone.
@@ -31,9 +32,16 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 ## Plan before coding
 
-1. Write 5 or 6 spoken lines (Kokoro adds a pause at line breaks, so fewer, longer lines are faster), a hook in line 0, one beat per picture, a twist in the last line. Cue scenes from `vfrey.line(i)` and `vfrey.timing.words`, never from fixed seconds. Word regexes are case-insensitive and anchored (`/^one/i`: "anyone" contains "one").
+1. Write 5 or 6 spoken lines (fewer, longer lines are faster, see `voice.md`), a hook in line 0, one beat per picture, a twist in the last line. Cue scenes from `vfrey.line(i)` and `vfrey.timing.words`, never from fixed seconds. Word regexes are case-insensitive and anchored (`/^one/i`: "anyone" contains "one").
 2. One sheet per beat, one ground colour per sheet, a different transition kind where you can. Decide the map beat, the number beat and the twist beat first.
-3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+3. Pace the script as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice).
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -178,7 +186,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 11. Reference frames
 
-Saved in this style's package folder (not installed into projects): look at them before drawing.
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg` the title sheet: copy the ransom letters with mixed fonts and tilts, the stacked concentric sun, the three scissor hills, the puppets with straw hats and the foreground strata with a fence.
 - `ref-2.jpg` the map beat: copy the teal sea, the red country polygon with a pale cut edge, the accent state polygon and the pin, the cloud at the bottom and the torn plate behind the caption.
 - `ref-3.jpg` a crowd with a prop: copy the three olive soldiers on the same ground line, the wooden crate, the sunburst behind, ransom number chips and the caption strip.

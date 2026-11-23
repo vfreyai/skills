@@ -1,3 +1,6 @@
+/* vfrey-demo (vfrey-style-real-3d): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["THE STAR", "THE WORLD", "FROM THE STAR"] */
+/* vfrey-keep (vfrey-style-real-3d): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["3D scene error:"] */
 // Starter for a real 3D (three.js / WebGL) scene in vfrey (vfrey-style-real-3d). It is a working film skeleton, not a template:
 // keep the plumbing (renderer, the timeline-driven loop, the error box, sky, bloom, the shot camera, DOM tags) and replace the
 // subjects, the shots and the cues with your own. Copy it with glsl.js into src/<idea>/, then bundle (see helpers.md):

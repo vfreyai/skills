@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-whiteboard-sketch
 description: "Use when the chosen video style is Whiteboard sketch (vfrey-style-whiteboard-sketch), or the person asks for a whiteboard, marker, hand-drawn, doodle, sketch-note or 'drawn live' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: stroke-by-stroke marker drawing, a single-stroke hand-lettering kit, doodle people and charts, a sticky-note caption plate, page flicks and eraser wipes, and a generated marker-and-marimba bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
@@ -13,13 +13,14 @@ metadata:
   style-poster: whiteboard-sketch.jpg
   style-preview: whiteboard-sketch.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Whiteboard sketch
 
 Start from `starter.html` next to this file (`npx vfrey styles start whiteboard-sketch scenes/<idea>` creates the folder with it as `index.html` and the `sketch.js` it loads, whichever agent folder this skill was installed in; without sketch.js the render stops with `scene.page-error`): then replace the placeholder art, labels and cues, and render a frame. Code to copy is in `helpers.md`; the drawing kit is `sketch.js`; the sound script is `make-bed.py`. This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "A SMALL NOTE", "PLACEHOLDER TITLE", "LABEL Y", "TIME", "BEFORE", "AFTER", "FAST!", "SLOW", "DAY 1", "DAY 4", "DAY 7", "THE POINT". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
 
 ## Limits: when to use it, when not
 
@@ -28,11 +29,20 @@ Start from `starter.html` next to this file (`npx vfrey styles start whiteboard-
 
 ## Plan before coding
 
-1. Split the script into 4 to 6 scenes, one idea each, and name the one drawable noun per phrase: a person, a chart, a calendar, a book, a clock. Plan a big idea in the top zone and a supporting strip in the lower zone of each scene.
+1. Split the script into 4 to 6 lines, one scene and one idea per line (the scene changes its picture on every line), and name the one drawable noun per phrase: a person, a chart, a calendar, a book, a clock. Plan a big idea in the top zone and a supporting strip in the lower zone of each scene.
 2. Give each ink colour a job and keep it all film: red for the problem, blue for the fix and labels, black for structure.
 3. Decide which scene is the chart (axes, one curve, two or three labels) and what the last picture is (the takeaway in big lettering).
 4. Facts: only things you can cite go on screen. A chart is a sketch with no invented numbers; label the axes in words.
-5. Script pace: 5 lines, 35 seconds. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. The voice also pauses after each full stop inside a line, so keep a full stop only where a page flick or a wipe should fall. The voice is the person's setting: suggest a friendly one (`af_heart`), never switch it. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+5. Script pace: 5 lines, 35 seconds, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice). The voice also pauses after each full stop inside a line, so keep a full stop only where a page flick or a wipe should fall. The voice is the person's setting: suggest a friendly one (`af_heart`), never switch it.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
+
+Whiteboard only: the sticky-note caption shows the whole spoken word for as long as it is spoken; the pen draws the diagram, never the caption.
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -47,7 +57,7 @@ Signature traits (each checkable on a frame):
 6. Hand lettering: capitals only, single-stroke, each letter slightly different in size, tilt and baseline.
 7. Doodle people: a big round head, spiky or bald, closed lids or dot eyes, few lines; props are rectangles, ovals and curves.
 8. A visible marker pen that writes, glides between strokes and lifts.
-9. A pale-yellow sticky note with two tape strips carrying hand-written captions, same place all film.
+9. A pale-yellow sticky note with two tape strips carrying hand-written captions, same place all film. The starter sizes each caption from the hand font's measured width so every letter sits inside the note, shows each word whole from the moment it is spoken until the line goes (the note is never lettered stroke by stroke: a half-written word is what the viewer would read, and the pen draws the diagram, not the caption), and stops the render (`caption_outside_note`, `caption_not_script`) when the note would letter something other than the script line. Keep that code when you change the look.
 10. An aluminium frame edge and a marker tray with markers at the bottom; the board's lower strip holds more art.
 11. Arrows with a bow, circled words, underlines in red, labels beside things.
 12. Page flick and eraser wipe as the only transitions; slow camera push on the board.
@@ -171,6 +181,7 @@ Script: 5 lines; `lineGap` 0.25 to 0.4 (Kokoro's default pause is about a second
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the opening desk scene. Copy the hatched drawer, the doodle head with spiky hair and droopy lids, the books with red and blue stripes, the sticky note with tape and the tray with markers.
 - `ref-2.jpg`: a character with a checklist card. Copy the bearded head with hatched jacket and red bow tie, the lettered card with blue ticks and the pen mid-stroke.
 - `ref-3.jpg`: the chart. Copy the axes, the thick red curve, the circled area with its labelled arrow and the blue hand-lettered axis labels.

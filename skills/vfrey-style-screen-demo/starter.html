@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-screen-demo): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["APP NAME", "List title", "3 items", "Item one", "Item two", "Item three", "Item four", "Item five", "Item six", "Item seven", "Item eight", "Item nine", "Item ten", "Step one", "Step two", "Step three", "Label", "Button label", "Toast headline", "Toast detail line", "key part", "PLACEHOLDER claim", "PLACEHOLDER: headline of the detail view", "PLACEHOLDER: a first sentence of supporting detail.", "PLACEHOLDER: the sentence the voice points at.", "PLACEHOLDER preview text"] -->
+<!-- vfrey-keep (vfrey-style-screen-demo): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["Search", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "9:41", "8:15"] -->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -20,8 +24,9 @@
   .dot{position:absolute;top:23px;width:18px;height:18px;border-radius:50%;background:#d5d9e6}
   #apptitle{position:absolute;left:0;width:100%;top:15px;text-align:center;font-weight:700;font-size:26px;color:var(--mut)}
   .view{position:absolute;left:0;top:64px;width:1020px;height:2536px;background:#fff;overflow:hidden}
-  #listHead{position:absolute;left:40px;top:22px;font-size:54px;font-weight:800}
-  #listSub{position:absolute;left:300px;top:41px;font-size:28px;color:var(--mut)}
+  /* The count follows the title, however long the title is (a fixed left put a longer title on top of it). */
+  #listHead{position:absolute;left:40px;top:22px;right:380px;display:flex;align-items:baseline;gap:24px;font-size:54px;font-weight:800;white-space:nowrap}
+  #listSub{font-size:28px;font-weight:400;color:var(--mut)}
   #search{position:absolute;right:40px;top:26px;width:300px;height:56px;border-radius:28px;background:#f0f2f8;color:var(--mut);font-size:24px;line-height:56px;padding-left:24px}
   .row{position:absolute;left:0;width:1020px;height:150px;border-top:1px solid var(--line)}
   .rowbg{position:absolute;inset:0;background:var(--accSoft);opacity:0}
@@ -78,7 +83,7 @@
     <div id="win">
       <div id="titlebar"><div class="dot" style="left:30px"></div><div class="dot" style="left:60px"></div><div class="dot" style="left:90px"></div>
         <div id="apptitle">APP NAME</div></div>
-      <div class="view" id="list"><div id="listHead">List title</div><div id="listSub">3 items</div><div id="search">Search</div></div>
+      <div class="view" id="list"><div id="listHead">List title<span id="listSub">3 items</span></div><div id="search">Search</div></div>
       <div class="view" id="detail">
         <div id="bar"><div id="back">&#8249; List title</div></div>
         <div id="title">PLACEHOLDER: headline of the detail view</div>

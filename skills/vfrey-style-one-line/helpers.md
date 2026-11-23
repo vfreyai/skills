@@ -210,11 +210,15 @@ const addLabel = (txt, x, y, size, anchor, t0) => { const el = document.createEl
 const figTxt = ["I, first idea", "II, second idea", "III, the turn", "IV, the quiet end"];
 const figAt = [0.35, ls(1) + 0.15, ls(2) + 0.15, T.pullS + 0.3, DUR];
 const figs = $("#figs");
+// One note at a time: each fades out before the next fades in (a cross-fade stacks two notes, and frames.text-overlap refuses it).
+let figFree = 0;
 figTxt.forEach((txt, i) => { const d = document.createElement("div"); d.className = "fig"; d.textContent = txt; d.style.top = NOTE_Y / VB + "px"; figs.appendChild(d);
-  tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, figAt[i]);
-  if (i < figTxt.length - 1) tl.to(d, { opacity: 0, duration: 0.3, ease: "power1.in" }, figAt[i + 1] - 0.05); });
+  const on = Math.max(figAt[i], figFree), off = Math.max(on + 0.45, figAt[i + 1] - 0.35);
+  tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, on);
+  if (i < figTxt.length - 1) { tl.to(d, { opacity: 0, duration: 0.3, ease: "power1.in" }, off); figFree = off + 0.3; } });
 for (let i = 0; i <= figTxt.length; i++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", 120 + (840 / figTxt.length) * i); c.setAttribute("cy", RAIL_Y); c.setAttribute("r", 5); c.setAttribute("fill", "#1C1A17"); $("#ticks").appendChild(c); }
 tl.to("#rail", { opacity: 0, duration: 0.6 }, T.pullS + 0.3);                              // on the end card the rail gives way to the title
+tl.to("#labels", { opacity: 0, duration: 0.6 }, T.pullS);                                   // and the labels, which the pull-out carries under the last note
 tl.to("#endcard", { opacity: 1, duration: 1.2, ease: "power2.out" }, T.pullS + 1.1);
 ```
 

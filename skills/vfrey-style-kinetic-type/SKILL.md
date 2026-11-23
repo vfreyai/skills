@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-kinetic-type
 description: "Use when the chosen video style is Kinetic type (vfrey-style-kinetic-type), or the person asks for a kinetic typography, title-sequence, words-fill-the-screen or lyric-video look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: giant serif words that slam, stretch, rotate, stack and fill with marble in time with the voice, three colours, two typefaces, vfrey's own captions switched off and a generated drone and hit bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
@@ -13,13 +13,23 @@ metadata:
   style-poster: kinetic-type.jpg
   style-preview: kinetic-type.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Kinetic type
 
-Start from `starter.html` next to this file (`npx vfrey styles start kinetic-type scenes/<idea>` creates the folder with it as `index.html`{W}): replace its placeholder words, render one frame, run `measure-type.cjs`, then build the shots. Code to copy is in `helpers.md`; the type-measuring script is `measure-type.cjs`; the sound script is `make-bed.py`. This file teaches a look, never a topic: apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`). The vfrey skill's `scenes/craft.md` still holds for everything not said here. Use it for ideas that live in the sentence (a quote, a principle, an opinion, a speech, a book's argument; six to ten words a shot). Not for anything that needs a picture of a thing, a chart, a map, a product or a face.
+Start from `starter.html` next to this file (`npx vfrey styles start kinetic-type scenes/<idea>` creates the folder with it as `index.html`{W}): replace its demo words (the `vfrey-demo` comment at the top of the starter lists them all), run `npx vfrey styles measure scenes/<idea>`, then build the shots. Code to copy is in `helpers.md`; `styles start` already measured the starter's own words into `meas.js`; the sound script is `make-bed.py`. This file teaches a look, never a topic: apply it to the scene you write (`scenes/<idea>/index.html`, HTML + GSAP, engine `vfrey-render`). The vfrey skill's `scenes/craft.md` still holds for everything not said here. Use it for ideas that live in the sentence (a quote, a principle, an opinion, a speech, a book's argument; six to ten words a shot). Not for anything that needs a picture of a thing, a chart, a map, a product or a face.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "FIRST", "SECOND", "THIRD", "SMALL TAG", "echo", "2000", "YEARS AGO", "WALL", "SOURCE, PLACEHOLDER LINE". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -159,10 +169,11 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 | 30 to 36 s | Payoff in 2 to 4 words | STACK | red or bone | big slam, longest hold, source tag |
 | last 2 s | Hold | any | last ground | push only |
 
-Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; use each pause for a second motion. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure) at lineGap 0.3. Set `"captions": "off"`. Words on screen are the script's words; a source, name or date goes in a mono tag only if you can cite it; never invent a quote or statistic.
+Script rules: pace it as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); use each pause for a second motion. Set `"captions": "off"`. Words on screen are the script's words; a source, name or date goes in a mono tag only if you can cite it; never invent a quote or statistic.
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: STACK on ink. Copy the three-row block fitted to one width, bone / red / bone, and the red plate with the mono tag.
 - `ref-2.jpg`: WALL on bone. Copy five identical rows, the one red row, and the red source bar at the bottom edge.
 - `ref-3.jpg`: outline echo on ink. Copy the solid row over a hollow row (5 px stroke) and the `01` counter with its mono line.
@@ -170,7 +181,7 @@ Script rules: set `lineGap` (0.25 to 0.4; Kokoro's default pause is about a seco
 
 ## 12. Reference implementation
 
-`starter.html` is a working three-shot scene (stack, numeral with marble and band, wall) with the slab wipes and grain, built from the showcase film. Start it with `npx vfrey styles start kinetic-type scenes/<idea>`, replace the placeholder strings (`FIRST`, `SECOND`, `THIRD`, `SMALL TAG`, `2000`, `YEARS AGO`, `WALL`, `echo`, the source line) with the script's words, add shots by copying a block, and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`. After the first render, run `node "$(npx vfrey styles path kinetic-type)/measure-type.cjs" scenes/<idea>` (and again whenever a string changes); strings that reach `W()` from a list go in a `/* meas U: A | B */` comment. The starter reads `vfrey.timing.words` through `ws(i)`; it clamps indices, but cue each shot to the real word numbers.
+`starter.html` is a working three-shot scene (stack, numeral with marble and band, wall) with the slab wipes and grain, built from the showcase film. Start it with `npx vfrey styles start kinetic-type scenes/<idea>`, replace the placeholder strings (`FIRST`, `SECOND`, `THIRD`, `SMALL TAG`, `2000`, `YEARS AGO`, `WALL`, `echo`, the source line) with the script's words, add shots by copying a block, and check it with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame 3 out.png`. Then run `npx vfrey styles measure scenes/<idea>` (and again whenever a string changes; it uses vfrey's own fonts and Chrome, nothing to install, and needs no render first); strings that reach `W()` from a list go in a `/* meas U: A | B */` comment. The starter reads `vfrey.timing.words` through `ws(i)`; it clamps indices, but cue each shot to the real word numbers.
 
 ## 13. Do and Don't, and the final checklist
 
@@ -215,7 +226,7 @@ Final checklist: render, make a 12-frame contact sheet (`ffmpeg -v error -y -i "
 
 ## Pitfalls
 
-- Measuring fonts in the scene: use the offline table and rerun `measure-type.cjs` after any text change; a missing string logs `no meas`.
+- Measuring fonts in the scene: use the offline table and rerun `npx vfrey styles measure scenes/<idea>` after any text change; a missing string logs `no meas`.
 - Slab wipe: with `left:-160%; width:150%`, full cover needs `xPercent` 90 and the exit goes to 190. Set it back with `tl.set` after.
 - `yPercent` does nothing on a zero-height wrapper; tween `y:"-=N"` in px.
 - GSAP opacity tweens and an `onUpdate` that writes `style.opacity` fight; give 3D layers only the updater (also called from `vfrey.onFrame`) and keep rotated layers about 80% of the frame width.

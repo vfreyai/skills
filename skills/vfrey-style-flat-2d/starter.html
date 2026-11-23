@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-flat-2d): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["71%", "OF EARTH", "SHARE OF EARTH'S SURFACE", "WATER", "LAND", "29%", "ROUGH ESTIMATE"] -->
 <!-- 2D flat starter: three acts (hook with a character, a live chart, a payoff), shape-wipe seams, caption plate. 1080x1920.
      Replace every PLACEHOLDER: the numbers (INPUTS), the labels, the value object, the palette hues. Keep the structure and the numbers in the recipe.
      Sample script (any script works: words are looked up by text and fall back to even thirds): "Most of the planet is water. Seventy-one percent is ocean. Only twenty-nine percent is land. Look at the globe again." -->
@@ -127,14 +130,13 @@ const seam = (rim, sc, kind, x, y, t) => { const a = { circle: `circle(0px at ${
 seam("t1", "s1", "circle", 540, 900, T1 - 0.45); seam("t2", "s2", "rise", 540, 1920, T2 - 0.45);
 const cam = (id, s0, s1, x1, t0, dur) => tl.fromTo("#" + id, { scale: s0, x: 0, y: 0 }, { scale: s1, x: x1, y: -10, duration: dur, ease: "power1.inOut" }, t0);
 cam("s0c", 1, 1.08, -14, 0, T1 + 0.2); cam("s1c", 1.02, 1.1, 10, T1 - 0.3, T2 - T1 + 0.3); cam("s2c", 1, 1.08, -10, T2 - 0.3, DUR - T2 + 0.4);
-tl.from("#s0-badge", { scale: 0, svgOrigin: "200 250", duration: 0.5, ease: "back.out(1.8)" }, 0.15);
-tl.from("#hero", { x: -420, duration: 0.7, ease: "back.out(1.3)" }, 0.1); tl.from("#pal", { x: 1500, duration: 0.7, ease: "back.out(1.3)" }, 0.25); decoIn("s0", 0.2);
+/* frame 0 already shows the badge, the hero, the pal and the decorations whole: nothing is sliding or popping in (rule 3); the first beat is the pose below */
 tl.to(pose("hero"), { aR: 150, smile: 1.6, duration: 0.3, ease: "back.out(2)" }, 0.9); tl.to(pose("hero"), { aR: 6, duration: 0.4 }, 1.9);
 decoIn("s1", T1 - 0.1);
 const st = { a: 0, b: 0 };
 const draw = () => { for (const [k, v, x] of [["A", st.a, barX[0]], ["B", st.b, barX[1]]]) { const h = v / K;
   for (const id of ["bar" + k, "bar" + k + "s"]) { $("#" + id).setAttribute("y", BASE - h); $("#" + id).setAttribute("height", Math.max(0, h)); }
-  $("#val" + k).setAttribute("y", BASE - h - 22); $("#val" + k).textContent = Math.round(v).toLocaleString(document.documentElement.lang || "en") + INPUTS.unit; } };
+  $("#val" + k).setAttribute("y", BASE - h - 22); $("#val" + k).textContent = v >= (k === "A" ? INPUTS.aVal : INPUTS.bVal) ? Math.round(v).toLocaleString(document.documentElement.lang || "en") + INPUTS.unit : ""; } };   /* the label shows the whole figure once the bar arrives, never a count through other values */
 draw();
 tl.from("#chipA", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.05); tl.from("#chipB", { y: 160, opacity: 0, duration: 0.4, ease: "back.out(1.6)" }, T1 + 0.2);
 tl.to(st, { a: INPUTS.aVal, duration: 1.4, ease: "power2.out", onUpdate: draw }, T1 + 0.3);

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-map-documentary
 description: "Use when the chosen video style is Map documentary (vfrey-style-map-documentary), or the person asks for an atlas, old-map, travel documentary, route or 'camera flying over a map' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic that happens at places: a hand-inked navy and parchment atlas under a tilted perspective camera, a route that draws itself with a plane, a flat map that folds into a globe, lower thirds and a generated orchestral bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -13,15 +13,25 @@ metadata:
   style-poster: map-documentary.jpg
   style-preview: map-documentary.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Map documentary
 
 This file teaches a look, never a topic. Apply it to any subject that happens at places or along a route. The scene is HTML + inline SVG + GSAP (`scenes/<idea>/index.html`, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start map-documentary scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (a working atlas with a route, plane, labels, lower third, HUD and caption plate; replace PLACE A/B and the text, keep the structure). Code to copy for the rest (the camera projection and the globe fold) is in `helpers.md` next to this file; the optional texture script is `make-textures.py` next to this file; the music script is `make-bed.py` next to this file.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). Write 4 to 6 long lines (each line break costs about 1.2 s of silence); put colons and commas, not periods, where a short pause is wanted.
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACE A", "PLACE B", "PLACE A to PLACE B", "KICKER IN CAPITALS", "SECOND KICKER", "One line, one number", "One line,", "one number", "51.5 N 0.1 W", "1.3 N 103.8 E". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "SIMPLIFIED MAP", "HAND-DRAWN COASTLINES", "EUROPE", "AFRICA", "ASIA", "INDIAN", "ATLANTIC", "PACIFIC", "AUSTRALIA".
+
+Script pace: size the script from a voice sample, as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice).
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -37,7 +47,7 @@ Signature traits:
 7. A top-down airliner with an offset squashed shadow on the ground.
 8. Serif italic place names; ocean names in letter-spaced italic at 46% cream lying on the map.
 9. Pulsing ground ellipses (two rings) at the places.
-10. HUD: compass rose top right, coordinates readout top left, scale bar bottom left, "SIMPLIFIED MAP" note.
+10. HUD: compass rose top right, a route readout top left (place A to place B, by name), scale bar bottom left, "SIMPLIFIED MAP" note. No live coordinates: every number on screen must be one the voice says (`frames.numbers` refuses the video otherwise), so a place's coordinates appear only if the script says them.
 11. Lower third with an 8 px gold bar and a mono-caps kicker; plate with gold top and bottom rules.
 12. Vignette plus 13% grain overlay.
 
@@ -71,7 +81,7 @@ Ratios: sea 40 to 60%, land 25 to 45%, gold at most 6%, route red at most 4%. Ne
 No characters. Objects, all vector:
 1. Plane: the 100-unit top-down airliner path in `starter.html`, cream fill, deep-ink 2 px outline, scale .55; its shadow is the same path black 40%, offset (8, 6), y-scaled by `cos(tilt)`.
 2. Marker: dot r 8 `#ff5a36` with a cream 3 px ring, plus two ellipses pulsing (phase `t * .8 % 1`, `ry = rx * cos(tilt)`).
-3. City label: Playfair italic 54 px cream with a dark outline and a mono 22 px gold coordinate line, floating at height z = 60.
+3. City label: Playfair italic 54 px cream with a dark outline and a mono 22 px gold line under it (a coordinate or a figure only when the script says it; otherwise a word from the script, or nothing), floating at height z = 60.
 4. Cloud: 9 radial-gradient circles at height z 150 to 330 with a soft shadow blob on the ground; 13 sprites, drifting slowly.
 5. Compass rose: circle r 60, a long gold needle, a short crossbar, serif N.
 6. Scale bar computed from the real scale at the focus latitude (px per degree times cos(lat)).
@@ -151,6 +161,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: opening close. Copy the tilted parchment land, navy halo, serif place label, pulsing ring, lower third and plate.
 - `ref-2.jpg`: route over the ocean. Copy the glowing red route, the plane with its shadow, letter-spaced ocean lettering.
 - `ref-3.jpg`: overlay explain. Copy the translucent ghost circles and shapes with gold chips over the map.
@@ -158,7 +169,7 @@ One pass instead: `--duration 60` with no `--timing`. No `python3` (`python3 --v
 
 ## 12. Reference implementation
 
-`starter.html` next to this file renders a London to Singapore route (about 11 s): Mercator atlas with the full land stack (halo, shadow, paper, tint, inner shade, lakes, hachures, coast), graticule, lettering, great-circle route with plane and shadow, ground markers, perspective camera, floating labels, compass, coordinates readout, two lower thirds, caption plate. Start it with `npx vfrey styles start map-documentary scenes/<idea>`, change `A` and `B`, the lower-third texts and camera states, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Add the globe from `helpers.md` (and clouds as radial-gradient sprites) when the story needs them.
+`starter.html` next to this file renders a London to Singapore route (about 11 s): Mercator atlas with the full land stack (halo, shadow, paper, tint, inner shade, lakes, hachures, coast), graticule, lettering, great-circle route with plane and shadow, ground markers, perspective camera, floating labels, compass, route readout, two lower thirds, caption plate. Start it with `npx vfrey styles start map-documentary scenes/<idea>`, change `A` and `B`, the lower-third texts and camera states, and test with `npx vfrey render --scene scenes/<idea> --script scripts/<idea>.json --frame <t> out.png`. Add the globe from `helpers.md` (and clouds as radial-gradient sprites) when the story needs them.
 
 ## 13. Do, don't, and the final checklist
 
@@ -193,7 +204,7 @@ Final checklist on the 12-frame contact sheet (`ffmpeg -v error -y -i "videos/<f
 - The tilt shows perspective; the map reaches the bottom edge.
 - Route is red with glow and pale core; plane has a shadow.
 - Serif italic labels and letter-spaced ocean names.
-- HUD present (compass, coordinates, scale, simplified note).
+- HUD present (compass, route readout, scale, simplified note), and no number on screen that the voice does not say.
 - Lower third above the plate, one at a time; plate dark with gold rules.
 - Globe fold (if used) is staggered and centred on the route.
 - Vignette and grain visible; AI label corner clear.

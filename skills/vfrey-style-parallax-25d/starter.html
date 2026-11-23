@@ -1,0 +1,128 @@
+<!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-parallax-25d): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["YOUR TITLE", "ONE LINE UNDER IT", "THE FOUNTAIN"] -->
+<!-- vfrey-keep (vfrey-style-parallax-25d): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["Diorama error:"] -->
+<!-- 2.5D pixel diorama starter: a small lit village square. Everything in the world is real 3D geometry with pixel-art textures: cobbles,
+     stucco houses with tiled gable roofs, windows and doors, a stone fountain with moving water, market stalls whose awnings open on a
+     word, crates, barrels, a 3D tree and a cypress, a low wall. ONLY the people are flat pixel sprites: camera-facing billboards with a
+     4-frame walk that cast real shadows. One low warm sun with a soft shadow map against cool blue-violet ambient light, a lamp, light
+     shafts in the haze, floating dust, tilt-shift depth of field (a wall and a tree blurred in the foreground), bloom, a warm grade, a
+     vignette, and a perspective camera at a raised three-quarter view that cranes slowly down and around over 8 seconds.
+     Copy diorama.js next to this file (styles start does). Replace INPUTS, the palette, the stage and the beats; keep the plumbing. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #2a2238; }
+  #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #2a2238; font-family: "Google Sans Flex", sans-serif; }
+  #gl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  /* title and tags: flat cards in the upper band, square corners, a hard darker edge */
+  .card { position: absolute; left: var(--vf-safe-left); top: calc(var(--vf-safe-top) + 30px); background: #f6ecd8; color: #2b2028; padding: 22px 34px 26px; font-weight: 680; font-size: calc(var(--vf-vmin) * 0.084); line-height: 1.04; letter-spacing: -0.02em; box-shadow: 6px 6px 0 #7a5a48, 10px 14px 26px rgba(20, 12, 30, 0.45); white-space: nowrap; }
+  .card small { display: block; margin-top: 14px; font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: calc(var(--vf-vmin) * 0.032); letter-spacing: 0.08em; color: #8a4a32; }
+  .tag { position: absolute; left: 0; top: 0; opacity: 0; background: #2b2028; color: #ffe2b0; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: calc(var(--vf-vmin) * 0.036); letter-spacing: 0.06em; padding: 9px 16px; white-space: nowrap; box-shadow: 5px 5px 0 #c8743a; will-change: transform; }
+  /* captions: a flat card in the caption band, inside the safe area */
+  #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); top: var(--vf-caption-at); height: var(--vf-caption-h); z-index: 9; }
+  #captions .vf-grp.on { background: #f6ecd8; padding: 14px 28px 18px; box-shadow: 6px 6px 0 #7a5a48, 10px 14px 26px rgba(20, 12, 30, 0.45); }
+  #captions .vf-w { color: #2b2028; font-weight: 680; border-radius: 0; }
+  #err { position: absolute; left: 24px; right: 24px; top: 40%; font: 28px monospace; color: #0f0; background: #000; padding: 12px; display: none; z-index: 99; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+  <canvas id="gl"></canvas>
+  <div class="card" id="title"></div>
+  <div class="tag" id="tag"></div>
+  <div id="captions"></div>
+  <div id="err"></div>
+</div>
+<script src="diorama.js"></script>
+<script>
+const tl = vfrey.timeline();
+vfrey.captions("#captions", { style: "box", color: "#2b2028", highlight: "#c8743a", highlightText: "#fff6e6", maxWords: 4 });
+function showError(e) { const d = document.getElementById("err"); d.style.display = "block"; d.textContent = "Diorama error: " + e.message + " " + ((e.stack || "").split("\n").slice(1, 3).join(" ")); }
+try {
+/* ---------- INPUTS: the words on the cards (from your script) ---------- */
+const INPUTS = { title: ["YOUR TITLE", "ONE LINE UNDER IT"], tag: "THE FOUNTAIN" };
+document.getElementById("title").innerHTML = INPUTS.title[0] + "<small>" + INPUTS.title[1] + "</small>";
+const T = vfrey.timing.durationSec, W = vfrey.frame.width, H = vfrey.frame.height;
+const { TEX, clamp, sm } = Diorama;
+const D = Diorama.create({ canvas: "#gl", width: W, height: H });
+
+/* ---------- cues: line starts and the words the picture changes on (never fixed seconds) ---------- */
+const NL = (vfrey.timing.lines || []).length;
+const L = (i) => vfrey.line(Math.max(0, Math.min(i, NL - 1)));
+const norm = (s) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+function cue(li, re, frac = 0.5) { const l = L(li); const w = (l.words || []).find((x) => re.test(norm(x.text))); return w ? w.start : l.start + (l.end - l.start) * frac; }
+
+/* ---------- palette, picked from the topic: warm stucco and terracotta in the sun, the shade cool blue-violet ---------- */
+const P = { cob: { a: "#a88c70", b: "#96785e", c: "#b89c7c", joint: "#5e4a44" }, ochre: { a: "#e3b47c", b: "#cf9c66", c: "#a77c5a" }, rose: { a: "#dc9a7c", b: "#c4806a", c: "#a26652" },
+  roof: { a: "#b8583a", b: "#8e3f2c", c: "#5e2a24" }, stone: { a: "#c0b09c", b: "#a89886", c: "#d0c2ae", joint: "#6e605a" }, wood: { a: "#8a5a3a", b: "#6e4630", c: "#4e3024" },
+  leaf: { a: "#4a6230", b: "#5f7a3a", c: "#7c9446" }, cyp: { a: "#2f4a2c", b: "#3e5c34", c: "#56743e" } };
+const stripes = (a, b) => Diorama.pix(16, 16, (p) => { for (let x = 0; x < 16; x += 4) { p.rect(x, 0, 2, 16, a); p.rect(x + 2, 0, 2, 16, b); } });
+const M = { cob: D.mat(TEX.cobbles(P.cob)), ochre: D.mat(TEX.plaster(P.ochre, 3)), rose: D.mat(TEX.plaster(P.rose, 5)), roof: D.mat(TEX.tiles(P.roof)), stone: D.mat(TEX.stone(P.stone)),
+  wood: D.mat(TEX.planks(P.wood)), leaf: D.mat(TEX.grass(P.leaf, 21)), cyp: D.mat(TEX.grass(P.cyp, 23)), water: D.mat(TEX.water({ a: "#3e6a8a", b: "#5e8eaa", c: "#bfe0ea" }), { scroll: [0.05, 0.02], emit: 0.3 }),
+  dark: D.mat(TEX.flat("#2e2230")), glass: D.mat(TEX.flat("#ffcf7a"), { emit: 3.5 }), shutter: D.mat(TEX.planks({ a: "#5a7a62", b: "#4a6652", c: "#34483a" }, 4)),
+  door: D.mat(TEX.planks({ a: "#7a5a3a", b: "#664a30", c: "#4a3424" }, 8)), red: D.mat(stripes("#c8423a", "#efe0c0")), gold: D.mat(stripes("#d89a3a", "#f2e6c8")), lamp: D.mat(TEX.flat("#ffd890"), { emit: 6 }) };
+const HM = { roof: M.roof, glass: M.glass, dark: M.dark, shutter: M.shutter, door: M.door, sill: M.stone };
+
+/* ---------- the place: one world with its own sun, ambient, haze and grade ---------- */
+const w = D.world({ sun: { azimuth: -48, elevation: 22, color: "#ffc68c", power: 2.7 }, sky: "#6a78e0", ground: "#5a4870", ambient: 0.6,
+  haze: "#e9c6a4", fog: 0.008, fogStart: 40, shafts: 0.05, skyTop: "#8fb0e0", skyBottom: "#f6d2a6", bounds: [-14, -16, 14, 14, 0, 14],
+  grade: { bloom: 0.4, threshold: 0.8, vignette: 0.45, cool: "#101848", warm: "#301a08", sat: 1.12 } });
+w.ground(-34, -34, 34, 34, M.cob);
+w.house(-3.6, -11, 6.4, 5, 2, Object.assign({ wall: M.ochre }, HM), { door: 1 }); w.house(4.0, -11.5, 6.8, 5, 3, Object.assign({ wall: M.rose }, HM), { door: 1 });
+w.house(-10.5, -4, 5, 7, 2, Object.assign({ wall: M.rose }, HM), { along: "z", face: "+x" }); w.house(10.6, -4.5, 5, 7, 3, Object.assign({ wall: M.ochre }, HM), { along: "z", face: "-x" });
+/* the fountain: a stone basin, water, a column, a bowl */
+w.cyl(0, 0, -2.2, 2.2, 0.7, M.stone, { sides: 20, top: false }); w.cyl(0, 0.05, -2.2, 1.95, 0.55, M.water, { sides: 20, noContact: true });
+w.cyl(0, 0, -2.2, 0.32, 2.1, M.stone, { sides: 10, noContact: true }); w.cyl(0, 2.1, -2.2, 0.85, 0.28, M.stone, { sides: 14 }); w.cyl(0, 2.15, -2.2, 0.7, 0.28, M.water, { sides: 14 });
+/* two market stalls: a counter, four posts, and an awning that is a node, so it can open on its word */
+function stall(x, z, cloth) { w.box(x, 0, z, 3.0, 0.9, 1.4, M.wood); for (const px of [-1.4, 1.4]) for (const pz of [-0.6, 0.6]) w.box(x + px, 0, z + pz, 0.14, 2.5, 0.14, M.wood, { noContact: true });
+  const aw = w.node((n) => n.awning(0, 0, 0, 3.4, 2.0, 0.5, cloth)); aw.pos = [x, 2.7, z]; return aw; }
+const awnings = [stall(-4.6, -5.4, M.red), stall(4.4, -5.8, M.gold)];
+w.box(3.0, 0, -8.0, 0.8, 0.7, 0.8, M.wood); w.box(3.8, 0, -7.8, 0.7, 0.6, 0.7, M.wood); w.cyl(-7.2, 0, -7.0, 0.45, 1.0, M.wood, { sides: 10 }); w.cyl(-8.0, 0, -6.6, 0.45, 1.0, M.wood, { sides: 10 });
+w.tree(7.2, -1.5, { h: 5.2, r: 1.9, trunk: M.wood, leaf: M.leaf }); w.cypress(-7.6, -8.6, { h: 7, r: 0.8, trunk: M.wood, leaf: M.cyp });
+/* the foreground frame: a low wall and a tree close to the lens, blurred by the tilt-shift */
+w.box(-4.5, 0, 9.8, 8, 1.5, 1.0, M.stone); w.tree(5.4, 11.8, { h: 6.5, r: 2.4, trunk: M.wood, leaf: M.leaf, seed: 4 });
+/* a lamp on the left stall: a point light, a glow that blooms, a small emissive box */
+const lamp = w.light(-4.6, 2.0, -4.6, "#ffb460", 5, 0), lampGlow = w.glow(-4.6, 2.1, -4.5, 0.5, "#ffb460", 0);
+w.box(-4.6, 1.95, -4.55, 0.22, 0.3, 0.22, M.lamp, { noContact: true });
+w.dust(220, [-9, 0.3, -10, 9, 8, 8], "#ffe0aa");
+
+/* ---------- characters: the only flat things, pixel sprites (Diorama.person) standing in the 3D world ---------- */
+const SH = 2.6;   // a little larger than life, so the pixel grid reads at this distance
+const ana = w.sprite(Diorama.person({ skin: "#e8b48c", hair: "#5a3020", top: "#b8423a", trim: "#f0e0c0", bottom: "#7a2c2c", dress: true, hat: "#f0e6d0" }), { height: SH });
+const ben = w.sprite(Diorama.person({ skin: "#d8a07a", hair: "#3a2418", top: "#3e5f8a", trim: "#e8d8b0", bottom: "#d8c08a" }), { height: SH });
+const seller = w.sprite(Diorama.person({ skin: "#e8b48c", hair: "#6a4028", top: "#f0e8dc", bottom: "#7a5a3a", apron: "#d8ccb8", hat: "#ffffff" }, "stand"), { height: SH });
+/* a walk from a to b over [t0, t1] (x, z), 8 frames a second of the 4-frame loop, flipped when walking left */
+function walk(s, t, t0, t1, a, b) { const k = clamp((t - t0) / (t1 - t0)); s.x = a[0] + (b[0] - a[0]) * k; s.z = a[1] + (b[1] - a[1]) * k; s.flip = b[0] < a[0]; s.frame = k > 0 && k < 1 ? Math.floor(t * 8) % 4 : 1; }
+const pop = (t, t0, d = 0.5) => { const s = clamp((t - t0) / d), c = 1.3; return s <= 0 ? 1e-3 : 1 + (c + 1) * Math.pow(s - 1, 3) + c * Math.pow(s - 1, 2); };   // ease-out-back
+
+/* ---------- the camera: perspective, raised three-quarter view, one slow crane down and around over 8 seconds, eased in and out ---------- */
+const CAM_A = { target: [0, 2.2, -4], yaw: 12, pitch: 36, dist: 38, fov: 36 };
+const CAM_B = { target: [0, 1.4, -2.0], yaw: -6, pitch: 31, dist: 28, fov: 36 };
+const CRANE = Math.max(8, T);
+
+/* ---------- beats: the hero picture changes on every line, and at least every 3 seconds ---------- */
+const tagEl = document.getElementById("tag"), titleEl = document.getElementById("title");
+function frame(t) {
+  walk(ana, t, 0, CRANE, [-6, 4.5], [3.5, 1.8]); walk(ben, t, 0.4, CRANE, [8, 5.0], [-2.5, 3.0]);
+  seller.x = -4.6; seller.z = -4.2; seller.frame = Math.floor(t * 2) % 2;
+  titleEl.style.opacity = String(1 - sm(L(1).start - 0.35, L(1).start, t));            // line 1: the title leaves
+  const a = cue(1, /^stall/, 0.5); awnings.forEach((n, i) => { const k = pop(t, a - 0.3 + i * 0.15); n.scale = [1, k, k]; });   // line 1: the awnings open
+  const on = sm(L(2).start, L(2).start + 0.5, t); lamp.power = 2.6 * on; lampGlow.k = 0.9 * on;   // line 2: the lamp lights
+  D.render(w, D.move(CAM_A, CAM_B, 0, CRANE, t), t);
+  const k = sm(cue(2, /^fountain/, 0.3), cue(2, /^fountain/, 0.3) + 0.35, t);                // line 2: a tag beside the fountain
+  tagEl.style.opacity = String(k);
+  if (k > 0.01) { const p = D.project([0, 3.0, -2.2]); tagEl.style.transform = `translate(${(p.x + 60).toFixed(1)}px, ${(p.y - 60 - (1 - k) * 18).toFixed(1)}px)`; }
+}
+tagEl.textContent = INPUTS.tag;
+vfrey.onFrame((t) => { try { frame(t); } catch (e) { showError(e); } });
+frame(0);
+} catch (e) { showError(e); }
+</script>
+</body>
+</html>

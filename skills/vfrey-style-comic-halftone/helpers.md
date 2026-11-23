@@ -33,7 +33,7 @@
 
 ## Pages, panels, the build order
 
-`ROW_A` (above the plate, or `null`) and `ROW_B` (below it, to the bottom edge) come from `comic.js` and follow `vfrey.captionBox`, so nothing is typed in pixels. A page is one or two panels in `ROW_A` plus one to three in `ROW_B`. Each panel is edge to edge: a ground colour, a `ht` gradient, a subject.
+`ROW_A` (above the plate, or `null`) and `ROW_B` come from `comic.js` and follow `vfrey.captionBox`, so nothing is typed in pixels. With the plate low (captions at the bottom, the default) both rows stack above it, A the big picture and B the small panels; with the plate higher, B sits below it and ends at 80 % of the height, because the platforms cover the bottom fifth and `frames.safe-area` warns about text there. A page is one or two panels in `ROW_A` plus one to three in `ROW_B`. Each panel is edge to edge: a ground colour, a `ht` gradient, a subject.
 
 ```js
 const tl = vfrey.timeline();
