@@ -53,89 +53,91 @@ A style is a look for your videos: the colours, the drawing, the camera and the 
 
 <table>
 <tr>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-flat-2d"><img src="assets/gifs/flat-2d.gif" width="190" alt="2D flat"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-flat-2d"><img src="assets/gifs/flat-2d.gif" width="230" alt="2D flat"></a><br>
 <b>2D flat</b><br>
 <sub>Friendly cartoon people, bold flat colours and charts that grow as the voice explains.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-flat-2d</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-flat-2d.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-storybook"><img src="assets/gifs/storybook.gif" width="190" alt="Storybook watercolour"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-storybook"><img src="assets/gifs/storybook.gif" width="230" alt="Storybook watercolour"></a><br>
 <b>Storybook watercolour</b><br>
 <sub>A hand-painted picture book with soft watercolour pages that turn, a paper caption strip and a gentle lullaby.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-storybook</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-storybook.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-paper-cutout"><img src="assets/gifs/paper-cutout.gif" width="190" alt="Paper cut-out"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-paper-cutout"><img src="assets/gifs/paper-cutout.gif" width="230" alt="Paper cut-out"></a><br>
 <b>Paper cut-out</b><br>
 <sub>Scenes made of layered cut and torn paper, with puppets that move like stop-motion and titles of cut-out letters.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-paper-cutout</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-paper-cutout.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-comic-halftone"><img src="assets/gifs/comic-halftone.gif" width="190" alt="Comic halftone"></a><br>
+</tr>
+<tr>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-comic-halftone"><img src="assets/gifs/comic-halftone.gif" width="230" alt="Comic halftone"></a><br>
 <b>Comic halftone</b><br>
 <sub>A comic page that comes alive, with bold ink outlines, dotted shading, panels that smash in and loud sound-effect lettering.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-comic-halftone</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-comic-halftone.zip"><b>Download .zip</b></a>
 </td>
-</tr>
-<tr>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-whiteboard-sketch"><img src="assets/gifs/whiteboard-sketch.gif" width="190" alt="Whiteboard sketch"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-whiteboard-sketch"><img src="assets/gifs/whiteboard-sketch.gif" width="230" alt="Whiteboard sketch"></a><br>
 <b>Whiteboard sketch</b><br>
 <sub>A marker draws everything live on a whiteboard, with hand lettering, doodles, arrows and eraser wipes.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-whiteboard-sketch</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-whiteboard-sketch.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-one-line"><img src="assets/gifs/one-line.gif" width="190" alt="One-line minimal"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-one-line"><img src="assets/gifs/one-line.gif" width="230" alt="One-line minimal"></a><br>
 <b>One-line minimal</b><br>
 <sub>One unbroken ink line draws each idea in turn on warm paper, then flows on into the next. Calm and hypnotic.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-one-line</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-one-line.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-soft-gradient"><img src="assets/gifs/soft-gradient.gif" width="190" alt="Soft gradient"></a><br>
+</tr>
+<tr>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-soft-gradient"><img src="assets/gifs/soft-gradient.gif" width="230" alt="Soft gradient"></a><br>
 <b>Soft gradient</b><br>
 <sub>Drifting pastel colour fields with frosted glass cards and glossy icons that float in gently.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-soft-gradient</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-soft-gradient.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-real-3d"><img src="assets/gifs/real-3d.gif" width="190" alt="Real 3D"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-real-3d"><img src="assets/gifs/real-3d.gif" width="230" alt="Real 3D"></a><br>
 <b>Real 3D</b><br>
 <sub>A real 3D camera flying between glowing, lit objects in deep space, like a science documentary.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-real-3d</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-real-3d.zip"><b>Download .zip</b></a>
 </td>
-</tr>
-<tr>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-low-poly"><img src="assets/gifs/low-poly.gif" width="190" alt="Low-poly 3D"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-low-poly"><img src="assets/gifs/low-poly.gif" width="230" alt="Low-poly 3D"></a><br>
 <b>Low-poly 3D</b><br>
 <sub>A bright toy world made of flat coloured triangles, filmed by a camera that glides around a floating diorama.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-low-poly</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-low-poly.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-isometric"><img src="assets/gifs/isometric.gif" width="190" alt="Isometric miniature world"></a><br>
+</tr>
+<tr>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-isometric"><img src="assets/gifs/isometric.gif" width="230" alt="Isometric miniature world"></a><br>
 <b>Isometric miniature world</b><br>
 <sub>A tiny model world seen from above, with a glowing dot that travels through it as the voice explains.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-isometric</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-isometric.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-map-documentary"><img src="assets/gifs/map-documentary.gif" width="190" alt="Map documentary"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-map-documentary"><img src="assets/gifs/map-documentary.gif" width="230" alt="Map documentary"></a><br>
 <b>Map documentary</b><br>
 <sub>A hand-inked atlas the camera glides over, where a route draws itself and the flat map folds into a globe.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-map-documentary</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-map-documentary.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-data-story"><img src="assets/gifs/data-story.gif" width="190" alt="Data story"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-data-story"><img src="assets/gifs/data-story.gif" width="230" alt="Data story"></a><br>
 <b>Data story</b><br>
 <sub>Animated maps and charts like a newspaper data desk, with counting numbers and dots that regroup into bars.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-data-story</code></sub><br>
@@ -143,59 +145,61 @@ A style is a look for your videos: the colours, the drawing, the camera and the 
 </td>
 </tr>
 <tr>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-screen-demo"><img src="assets/gifs/screen-demo.gif" width="190" alt="Screen demo"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-screen-demo"><img src="assets/gifs/screen-demo.gif" width="230" alt="Screen demo"></a><br>
 <b>Screen demo</b><br>
 <sub>A clean, light fake app on screen where a cursor clicks and zooms in on the exact detail the voice is explaining.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-screen-demo</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-screen-demo.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-blueprint"><img src="assets/gifs/blueprint.gif" width="190" alt="Blueprint"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-blueprint"><img src="assets/gifs/blueprint.gif" width="230" alt="Blueprint"></a><br>
 <b>Blueprint</b><br>
 <sub>A drafted engineering sheet on blueprint blue, drawn line by line, with colour-coded arrows showing how it works.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-blueprint</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-blueprint.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-terminal"><img src="assets/gifs/terminal.gif" width="190" alt="Terminal / ASCII"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-terminal"><img src="assets/gifs/terminal.gif" width="230" alt="Terminal / ASCII"></a><br>
 <b>Terminal / ASCII</b><br>
 <sub>A glowing old-school computer screen where everything is typed and drawn from text characters.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-terminal</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-terminal.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-kinetic-type"><img src="assets/gifs/kinetic-type.gif" width="190" alt="Kinetic type"></a><br>
+</tr>
+<tr>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-kinetic-type"><img src="assets/gifs/kinetic-type.gif" width="230" alt="Kinetic type"></a><br>
 <b>Kinetic type</b><br>
 <sub>Huge words that fill the screen and move with the voice, like the opening titles of a film.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-kinetic-type</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-kinetic-type.zip"><b>Download .zip</b></a>
 </td>
-</tr>
-<tr>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-pixel-art"><img src="assets/gifs/pixel-art.gif" width="190" alt="Pixel art"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-pixel-art"><img src="assets/gifs/pixel-art.gif" width="230" alt="Pixel art"></a><br>
 <b>Pixel art</b><br>
 <sub>A retro video game look with chunky pixels, little animated characters and chiptune music.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-pixel-art</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-pixel-art.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-neon-synthwave"><img src="assets/gifs/neon-synthwave.gif" width="190" alt="Neon synthwave"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-neon-synthwave"><img src="assets/gifs/neon-synthwave.gif" width="230" alt="Neon synthwave"></a><br>
 <b>Neon synthwave</b><br>
 <sub>Glowing neon line drawings on a purple night sky with a striped sun, a drifting grid floor and VHS glitches.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-neon-synthwave</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-neon-synthwave.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-vintage-newspaper"><img src="assets/gifs/vintage-newspaper.gif" width="190" alt="Vintage newspaper"></a><br>
+</tr>
+<tr>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-vintage-newspaper"><img src="assets/gifs/vintage-newspaper.gif" width="230" alt="Vintage newspaper"></a><br>
 <b>Vintage newspaper</b><br>
 <sub>A yellowed old newspaper page where headlines are stamped in and the engraved pictures come alive, story by story.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-vintage-newspaper</code></sub><br>
 <a href="https://github.com/vfreyai/skills/releases/latest/download/vfrey-style-vintage-newspaper.zip"><b>Download .zip</b></a>
 </td>
-<td align="center" valign="top" width="25%">
-<a href="skills/vfrey-style-noir"><img src="assets/gifs/noir.gif" width="190" alt="Silhouette noir"></a><br>
+<td align="center" valign="top" width="33.333333333333336%">
+<a href="skills/vfrey-style-noir"><img src="assets/gifs/noir.gif" width="230" alt="Silhouette noir"></a><br>
 <b>Silhouette noir</b><br>
 <sub>Dark, foggy scenes of black shapes lit by one warm light, like the opening of a mystery film.</sub><br>
 <sub><code>npx skills add vfreyai/skills --skill vfrey-style-noir</code></sub><br>
