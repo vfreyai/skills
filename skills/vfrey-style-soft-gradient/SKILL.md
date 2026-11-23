@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-soft-gradient
 description: "Use when the chosen video style is Soft gradient (vfrey-style-soft-gradient), or the person asks for a calm frosted-glass, mesh-gradient, glossy-icon or wellness-app look. Teaches how to build, compose, animate and score that look in a vfrey HTML scene, for any topic: drifting pastel colour fields that change with the story, frosted glass cards over bokeh, glossy gradient icons, spring entrances, captions on a glass plate around vfrey's caption band and a generated pad."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -13,15 +13,25 @@ metadata:
   style-poster: soft-gradient.jpg
   style-preview: soft-gradient.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Soft gradient
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + CSS + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours; the vfrey skill's `scenes/craft.md` still holds. Start from `starter.html` next to this file (`npx vfrey styles start soft-gradient scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (mesh-gradient moods, a glass card with a glossy sun, a dial, a dock, beads, the glass caption plate; replace PLACEHOLDER text and the beat times, keep the structure); more code is in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Use it for calm, reassuring subjects (health, wellness, sleep, mindfulness, lifestyle, beauty, money basics, apps and product explainers); not for loud, gritty, urgent or data-dense topics. Rounded forms are right here.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser`; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACEHOLDER headline", "placeholder tag", "units", "24". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
+Script pace: size the script from a voice sample, as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice).
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -158,6 +168,7 @@ Each sentence gets one new widget or one change; dock icon follows the mood.
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: night hero card. Copy the frosted card on the dark violet mesh, the moon icon, the bokeh and the dock.
 - `ref-2.jpg`: the dial. Copy the glass disc, conic ring, glass hub with the big number, the glowing knob and the corner sun.
 - `ref-3.jpg`: the dusk curve panel. Copy the large glass panel, white curve with dotted ghost, the pill tags.

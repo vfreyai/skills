@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-storybook
 description: "Use when the chosen video style is Storybook watercolour (vfrey-style-storybook), or the person asks for a picture-book, hand-painted, watercolour, fable, bedtime-story or fairy-tale look. Teaches how to paint, compose, animate and score that look in a vfrey HTML scene, for any topic: SVG wash and ink filters, paper grain, page-turn transitions, a torn paper caption strip around vfrey's caption band, and a generated lullaby bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,13 +14,23 @@ metadata:
   style-preview: storybook.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Storybook watercolour
 
 This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start storybook scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the PLACEHOLDER headings, swap the bird for the topic's character and keep the engine (washes, filters, paper grain, painted page window, parallax pages, page turns, caption strip). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file holds the full drawing library and `make-bed.py` is the sound script.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "A Title", "A Title and the title", "and the title", "a short subtitle line", "A page title", "plop!", "The moral of the story.", "The moral of", "the story.". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences
 
@@ -145,7 +155,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no cues
 
 ## 10. Shot plan template (34 to 40 s, 5 or 6 lines)
 
-Pace: write 5 or 6 lines of one or two sentences; set `lineGap` in the script (0.25 to 0.4, `voice.md`) and do not merge lines to hide the pause: put page turns inside the gaps and keep ambient motion running. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)).
+Pace: write 5 or 6 lines of one or two sentences, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); put page turns inside the gaps and keep ambient motion running.
 
 | Beat | Time | Shot type | Content | Mood |
 |---|---|---|---|---|
@@ -158,7 +168,7 @@ Pace: write 5 or 6 lines of one or two sentences; set `lineGap` in the script (0
 
 ## 11. Reference frames
 
-Four frames of the showcase film, 540 x 960, in this folder (not copied into installed projects):
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the opening page with brushed title, sun and character; copy the wash colours, the window border and the strip.
 - `ref-2.jpg`: a close-up page with the heading and a prop; copy the push-in framing and the painted prop translucency.
 - `ref-3.jpg`: an action page with a sound word; copy the lettering filter and the foreground flowers.

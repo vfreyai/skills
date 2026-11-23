@@ -8,6 +8,14 @@ Use this when the person says "plan a series" or "plan N videos for this channel
 
 Do not let the first theme that comes to mind fill the whole plan.
 
+## A plan in a spreadsheet
+
+When the person has (or wants) a list of videos with dates, use a plan sheet instead of making each one by hand.
+
+1. `npx vfrey plan template` writes `plan-template.csv`: one row per video, columns topic (needed), series, style, voice, voice_speed, language, length, date, time (in the series' timezone), music_mood, notes. The person can fill it in a spreadsheet and keep it as `.xlsx`, or save it as CSV.
+2. `npx vfrey plan import plan.csv --dry-run` checks every row and names the row of each problem (an unknown style or voice, a bad date, a repeated topic); nothing is saved while any row is wrong. Relay the problems, fix them with the person, then import without `--dry-run`.
+3. Each row is made at a tick after its time, only when the series' cadence allows (posting windows, hours between videos, the daily cap), and every video still gets every check. `npx vfrey plan list` and the dashboard's Kit tab show the plan and each row's run; `npx vfrey plan export` writes it back as CSV (edit, then `plan import --replace`); `npx vfrey plan clear` removes the waiting rows.
+
 ## One channel, one project
 
 Two channels (say a TikTok channel and an Instagram one) are two things to set up, not one. Do not put them in the same project with a shared `vfrey.json`: its engine, shape, voice and style would be shared too, and the second channel gets the first one's defaults.

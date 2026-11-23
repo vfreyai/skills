@@ -20,7 +20,7 @@ Default: 9:16, 1080x1920, 30 fps. Choose per run with flags, or keep a choice in
 
 - `--size 1440x1800` for any other size: even numbers, 360 to 4096 on each side. `--aspect` and `--size` are one choice, never both. `--fps 24|30|60`.
 - Order of precedence: the run's flags, then the series (`npx vfrey desk series update --id S --aspect 16:9 --fps 24`; `default` clears it), then `vfrey.json` (`{ "aspect": "16:9", "fps": 24 }` or `"size": "1440x1800"`; `npx vfrey init --aspect 16:9` writes them), then 9:16 at 30 fps. A bad value gets a `✗` line and a `Fix:` line.
-- Use the same flags everywhere for one video: `scene init`, the `--frame` preview, `scene inspect`, `scene studio`, `render` and `tick`. `scene init` writes the frame into `vfrey/timing.json` (`width`, `height`, `fps`); a render takes the frame from the flags and `vfrey.json`, not from the file.
+- Use the same flags everywhere for one video: `scene init`, the `--frame` preview, `scene inspect`, `scene edit`, `render` and `tick`. `scene init` writes the frame into `vfrey/timing.json` (`width`, `height`, `fps`); a render takes the frame from the flags and `vfrey.json`, not from the file.
 - The scene reads its frame from `vfrey.frame` / `useFrame()`: `{ width, height, fps, aspect, orientation, vmin, safe }`. Lay out with `100%`, `vmin` fractions and the safe areas, never 1080 or 1920. A scene that names `1080px` and `1920px` while the frame is another shape gets a warning at render time.
 - The quality checks compare the finished file with the frame you asked for (`frames.resolution`, `frames.fps`).
 - At 60 fps every frame is drawn, so a render takes longer. Subtitles (SRT and VTT) are in seconds and do not depend on the frame rate.
@@ -32,7 +32,7 @@ Default: 9:16, 1080x1920, 30 fps. Choose per run with flags, or keep a choice in
 
 ## Long videos
 
-Speech may run 6 to 180 s (the script check counts a voice nobody measured at 2.6 words a second, so 16 to 468 words; the default natural voice reads 2.8, and the `series kit` Pace line has yours); a script allows 4 to 30 lines of up to 220 characters. A 172 s video was rendered on the default engine in 77 s with about 3 GB of memory, the same as a 20 s one, so length costs time (about 0.45 s per second of video) and not memory. For a long video write more lines, not longer ones, and give each section its own picture change.
+Speech may run 6 to 180 s (the script check counts a voice nobody measured at 2.6 words a second, so 16 to 468 words; size yours by the pace `npx vfrey voice sample` prints for your voice, which the `series kit` Pace line then shows); a script allows 4 to 30 lines of up to 220 characters. A 172 s video was rendered on the default engine in 77 s with about 3 GB of memory, the same as a 20 s one, so length costs time (about 0.45 s per second of video) and not memory. For a long video write more lines, not longer ones, and give each section its own picture change.
 
 ## Voice
 

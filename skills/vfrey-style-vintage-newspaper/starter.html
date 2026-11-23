@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-vintage-newspaper): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["Big words in red", "Big words", "in red", "Second story page", "Second", "story page", "The payoff in two lines", "The payoff", "in two lines", "PLACEHOLDER deck line, one italic sentence", "PLACEHOLDER dateline and source, Month Year", "PLACEHOLDER what it means, in one sentence", "PLACEHOLDER STAMP", "VOL. XIV, NO. 217, MONTH 1900, PLACEHOLDER"] -->
+<!-- vfrey-keep (vfrey-style-vintage-newspaper): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["THE GAZETTE", "FAIR & WARM", "PRICE ONE CENT", "VOL. XIV", "ONE CENT", "WIRE NEWS", "Extra", "EXTRA", "THE GAZETTE VOL. XIV ONE CENT"] -->
 <!-- Vintage newspaper / letterpress: a 19th-century broadsheet comes to life. Period display faces, greeked columns,
      engraved (line-hatched) SVG illustrations that animate inside their frames, ink-press word reveals, paper fibre and
      yellowing from SVG filters, red halftone spot colour printed slightly out of register, page turns / sheet stacks / ink floods. -->
@@ -341,9 +345,9 @@ tl.to(CAM[2], { scale: 1.06, y: -36, transformOrigin: "50% 55%", duration: 7.5, 
 
 // ----- page 0: front page, hook -----
 (() => {
-  tl.fromTo(".mh", { autoAlpha: 0, scaleY: 1.18, filter: "blur(6px)" }, { autoAlpha: 1, scaleY: 1, filter: "blur(0px)", duration: .25, ease: "power3.in" }, 0); thump(.4, 9);
-  pressHeadline(0, .3, .22);
-  revealArt(0, .05, .7);
+  /* frame 0 already shows the whole masthead, headline and engraving: nothing is stamping in or being revealed (the first beat is the shadow below) */
+  tl.set($$(".w", $("#hl0")), { autoAlpha: 1, scale: 1, y: 0, filter: "blur(0px)" }, 0); thump(.4, 9);
+  tl.fromTo($$(".w", $("#hl0")), { textShadow: "0px 0px 0px rgba(198,58,34,0)" }, { textShadow: "6px 5px 0px rgba(198,58,34,.45)", duration: .35, ease: "power2.out", immediateRender: false }, .3);
   loop("#p0 .corona", { rotation: 360, ease: "none", svgOrigin: "0 0" }, 40);
   $$("#p0 .tw0").forEach((e, k) => tl.fromTo(e, { opacity: 1 }, { opacity: .25, duration: 1.1 + k * .3, yoyo: true, repeat: loopN(1.1 + k * .3) * 2, ease: "sine.inOut" }, k * .2));
   const sp = $("#p0 .spk0"), tS = L(0) + 1.4;

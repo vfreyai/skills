@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-flat-2d
 description: "Use when the chosen video style is 2D flat (vfrey-style-flat-2d), or the person asks for a flat, vector, cartoon-explainer, infographic or 'clean animated characters and charts' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: palette, code-drawn characters and props, live charts, full-frame layout around the caption band, shape-wipe transitions and a generated music bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,8 +14,6 @@ metadata:
   style-preview: flat-2d.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: 2D flat
@@ -23,6 +21,9 @@ metadata:
 Flat vector illustration with no gradients, blurs or outlines on characters: big simple people, chunky ink-stroked props and charts in a handful of solid colours, on a ground colour that changes with each act. Everything pops, hops and wipes in time with the voice, like a friendly animated explainer. If a frame has a gradient, a blur, a thin line or a photo-real detail, it is not this style.
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start flat-2d scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER content: it already renders three acts with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "71%", "OF EARTH", "SHARE OF EARTH'S SURFACE", "WATER", "LAND", "29%", "ROUGH ESTIMATE". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
 
 ## When to use it, when not
 
@@ -32,9 +33,16 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 ## Plan before coding
 
 1. Cast it: one or two characters (one colour each) and one "value" object the topic is about (a coin, a leaf, a battery). Every act shows a character doing something with that object, or a chart of it.
-2. Split the script into 5 to 8 acts, one per idea, and give each a ground colour from the palette so neighbours differ. Decide which act is the chart and which is the payoff.
+2. Split the script into 5 to 8 lines, one idea per line (an act is never several lines: each line changes the picture), and give each a ground colour from the palette so neighbours differ. Decide which act is the chart and which is the payoff.
 3. Write the numbers down first. Charts and counters are computed in the scene from real inputs (a formula in JS), never typed in or invented, and an assumption (a rate, a date) is shown on screen as a chip.
-4. Pace the script for the voice and avoid colons. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+4. Pace the script as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice) and avoid colons.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -190,7 +198,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 11. Reference frames
 
-Saved in this style's package folder (not installed into projects): look at them before drawing.
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg` the hook: copy the cream ground, the big pale circle, the two hills, the badge top-left, the two figures at scale 1.4, coin stacks cropped at the bottom corners.
 - `ref-2.jpg` a mechanism act on a navy ground: copy the pale circle on navy, the tree with gold fruit, the badge in the corner and the same caption plate.
 - `ref-3.jpg` a chart on cream: copy the gridlines with mono labels, striped bars with a navy edge, the name pills under the baseline above the plate and the value labels in 84 px ink.

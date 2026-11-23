@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="vfrey skills">
+<rect width="1280" height="640" fill="#0b0b0b"/>
+<rect x="96" y="120" width="120" height="120" fill="#2196f3"/>
+<text x="248" y="216" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="88" font-weight="700" fill="#ffffff">vfrey skills</text>
+<text x="96" y="352" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff">Make short videos by asking</text>
+<text x="96" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff">your coding agent.</text>
+<text x="96" y="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" fill="#2196f3">20 video styles. Download one, or all.</text>
+<text x="96" y="568" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="28" fill="#b5b5b5">Claude Code, Codex, Cursor, Gemini CLI, Grok</text>
+<rect x="1184" y="544" width="24" height="24" fill="#2196f3"/>
+</svg>

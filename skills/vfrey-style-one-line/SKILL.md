@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-one-line
 description: "Use when the chosen video style is One-line minimal (vfrey-style-one-line), or the person asks for a single-line, continuous-line, minimal, quiet, gallery-print or 'one pen stroke' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one unbroken ink line on warm paper that draws an object then travels on to become the next, a single accent dot at its tip, full-frame layout around the caption band, the connector line as the only transition and a generated music bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,13 +14,23 @@ metadata:
   style-preview: one-line.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: One Line
 
 This is an art-direction bible for one look. Start every scene from `starter.html` next to this file (section 12): `npx vfrey styles start one-line scenes/<idea>` creates the folder with it as `index.html` and any script it needs, then replace the PLACEHOLDER labels, redraw or reorder the objects in the single path, keep the engine (resampled path, tip schedule, camera keys, captions plate, marginalia). The script, voice and facts are yours; the rules below are topic-free but exact. The vfrey skill's `scenes/craft.md` still holds for everything not said here. `helpers.md` next to this file has the page shell, geometry helpers, tip schedule and camera; `make-bed.py` is the sound script.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "I, PLACEHOLDER the problem", "II, PLACEHOLDER the clue", "III, PLACEHOLDER the list", "IV, PLACEHOLDER one line", "V, quiet", "1927", "PLACEHOLDER", "one line.". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences
 
@@ -33,7 +43,7 @@ Signature traits (each checkable on a frame):
 4. A vermilion dot (r 15 px on screen) sits at the tip with a pulsing halo at .22 opacity.
 5. Objects are simple, bold, outline-only silhouettes: no fills, no shading, no second line weight.
 6. The art sits at about screen y 650, large and centred, with empty paper around it.
-7. A printed-matter frame: an inner border at inset 46 px, a hairline rail with a tick per figure and a vermilion progress dot at y 1646, and an italic figure note at y 1706.
+7. A printed-matter frame: an inner border at inset 46 px, a hairline rail with a tick per figure and a vermilion progress dot at y 1646, and an italic figure note at y 236 (near the top, inside the safe area).
 8. Captions on a flat paper plate with two 2 px ink hairlines (top and bottom) at y 1318 to 1550, serif, the spoken word in vermilion.
 9. Italic serif labels in world space (a year, one word) appear beside the art, never more than a handful.
 10. Slow camera lean toward the tip, a 20% zoom dip while travelling between objects, a 0.8% breathing zoom.
@@ -88,8 +98,9 @@ Stock props (recipes in `helpers.md` and the starter): a scribble (Lissajous wit
 
 - Font: Playfair Display (shipped, weights 400 to 900 and italic); local fallback `Georgia, "Times New Roman", serif`.
 - World labels: italic 400, 58 to 64 px, ink, fade in over 0.6 s on their word, beside the art (a year, one word).
-- Figure note: italic 400, 44 px, centred at y 1706, roman numeral and a middle dot: `II . name, year`; crossfades per beat.
-- End title: italic 400, 150 px, line-height 1, tracking -.01em, centred at y 1632, lower-case sentence ("one line.").
+- Opening title: italic 400, 120 px, the script's title centred near the top (y 230), on screen from frame 1 and fading as the scribble ends: a page with only the pen line is under 3% filled and `frames.opening` refuses it.
+- Figure note: italic 400, 44 px, centred at y 236 (inside the platform safe area: TikTok, Reels and Shorts cover the bottom 20%), roman numeral and the beat's words from the script: `II, the clue`; crossfades per beat. Write it from the script's own words: a paraphrase in a margin fails `frames.safe-area`.
+- End title: italic 400, 150 px, line-height 1, tracking -.01em, centred at y 1120 (above the caption plate, inside the safe area), lower-case sentence from the script.
 - Captions: serif 500, 70 px, ink, `maxWords: 3`, spoken word in `#C23A1E`, `style: "color"`, letter-spacing .005em, centred; set the same style in the script JSON `captions` (it overrides the scene call).
 - Caption plate: paper `#F3ECDF`, left/right 70 px, top 1318 px, height 232 px, `border-top` and `border-bottom` 2 px `rgba(28,26,23,.55)`; shown only while words show. Never put art or the tip there.
 
@@ -126,7 +137,7 @@ LIST                TANGLE UNTIE          PULL-BACK + END
 - Feel: smooth continuous drawing, no steps; the tip moves along index positions with eased speed.
 - Easing: drawing segments `sine` in-out (`0.5 - 0.5 cos(pi u)`), connectors and camera `cubic` in-out (`4u^3` / `1 - (-2u + 2)^3 / 2`), labels and figure notes `power2.out`.
 - Durations: scribble about 1.4 s; head 2 to 4 s; each object 3 to 5 s; connector 0.45 to 1.3 s; untie 2.3 s; final line 1.9 to 2.6 s; pull-back 2.6 s; labels 0.6 s; figure note 0.45 s in and 0.3 s out; end title 1.2 s.
-- Holds: the first beat starts at 0.15 s (the opening is nearly empty paper; the `frames.opening` check warns, accept it); the last frame holds the end title.
+- Holds: the title holds the opening until the scribble ends, then the first figure note fades in; the last frame holds the end title.
 - Camera vocabulary: hold on an object; glide between objects with a zoom dip of 20% (`1 - .2 sin(pi u)`); lean 16% toward the tip while drawing; breathing `1 + .008 sin(.7 t)`; final pull-back to z 0.2 to 0.22 centred on the middle of the world.
 - Secondary: scribble tremble, halo pulse `1 + .18 sin(4.2 t)`, progress dot along the rail. Ambient: nothing else moves.
 - Forbidden: dasharray drawing (use index-based drawing), per-element tweens that fight the proxy, fades between objects, rotations of the camera, any second line, any glow. Everything is drawn from one `render(t)` called from a GSAP proxy tween with modifiers (never `onUpdate`).
@@ -147,7 +158,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no cues
 
 ## 10. Shot plan template (35 to 40 s, 5 lines)
 
-Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`); do not merge lines to hide the pause: the line keeps drawing. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure)). Facts on screen are only ones you can cite, as the voice says them.
+Pace: as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); the line keeps drawing through the pause. Facts on screen are only ones you can cite, as the voice says them.
 
 | Beat | Time | Shot type | Content |
 |---|---|---|---|
@@ -159,7 +170,7 @@ Pace: set `lineGap` in the script (0.25 to 0.4, `voice.md`); do not merge lines 
 
 ## 11. Reference frames
 
-Four frames of the showcase film, 540 x 960, in this folder (not copied into installed projects):
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the connector leaving the first object with the dot at its tip; copy the emptiness and the dot size.
 - `ref-2.jpg`: a travel move with a hard corner; copy the line weight and the caption plate with its hairlines.
 - `ref-3.jpg`: the tangle at full size with a year label; copy the density of a scribble and the label style.
@@ -211,7 +222,7 @@ Final checklist on the 12-frame contact sheet (`ffmpeg -v error -y -i "videos/<f
 ## Pitfalls
 
 - `tick` needs `--scene scenes/<idea>` or it renders the plain default template.
-- The `frames.opening` check warns (1% of the frame differs) because calm paper is the design; accept it or start the scribble already drawn.
+- `frames.opening` refuses an opening under 3% filled: the pen line alone on paper is about 1%. Keep the large title on screen from frame 1 (the starter does).
 - `vector-effect: non-scaling-stroke` makes dashes ignore zoom: use index-based drawing.
 - Keep the tip out of the caption band; the lean keeps it near y 650 and the plate is opaque anyway.
 - A tween's `onUpdate` does not run when the renderer seeks: `render(t)` is called from a proxy with modifiers.

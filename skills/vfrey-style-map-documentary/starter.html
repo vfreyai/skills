@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-map-documentary): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["PLACE A", "PLACE B", "PLACE A to PLACE B", "KICKER IN CAPITALS", "SECOND KICKER", "One line, one number", "One line,", "one number", "51.5 N 0.1 W", "1.3 N 103.8 E"] -->
+<!-- vfrey-keep (vfrey-style-map-documentary): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["SIMPLIFIED MAP", "HAND-DRAWN COASTLINES", "EUROPE", "AFRICA", "ASIA", "INDIAN", "ATLANTIC", "PACIFIC", "AUSTRALIA"] -->
 <!-- STARTER (vfrey-style-map-documentary). A hand-inked atlas: a Mercator plane under a perspective camera, one route that draws itself
      with a plane and its shadow, a lower third, HUD, caption plate. Replace PLACE A / PLACE B (lon, lat), the kicker/line texts and the
      camera states. Everything visible is a pure function of the state SS (tweened by GSAP) and tl.time(). No external assets. -->
@@ -137,7 +141,8 @@ function draw() {
   pSh.setAttribute("transform", `translate(${tip[0] + 8} ${tip[1] + 6}) rotate(${ang}) scale(.55 ${.55 * Math.cos(SS.a * D2R)})`); pSh.setAttribute("opacity", vis);  // ...shadow on the ground
   markers.forEach(([r1, r2, x, y], j) => { const ph = (t * .8 + j * .5) % 1; [[r1, ph], [r2, (ph + .5) % 1]].forEach(([r, p]) => { const rx = 14 + p * 46; r.setAttribute("rx", rx); r.setAttribute("ry", rx * Math.cos(SS.a * D2R)); r.setAttribute("opacity", 1 - p); }); });
   [A, B].forEach((p, j) => { const [sx, sy] = camProj(mx(p[0]), my(p[1]), 60); labels[j].style.transform = `translate(${sx}px,${sy}px) translate(-50%,-100%) scale(${Math.max(.6, Math.min(1.1, camProj(0, 0, 0)[2] * 1.0))})`; });
-  $("hudC").textContent = `${(-(SS.fy) > 0 ? "" : "")}${(Math.atan(Math.sinh(-SS.fy / RM)) / D2R).toFixed(1)} N   ${(SS.fx / S).toFixed(1)} E`;
+  // The route readout names the places, not live coordinates: a number on screen the voice never says is refused (frames.numbers).
+  if (!$("hudC").textContent) $("hudC").textContent = `${A[2]} \u2192 ${B[2]}`;
   const cs = $("compass"); if (!cs.firstChild) cs.innerHTML = '<circle cx="85" cy="85" r="60" fill="none" stroke="#efc063" stroke-width="2"/><path d="M85 15L95 85L85 155L75 85Z" fill="#efc063" fill-opacity=".7"/><path d="M15 85L85 75L155 85L85 95Z" fill="#efc063" fill-opacity=".35"/><text x="85" y="12" fill="#f6ead0" font-size="20" text-anchor="middle" font-family="Playfair Display,serif" font-weight="700">N</text>';
 }
 tl.eventCallback("onUpdate", draw);
@@ -150,6 +155,8 @@ tl.fromTo(SS, { fx: mx(A[0]), fy: my(A[1]), k: 1.7, a: 34 }, { fx: mx(A[0]) + 30
 tl.to(SS, { u: 1, duration: 4.2, ease: "sine.inOut" }, 1.4);                                         // the route draws itself
 tl.to(SS, { fx: mid[0], fy: mid[1], k: 0.95, a: 40, duration: 4.4, ease: "power3.inOut" }, 1.4);    // the camera follows, then pulls out
 tl.to(SS, { k: 0.78, a: 30, duration: 2.6, ease: "power3.inOut" }, 6.4);                              // wide hold
+// never a still map under the voice: a slow drift to the end of the film (a held picture over 8 s fails frames.still)
+tl.to(SS, { fx: mid[0] + 140, k: 0.98, a: 38, duration: Math.max(0.5, vfrey.timing.durationSec - 9), ease: "sine.inOut" }, 9);
 labels.forEach((l, i) => tl.fromTo(l, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: .5, ease: "power2.out", immediateRender: false }, 0.5 + i * 3.8));
 /* lower thirds sit at y 1128, always above the plate, one per beat */
 function lowerThird(id, t0, t1) { const e = $(id); tl.set(e, { opacity: 0 }, 0); tl.fromTo(e, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .5, ease: "power3.out", immediateRender: false }, t0); tl.fromTo(e.querySelector(".bar"), { scaleY: 0 }, { scaleY: 1, duration: .5, ease: "power3.out", immediateRender: false }, t0); tl.to(e, { opacity: 0, x: -30, duration: .4, ease: "power2.in" }, t1); }

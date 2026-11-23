@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-noir
 description: "Use when the chosen video style is Silhouette noir (vfrey-style-noir), or the person asks for a noir, dark, moody, eerie, cinematic, silhouette, foggy, 'true crime' or 'unsolved mystery' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: near-black layered silhouettes, one amber light, beams, fog, rain and grain, typed evidence lines, full-frame layout around the caption band and a generated atmosphere bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,8 +14,6 @@ metadata:
   style-preview: noir.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Silhouette noir
@@ -23,6 +21,9 @@ metadata:
 Near-black layered SVG silhouettes against a cold blue-teal night, lit by exactly one warm amber source: a lamp, a lantern, a window of light. Fog, rain, dust, film grain and a faint flicker sit over every shot, a slow camera creeps in, and the words arrive as typewriter evidence lines and big cream serif subtitles with the spoken word in amber. If a frame has a second accent colour, a flat well-lit scene, a visible face, or a pure black void, it is not this style.
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + a canvas + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start noir scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER silhouettes and evidence text: it already renders three shots with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "PLACE NAME", "MONTH YEAR", "LAST ENTRY ON THE SLATE", "DATE", "CAUSE: UNKNOWN". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
 
 ## When to use it, when not
 
@@ -33,7 +34,14 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 1. Write 6 or 7 lines for 40 s (one or two sentences each; the music bed fills the gaps between lines). Cue shots at line starts minus 0.1 s and story events at spoken words found by text.
 2. One shot per beat, each with one clear focal light (lamp, lantern, moon break behind a silhouette, lit ship windows, a window shaft). Decide where the evidence lines and the one tally or underline go.
-3. Pace the script for the voice. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure). A gritty free voice such as am_fenrir suits this style.
+3. Pace the script as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice). A gritty free voice such as am_fenrir suits this style.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -165,7 +173,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 11. Reference frames
 
-Saved in this style's package folder (not installed into projects): look at them before drawing.
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg` the hook: copy the tower silhouette with its amber lamp room and glow, the long thin beam to the right, the blue-teal sky and the cream serif subtitle with an amber word.
 - `ref-2.jpg` the setting: copy the steamer with a few lit windows on a dark sea, the low rock, the moon glow behind the mast, the rain and the typed amber evidence line at the top.
 - `ref-3.jpg` the evidence: copy the slate with scrawled lines in a warm amber tint, the typed evidence block with its left amber bar and the dark plate behind the subtitle.

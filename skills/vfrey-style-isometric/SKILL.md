@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-isometric
-description: "Use when the chosen video style is Isometric miniature world (vfrey-style-isometric), or the person asks for an isometric, 2.5D, diorama, tiny model world, 'little 3D map' or 'follow it along the route' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one projection for SVG blocks, soft shadows, a glowing marker travelling a route, a camera gliding between dioramas, full-frame layout around the caption band and a generated music bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+description: "Use when the chosen video style is Isometric miniature world (vfrey-style-isometric), or the person asks for an isometric, tiny model world, 'little 3D map' or 'follow it along the route' look. Teaches how to draw, compose, animate and score that look in a vfrey HTML scene, for any topic: one projection for SVG blocks, soft shadows, a glowing marker travelling a route, a camera gliding between dioramas, full-frame layout around the caption band and a generated music bed."
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -14,8 +14,6 @@ metadata:
   style-preview: isometric.mp4
 ---
 
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Isometric miniature world
@@ -24,6 +22,9 @@ A tiny pastel diorama built from cubes, pyramids and slabs on a night-navy groun
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html`, HTML + inline SVG + GSAP, engine `vfrey-render`); the script, voice and facts are yours as always. The vfrey skill's `scenes/craft.md` still holds for everything not said here. **Start from `starter.html` next to this file (`npx vfrey styles start isometric scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in)** (then replace the PLACEHOLDER objects, labels and cue words: it already renders a three-tile route with `vfrey render --frame`). Code to copy is also in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Four reference frames, `ref-1.jpg` to `ref-4.jpg`, live in the package copy of this style (section 11); they are not installed into projects.
 
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "HOME", "TOWER", "HALL", "SAME SIZE AS A GARDEN HOSE". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first.
+
 ## When to use it, when not
 
 - Use it for anything that travels or passes through stages: how a message, a parcel, water, money, power or a request gets from A to B; how a system's parts connect; a process with 4 to 6 stations.
@@ -31,11 +32,18 @@ This file teaches a look, never a topic. Apply it to the scene you write (`scene
 
 ## Plan before coding
 
-1. Write the script as 4 to 6 lines of one or two sentences. Kokoro's default pause is about a second; set `lineGap` in the script (0.25 to 0.4 is brisk, `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; key the picture to sentences, not lines. Do not trust a word budget: sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; typical Kokoro af_heart with lineGap 0.3 is about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+1. Write the script as 4 to 6 lines of one or two sentences, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice); key the picture to sentences, not lines.
 2. Pick 4 to 6 dioramas along one route, in a row along +x on a shared tile depth, with one hero object each. Add one "macro" shot at another scale (a cut-away, a close-up, a size comparison) reached through an iris.
 3. The marker (a glowing dot) carries the idea. One sentence is one diorama: one camera move and one marker leg.
 4. Open on the hook: the hero object close up with the starting action, a spark races the whole route while the camera pulls out to the wide shot, then the camera dives back to the first diorama.
 5. A scale claim ("as thick as a garden hose") needs a picture of it (both things side by side, guide lines, a chip), and only numbers you can cite go on screen.
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -171,7 +179,7 @@ One pass instead: `--duration 60` with no `--timing` writes the bed with no acce
 
 ## 11. Reference frames
 
-Saved in this style's package folder (not installed into projects): look at them before drawing.
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg` a phone diorama: copy the slab with its earth section, the pastel house and trees, the tall phone slab with the amber chat bubbles, the stage label with five square steps, the soft shadow.
 - `ref-2.jpg` the data-centre cut-away: copy the back wall with a wall display, the racks with LED slits, the amber lit trail on the dim conduit and the cell tower with a red beacon.
 - `ref-3.jpg` the seabed section: copy the layered water, the clipped section with kelp and fish, the ship on the surface, the amber marker under the water.

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-label="vfrey: short videos from your coding agent">
+<rect width="1280" height="320" fill="#0b0b0b"/>
+<rect x="72" y="88" width="144" height="144" fill="#2196f3"/>
+<text x="256" y="176" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="96" font-weight="700" fill="#ffffff">vfrey</text>
+<text x="258" y="226" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="32" fill="#ffffff">Short videos, made by asking your coding agent.</text>
+<rect x="258" y="250" width="120" height="6" fill="#2196f3"/>
+<text x="1208" y="276" text-anchor="end" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" fill="#2196f3">20 video styles, free skill</text>
+</svg>

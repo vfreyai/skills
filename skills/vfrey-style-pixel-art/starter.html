@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-pixel-art): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["WING BEATS", "230", "BEATS A SECOND"] -->
+<!-- vfrey-keep (vfrey-style-pixel-art): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["FIRE", "1UP"] -->
 <!-- Pixel art starter: a 135x240 canvas (frame / 8), 21-colour palette, 5x7 bitmap font, three scenes (hook, play field, payoff), pixel wipes, captions on a pixel plate.
      Replace the PLACEHOLDER sprites, INPUTS and cue words; keep the canvas, palette, clocks and plate. Any script works: cue words are looked up by text and fall back to shares of the film.
      Sample script: "A honeybee beats its wings two hundred thirty times every second. Count with me. Tiny wings, big sound." -->
@@ -143,21 +147,21 @@ function hud(label, value, fill, hot) {                                         
   R(70, 30, 59, 7, "i"); for (let x = 0; x < rd(59 * fill); x++) if (x % 3 !== 2) R(70 + x, 31, 1, 5, "o");
 }
 
-/* ---------- scene 0: hook, a big number drops in letter by letter over a night sky, hero sprite 3x, neon floor ---------- */
+/* ---------- scene 0: hook, a big number whole at frame 0 over a night sky, hero sprite 3x, neon floor ---------- */
 function sceneHook(t) {
   R(0, 0, W, H, "k"); ditherBand(30, 74, "k", "n"); ditherBand(74, 150, "n", "i"); stars(t, 120, [2, 5, 10]); neonFloor(t, 150);
   const s = String(INPUTS.count);
-  for (let i = 0; i < s.length; i++) { const u = clamp((t - 0.1 - i * 0.12) / 0.4); if (u <= 0) continue;
-    const yy = 40 - rd((1 - eo(u)) * 40) + (u > .85 && u < 1 ? 1 : 0), x = rd(W / 2 - (s.length * 18) / 2) + i * 18;
+  for (let i = 0; i < s.length; i++) {   // every digit is whole at frame 0: nothing is dropping in (rule 3), and the figure is the one the line says (rule 2)
+    const yy = 40, x = rd(W / 2 - (s.length * 18) / 2) + i * 18;
     for (const [ox, oy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1]]) T(s[i], x + ox * 2, yy + oy * 2, "k", 3);
     T(s[i], x + 3, yy + 3, "o", 3); T(s[i], x, yy, "y", 3); }
   TC(INPUTS.title, rd(W / 2), 78, tick(t) % 6 < 3 ? "w" : "g", 2, "k");
   const bob = [0, -1, -2, -1][tick(t) % 4]; SS(BEE[tick(t) % 2], 49, 104 + bob, 4, BEECOL[0]);
   R(52, 140, 24, 2, "i"); panel(t, false);
 }
-/* ---------- scene 1: the play field. A swarm crosses in whole-pixel steps, the counter climbs from the inputs ---------- */
+/* ---------- scene 1: the play field. A swarm crosses in whole-pixel steps, the counter shows the figure from the inputs, whole ---------- */
 function sceneField(t, t0, t1) {
-  const u = clamp((t - t0) / Math.max(0.5, t1 - t0)), n = rd(INPUTS.count * eo(u));
+  const u = clamp((t - t0) / Math.max(0.5, t1 - t0)), n = INPUTS.count;   // the figure the line says, whole: no climb through other values
   R(0, 0, W, H, "k"); ditherBand(100, 156, "k", "n"); stars(t, 156); R(0, 156, W, 24, "n"); R(0, 156, W, 1, "l");
   for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) { const x = 8 + c * 15 + ((fl(t * 6) + r * 2) % 7) - 3, y = 66 + r * 17 + [0, 1, 0, -1][(tick(t) + c) % 4]; S(BEE[(tick(t) + c + r) % 2], x, y, BEECOL[r % 3]); }
   const sx = 60 + rd(Math.sin(t * 1.6) * 40); SS(SHIP, sx - 9, 138, 2); R(sx - 1, 128 - (tick(t) % 5) * 6, 2, 5, "y");

@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-screen-demo
 description: "Use when the chosen video style is Screen demo (vfrey-style-screen-demo), or the person asks for a software walkthrough, product demo, app tutorial, how-to or 'screen recording' look. Teaches how to build, compose, animate and score that look in a vfrey HTML scene, for any topic: an invented app window, a gliding cursor with click ripples, camera zooms keyed to the voice, spotlight, loupe, callouts and toasts, a caption plate at vfrey's caption band and a generated sound bed."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 1.0.0
 license: Proprietary
 metadata:
@@ -13,15 +13,25 @@ metadata:
   style-poster: screen-demo.jpg
   style-preview: screen-demo.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Screen demo
 
 This file teaches a look, never a topic. Apply it to the scene you write (`scenes/<idea>/index.html` plus `scene.js`, HTML + CSS + GSAP, engine `vfrey-render`); the script, voice and facts are yours. The vfrey skill's `scenes/craft.md` still holds for everything not said here. Start from `starter.html` next to this file (`npx vfrey styles start screen-demo scenes/<idea>` creates the folder with it as `index.html`, whichever agent folder this skill was installed in) (replace every PLACEHOLDER and `APP NAME`, keep the structure); code blocks to paste are in `helpers.md` next to this file; the music script is `make-bed.py` next to this file. Every name, brand, domain and person in the window is invented (`example.com` domains). Use it for tech tips, online safety, how-to, software tutorials, app explainers and product walkthroughs; not for stories without an interface, not for charts, never for a real product or logo.
 
-Script pace: do not trust a word budget. Sample the script with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window; Kokoro af_heart with lineGap 0.3 speaks about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure).
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `starter.html` lists every one: "APP NAME", "List title", "3 items", "Item one", "Item two", "Item three", "Item four", "Item five", "Item six", "Item seven", "Item eight", "Item nine", "Item ten", "Step one", "Step two", "Step three", "Label", "Button label", "Toast headline", "Toast detail line", "key part", "PLACEHOLDER claim", "PLACEHOLDER: headline of the detail view", "PLACEHOLDER: a first sentence of supporting detail.", "PLACEHOLDER: the sentence the voice points at.", "PLACEHOLDER preview text". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "Search", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "9:41", "8:15".
+
+Script pace: size the script from a voice sample, as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice).
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -164,7 +174,7 @@ Each sentence gets one camera move, one cursor target, one overlay.
 
 ## 11. Reference frames
 
-Copy these in the skill folder (`ref-1.jpg` to `ref-4.jpg`, 540 x 960):
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: list hook. Copy the spotlight cut-out on one row, the pill callout above it, the tracker, the plate.
 - `ref-2.jpg`: loupe shot. Copy the stadium loupe with accent border and the highlight box on the real text.
 - `ref-3.jpg`: hover tooltip. Copy the dark mono tooltip, the lifted button, the "It really goes here" pill.

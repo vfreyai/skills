@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: vfrey docs
+    url: https://vfrey.ai/docs/quickstart
+    about: Setup and how vfrey works.

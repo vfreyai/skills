@@ -23,6 +23,14 @@ In the script (`scripts/<idea>.json`):
 - Or on the command line: `npx vfrey tick --now --script scripts/<idea>.json --music music/bed.mp3 --music-source own`. `--music` beats the script's file.
 - A default for every video: `npx vfrey desk series update --id ID --music music/bed.mp3 --music-source own` (`--music none` clears it), or a `music` object in `brand.json` (`{ "file", "source", "volume", "duck" }`, the file inside the project). Order, strongest first: `--music` on the run, the script's `music`, the series default, `brand.json`, none. A script that wants no music for one video cannot switch a default off; use a series without one.
 
+## The music folder
+
+The person's own tracks can live in the project's `music/` folder (or `music/<series>/` for one series; a series folder with tracks is used alone). **Only music the person owns or holds a licence for goes there; vfrey never downloads music and `music add` takes no links.** Never put a track you fetched from the web into the folder.
+
+- `npx vfrey music list` shows the tracks, their source, moods and when each was last used. `npx vfrey music add <file> --source own` (or `--source licensed:<where>`, and `--mood calm,upbeat`) copies one in; dropping files into the folder works too (source `own`). `npx vfrey music remove <name>` deletes one. Tags: in the file name in square brackets (`Morning walk [calm].mp3`) or in `tracks.json` in the folder.
+- A video that names no music (no `--music`, no script `music`, no series or `brand.json` default) gets one track from the folder: tagged with the mood asked for (`tick --music-mood calm`, or a plan row's `music_mood`) when any is, at least as long as the video when one is, and otherwise the one used longest ago. It is mixed like any bed (loop or trim, duck, -14 LUFS).
+- When the folder has tracks, the person's own music wins over a style's generated bed (`music/<idea>-bed.wav`): **check `npx vfrey music list` before you make a bed.** With an empty folder, make the bed the style skill describes, as before. `--music` on the run always wins.
+
 ## What vfrey does
 
 The track loops or trims to the film, fades in over 0.5 s and out over 1.5 s, and is ducked under the voice by sidechain compression. The finished sound is normalised in two passes to -14 LUFS with the true peak at or below -1 dBTP. The picture is copied, not re-encoded.

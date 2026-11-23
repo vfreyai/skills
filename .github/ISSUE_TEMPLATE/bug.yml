@@ -1,0 +1,24 @@
+name: Bug
+description: A skill or a download does not work
+labels: [bug]
+body:
+  - type: input
+    id: agent
+    attributes:
+      label: Which agent? (Claude Code, Codex, Cursor, Gemini CLI, Grok, other)
+    validations:
+      required: true
+  - type: dropdown
+    id: how
+    attributes:
+      label: How did you install it?
+      options: [npx skills add, vfrey itself, zip download, plugin]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the command you ran, any message, and the skill or zip name.
+    validations:
+      required: true

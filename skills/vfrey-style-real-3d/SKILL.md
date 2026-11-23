@@ -1,7 +1,7 @@
 ---
 name: vfrey-style-real-3d
 description: "Use when the chosen video style is Real 3D (vfrey-style-real-3d), or the person asks for real 3D, a 3D camera flying through space, planets, 'cinematic 3D', WebGL or three.js. Teaches how to build, light, compose, animate and score a true 3D scene inside a vfrey HTML scene, for any topic: bundling three.js into the scene folder, a render loop driven by the vfrey timeline, shader-made surfaces, bloom, a shot-based camera, full-frame layout around the caption band and a generated sound bed. Read its limits first: it needs a one-time package install and a machine with a graphics chip."
-allowed-tools: Bash(python3:*) Bash(ffmpeg:*) Bash(ffprobe:*) Bash(npx vfrey:*) Bash(npx @vfrey/vfrey:*) Read Write
+allowed-tools: Bash Read Write
 version: 2.0.0
 license: Proprietary
 metadata:
@@ -13,8 +13,6 @@ metadata:
   style-poster: real-3d.jpg
   style-preview: real-3d.mp4
 ---
-> **This style is for making videos with vfrey.** It teaches the look only; vfrey does the rest (script, voice, render). If vfrey is not installed here (there is no `vfrey` skill loaded, and `npx vfrey doctor` or `npx @vfrey/vfrey doctor` fails), tell the person and, with their yes, install it: `npx skills add vfreyai/skills --skill vfrey`, then create a project with `npm create vfrey@beta <name>` (see https://vfrey.ai/docs/quickstart). Then continue with this style.
-
 <!-- style-bible: v2 -->
 
 # Video style: Real 3D
@@ -34,6 +32,15 @@ Do not use it, and say why, when any of these holds:
 - **It must be quick.** A 35 s film renders in about 1.5 to 3.5 minutes with bloom on a fast laptop, and every source edit needs a rebuild before a preview.
 
 Known rough edges, so plan for them: vfrey has no official per-frame hook (this style uses a GSAP `modifiers` tween that runs on every seek), vfrey does not print errors from the page (the starter shows them on screen), and its frozen-picture check does not notice a stuck 3D canvas while labels still move (so look at the contact sheet).
+
+## Plan before coding
+
+The three rules every vfrey style follows (a film that breaks them reads as dead air; `frames.still` fails an 8-second hold and `frames.numbers` a number the script does not say):
+1. **Change the hero picture on every script line, and finish the change before that line ends.** No hold past 3 seconds; a long line gets a second or third beat. Do not plan in acts of several lines: one line, one change.
+2. **The only numeral on a frame is the one that line says.** A count-up must not pass through other values while a different number is spoken: show the figure whole, on its line, and take it away before the next.
+3. **Frame 0 already shows a whole word and a picture of the first noun.** Nothing is still entering: no half-typed title, no cut-off glyph, no counter at 0.
+
+Keep scene graphics out of the bottom-right corner: the burned-in `AI-GENERATED` label owns it (about 322 x 58 px, right margin 72, bottom margin 56).
 
 ## 1. The look in three sentences, and the signature traits
 
@@ -151,7 +158,7 @@ One pass instead: `--duration 60` with no `--timing` writes the drone alone. No 
 
 ## 10. Shot plan template (32 to 38 s)
 
-Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about a second; `voice.md` in the vfrey skill) and do not merge lines to avoid the pause; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and aim at the middle of the length window (about 2.8 words a second (measured; the `series kit` Pace line has your voice's own figure) at lineGap 0.3). Write numbers from sourced values and compute them in code; the HUD shows the computed number. Cue shots to spoken words, in increasing time order.
+Script: 5 or 6 lines, paced as `voice.md` in the vfrey skill says (`lineGap`; sample with `npx vfrey voice sample <voice> --script <file> --no-browser` and size the script by the words a second that sample prints for your voice). Write numbers from sourced values and compute them in code; the HUD shows the computed number. Cue shots to spoken words, in increasing time order.
 
 | Time | Beat | Shot type | Camera | HUD |
 | --- | --- | --- | --- | --- |
@@ -164,6 +171,7 @@ Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about
 
 ## 11. Reference frames
 
+Saved in this style's package folder, not installed into projects (the recipe in your project is `starter.html`): look at them before drawing.
 - `ref-1.jpg`: the star hero pair. Copy the corona rays and bloom on the bright side, the companion door beside it, the number and label top-left and the amber tags.
 - `ref-2.jpg`: a flight. Copy the dust streaks, the faint violet nebula, the empty-space depth and the caption plate with the amber chip.
 - `ref-3.jpg`: two bodies stacked. Copy the vertical stacking that fills the frame, the shader surfaces and tags beside (not on) the bodies.
@@ -172,6 +180,9 @@ Script: 5 or 6 lines; set `lineGap` 0.25 to 0.4 (Kokoro's default pause is about
 ## 12. Reference implementation
 
 `starter.html` is the page; `scene-starter.js` (with `glsl.js`) is a working film skeleton: a star, a lit world, a sky, bloom, a three-shot camera and two tags. Run `npx vfrey styles start real-3d scenes/<idea>`: it copies `starter.html` to `scenes/<idea>/index.html`, `scene-starter.js` (as `scene.js`) and `glsl.js` to `src/<idea>/`, and prints the bundle commands (it never installs three.js), then change the cast, shots and cues, bundle (`helpers.md` step 3) and check with `npx vfrey render --scene scenes/<idea> --engine vfrey-render --script scripts/<idea>.json --frame 4 out.png`. Keep the plumbing: renderer, `modifiers` loop, error box, sky, bloom, tags.
+
+<!-- vfrey-demo-text -->
+**Demo text to replace.** The starter's own words and numbers are the example video's, not yours. The `vfrey-demo` comment at the top of `scene-starter.js` lists every one: "THE STAR", "THE WORLD", "FROM THE STAR". Replace each with words and figures from your script, or remove it. vfrey reads the scene before it renders and rejects it (`frames.starter-text`) with all the leftovers named at once, so check this list first. The `vfrey-keep` comment names the style's own chrome, which may stay: "3D scene error:".
 
 ## 13. Do and Don't, and the final checklist
 

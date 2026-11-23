@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-blueprint): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["PLACEHOLDER TITLE", "PLACEHOLDER SUBTITLE", "1080 [PLACEHOLDER]", "00-XX-001", "BEAM", "BRACE", "WEIGHT", "LOAD", "DETAIL A"] -->
+<!-- vfrey-keep (vfrey-style-blueprint): the style's own chrome, the same in every video (not demo text, keep or restyle it). ["SECTION VIEW, FIG. 01", "NOT TO SCALE, SCHEMATIC", "FORCE KEY", "TITLE", "SHEET", "1 OF 1", "DRAWING NO.", "UNITS", "MM", "NOTE", "TENSION", "COMPRESSION"] -->
 <!-- STARTER (vfrey-style-blueprint). One big SVG sheet, a camera that moves by animating the viewBox, every stroke and text sized with --k (world units per
      screen pixel) so it stays crisp at any zoom, draw-on by stroke-dashoffset, flowing force arrows, a legend that lights up, a caption strip and a title
      block, a T-square transition. The example part is a wall bracket holding a weight: replace the drawing (world coordinates), the labels and the keys. -->
@@ -28,7 +32,7 @@
   #strip .frm { position:absolute; left:26px; right:26px; top:22px; bottom:20px; border:3px solid #f2fbff; }
   #strip .frm2 { position:absolute; left:38px; right:38px; top:34px; bottom:32px; border:1px solid #8fdcff; }
   #strip .tag { position:absolute; left:48px; top:8px; background:#071f55; padding:0 12px; font-size:20px; letter-spacing:.2em; color:#8fdcff; }
-  #captions { position:absolute; left:60px; right:60px; top:1350px; height:240px; z-index:40; display:flex; align-items:center; justify-content:center; }
+  #captions { position:absolute; left:60px; right:60px; top:1378px; height:214px; z-index:40; display:flex; align-items:center; justify-content:center; }
   #captions .vf-w { text-transform:uppercase; font-family:"JetBrains Mono", monospace; letter-spacing:.02em; }
   #tb { position:absolute; left:0; top:1608px; width:1080px; height:312px; background:#0a2c72; z-index:30; }
   #tb .bg { position:absolute; inset:0; background-image:linear-gradient(rgba(143,220,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(143,220,255,.12) 1px,transparent 1px); background-size:20px 20px; }
@@ -59,7 +63,7 @@
     </div>
     <div class="cell" style="left:24px;top:184px;width:200px;height:56px"></div><div class="lbl" style="left:34px;top:192px">SHEET</div><div class="tt" style="left:34px;top:212px;font-size:19px">1 OF 1</div>
     <div class="cell" style="left:224px;top:184px;width:360px;height:56px"></div><div class="lbl" style="left:234px;top:192px">DRAWING NO.</div><div class="tt" style="left:234px;top:212px;font-size:19px">00-XX-001</div>
-    <div class="cell" style="left:584px;top:184px;width:220px;height:56px"></div><div class="lbl" style="left:594px;top:192px">UNITS</div><div class="tt" style="left:594px;top:212px;font-size:19px">MM</div>
+    <div class="cell" style="left:584px;top:184px;width:96px;height:56px"></div><div class="lbl" style="left:594px;top:192px">UNITS</div><div class="tt" style="left:594px;top:212px;font-size:19px">MM</div>
   </div>
 </div>
 <script>
@@ -90,7 +94,7 @@ const FX0 = -40, FX1 = 2000, FY0 = -90, FY1 = 1500;
 let fr = `<rect id="frame1" class="o2 dr" pathLength="1" x="${FX0}" y="${FY0}" width="${FX1 - FX0}" height="${FY1 - FY0}"/><rect class="c" x="${FX0 + 26}" y="${FY0 + 26}" width="${FX1 - FX0 - 52}" height="${FY1 - FY0 - 52}"/>`;
 "ABCDEF".split("").forEach((c, i) => { const x = FX0 + (i + .5) * (FX1 - FX0) / 6; fr += `<text class="t t1" x="${x}" y="${FY0 + 20}" text-anchor="middle" style="stroke:none;fill:#8fdcff">${c}</text>`; });
 [1, 2, 3, 4].forEach((c, i) => { const y = FY0 + (i + .5) * (FY1 - FY0) / 4; fr += `<text class="t t1" x="${FX0 + 12}" y="${y + 8}" style="stroke:none;fill:#8fdcff">${c}</text>`; });
-fr += `<text class="t" x="${FX0 + 90}" y="70" style="font-size:calc(var(--k)*64px);stroke:none;letter-spacing:.04em">PLACEHOLDER TITLE</text><text class="t" x="${FX0 + 94}" y="120" style="font-size:calc(var(--k)*26px);stroke:none;fill:#8fdcff">SECTION VIEW, FIG. 01</text>`;
+fr += `<text id="shTitle" class="t" x="${FX0 + 90}" y="70" style="font-size:calc(var(--k)*64px);stroke:none;letter-spacing:.04em">PLACEHOLDER TITLE</text><text id="shSub" data-vfrey-keep class="t" x="${FX0 + 94}" y="120" style="font-size:calc(var(--k)*26px);stroke:none;fill:#8fdcff">SECTION VIEW, FIG. 01</text>`;
 add(fr);
 
 /* ---------- the part: wall (hatched), bracket (outline), weight; world coordinates, y down ---------- */
@@ -115,7 +119,8 @@ add(`<g id="labels"><text id="lbA" class="t t2" x="${BEAMX - 120}" y="${BY - 70}
 
 /* ---------- camera = viewBox from a proxy {x,y,w}; --k = world units per screen pixel ---------- */
 const cam = { x: 0, y: 0, w: 1500 };
-function setCam() { const h = cam.w * 1336 / 1080; svg.setAttribute("viewBox", `${cam.x.toFixed(1)} ${cam.y.toFixed(1)} ${cam.w.toFixed(1)} ${h.toFixed(1)}`); svg.style.setProperty("--k", (cam.w / 1080).toFixed(4)); }
+const shSub = document.getElementById("shSub");   // the sheet's subtitle sits under its title at every zoom: both are sized by --k, so a fixed gap in world units is not enough
+function setCam() { const h = cam.w * 1336 / 1080; svg.setAttribute("viewBox", `${cam.x.toFixed(1)} ${cam.y.toFixed(1)} ${cam.w.toFixed(1)} ${h.toFixed(1)}`); svg.style.setProperty("--k", (cam.w / 1080).toFixed(4)); if (shSub) shSub.setAttribute("y", (70 + (cam.w / 1080) * 44).toFixed(1)); }
 const KEYS = [   // [time, {x,y,w}]  one idea per station: wide establishing, the joint, the load path, wide again
   [0.0, { x: -40, y: -90, w: 2060 }],
   [2.8, { x: -40, y: -90, w: 2060 }],

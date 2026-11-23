@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-one-line): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["I, PLACEHOLDER the problem", "II, PLACEHOLDER the clue", "III, PLACEHOLDER the list", "IV, PLACEHOLDER one line", "V, quiet", "1927", "PLACEHOLDER", "one line."] -->
 <!-- CONTINUOUS ONE-LINE MINIMAL. One unbroken ink line (a single sampled polyline) draws a head, a clock, a to-do list, a tangle, a pen and finally untangles itself.
      Everything is a pure function of timeline time (render(t) via a GSAP proxy tween with modifiers). 1080x1920. -->
 <html lang="en">
@@ -20,8 +23,9 @@
   #capplate { position: absolute; left: 70px; right: 70px; top: 1318px; height: 232px; background: var(--paper); z-index: 40; border-top: 2px solid rgba(28,26,23,.55); border-bottom: 2px solid rgba(28,26,23,.55); }
   #captions { position: absolute; left: 90px; right: 90px; top: 1318px; height: 232px; z-index: 50; font-weight: 500; letter-spacing: .005em; }
   #captions.vf-captions { justify-content: center !important; }
-  .fig { position: absolute; left: 0; right: 0; top: 1706px; text-align: center; font-style: italic; font-size: 44px; z-index: 30; opacity: 0; }
-  #endcard { position: absolute; left: 0; right: 0; top: 1632px; text-align: center; z-index: 31; opacity: 0; }
+  .fig { position: absolute; left: 0; right: 0; top: 236px; text-align: center; font-style: italic; font-size: 44px; z-index: 30; opacity: 0; }
+  #opener { position: absolute; left: 90px; right: 90px; top: 230px; text-align: center; font-style: italic; font-weight: 400; font-size: 120px; line-height: 1.02; letter-spacing: -.01em; z-index: 32; }
+  #endcard { position: absolute; left: 0; right: 0; top: 1120px; text-align: center; z-index: 31; opacity: 0; }
   #endcard .big { font-size: 150px; line-height: 1; font-weight: 400; font-style: italic; letter-spacing: -.01em; }
   #err { position: absolute; left: 10px; top: 10px; z-index: 99; color: #b00; font: 20px monospace; white-space: pre; }
 </style>
@@ -45,6 +49,7 @@
     <circle id="prog" cx="120" cy="1646" r="9" fill="#D8472B"/></g>
   </svg>
   <div id="figs"></div>
+  <div id="opener"></div>
   <div id="endcard"><div class="big">one line.</div></div>
   <div id="capplate"></div>
   <div id="captions"></div>
@@ -187,13 +192,23 @@ const addLabel = (txt, x, y, size, anchor, t0) => { const el = document.createEl
 addLabel("1927", O_CLK[0] + 215, O_CLK[1] - 335, 64, "start", ls(1) + 1.0);
 addLabel("PLACEHOLDER", -330, O_FIN[1] - 160, 58, "start", ls(3) + 0.4);
 const figTxt = ["I, PLACEHOLDER the problem", "II, PLACEHOLDER the clue", "III, PLACEHOLDER the list", "IV, PLACEHOLDER one line", "V, quiet"];
-const figAt = [0, ls(1) + 0.15, ls(2) + 0.15, ls(3) + 0.15, T.pullS + 0.3, DUR + 1];
+/* The opening: the title, large, from frame 1 (a page with only a thin line is not a hook: frames.opening refuses under 3%), fading as the scribble finishes. */
+$("#opener").textContent = vfrey.script.title;
+tl.to("#opener", { opacity: 0, duration: 0.5, ease: "power1.in" }, T.scrEnd);
+const figAt = [T.scrEnd + 0.3, ls(1) + 0.15, ls(2) + 0.15, ls(3) + 0.15, T.pullS + 0.3, DUR + 1];
 const figs = $("#figs");
+/* One note at a time in the same place: each fades out before the next fades in (a cross-fade puts two notes on top of each other,
+   and frames.text-overlap refuses that), and a short line still shows its note in full before it goes. */
+let figFree = 0;
 figTxt.forEach((txt, i) => { const d = document.createElement("div"); d.className = "fig"; d.textContent = txt; figs.appendChild(d);
-  tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, figAt[i]);
-  tl.to(d, { opacity: 0, duration: 0.3, ease: "power1.in" }, figAt[i + 1] - 0.05); });
+  const on = Math.max(figAt[i], figFree), off = Math.max(on + 0.45, figAt[i + 1] - 0.35);
+  tl.to(d, { opacity: 1, duration: 0.45, ease: "power2.out" }, on);
+  tl.to(d, { opacity: 0, duration: 0.3, ease: "power1.in" }, off);
+  figFree = off + 0.3; });
 for (let i = 0; i < 5; i++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", 120 + (840 / 4) * i); c.setAttribute("cy", 1646); c.setAttribute("r", 5); c.setAttribute("fill", "#1C1A17"); $("#ticks").appendChild(c); }
 tl.to("#rail", { opacity: 0, duration: 0.6 }, T.pullS + 0.3);
+/* The line's labels give way as the camera pulls out: the pull-out carries them under the last note and the end card. */
+tl.to("#labels", { opacity: 0, duration: 0.6 }, T.pullS);
 tl.to("#endcard", { opacity: 1, duration: 1.2, ease: "power2.out" }, T.pullS + 1.1);
 
 tl.to("#endcard", { opacity: 1, duration: 1.2, ease: "power2.out" }, T.pullS + 1.1);

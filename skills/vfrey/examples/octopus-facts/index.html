@@ -3,7 +3,7 @@
      numeral; the octopus watches from the corner. Same helpers: vfrey.line() for when a fact is spoken, vfrey.captions
      for the words. Nothing here came from a template.
      Layout is relative, so it fits any ratio: sizes are fractions of --vf-vmin (the shorter side), edges are the safe areas
-     vfrey.js sets (--vf-safe-*, --vf-caption-bottom), and a tall frame and a wide frame get their own arrangement (media
+     vfrey.js sets (--vf-safe-*, --vf-caption-at), and a tall frame and a wide frame get their own arrangement (media
      queries on the frame's aspect ratio). Render it with --aspect 9:16, 1:1 or 16:9 to see all three. -->
 <html lang="en">
   <head>
@@ -20,7 +20,7 @@
       #intro { opacity: 1; }
       #intro .head { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); top: 15%; text-align: center; font-size: calc(var(--m) * 0.12); line-height: 1.02; }
       #octo { position: absolute; width: calc(var(--m) * 0.22); height: calc(var(--m) * 0.22); left: var(--vf-safe-left); top: 56%; }
-      #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); bottom: var(--vf-caption-bottom); height: calc(var(--m) * 0.24); }
+      #captions { position: absolute; left: var(--vf-safe-left); right: var(--vf-safe-right); top: var(--vf-caption-at); height: var(--vf-caption-h); }
       /* A tall frame (9:16): everything bigger, the octopus in the middle of the lower half. */
       @media (max-aspect-ratio: 3/5) {
         .panel .big { top: 11%; font-size: calc(var(--m) * 0.52); }
@@ -39,10 +39,10 @@
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0">
-      <div class="panel" id="intro"><div class="head" id="head-title">3 facts about octopuses</div></div>
-      <div class="panel" id="f1" data-bg="#d84315"><div class="big">1</div><div class="word">three hearts</div></div>
-      <div class="panel" id="f2" data-bg="#00838f"><div class="big">2</div><div class="word">blue blood</div></div>
-      <div class="panel" id="f3" data-bg="#6a1b9a"><div class="big">3</div><div class="word">nine brains</div></div>
+      <div class="panel" id="intro"><div class="head" id="head-title"></div></div>
+      <div class="panel" id="f1" data-bg="#d84315"><div class="big">1</div><div class="word"></div></div>
+      <div class="panel" id="f2" data-bg="#00838f"><div class="big">2</div><div class="word"></div></div>
+      <div class="panel" id="f3" data-bg="#6a1b9a"><div class="big">3</div><div class="word"></div></div>
       <img id="octo" src="octopus.svg" alt="" />
       <div id="captions"></div>
     </div>
@@ -69,6 +69,8 @@
       });
       // Read the title, never type it: in a language version (--languages vi) this is that language's title.
       document.getElementById("head-title").textContent = vfrey.script.title;
+      // The fact labels are the script's own words too: the sentence after "One.", "Two." and "Three.", up to its first comma.
+      opens.forEach((i, k) => { if (i >= 0) document.querySelector("#f" + (k + 1) + " .word").textContent = vfrey.script.lines[i].replace(/^\w+\.\s*/, "").split(/[,.]/)[0]; });
       tl.fromTo("#intro .head", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.1);
       // The octopus sways all the way through (a finite loop: the video is a known length).
       tl.to("#octo", { rotation: 6, y: -18, duration: 1.2, ease: "sine.inOut", yoyo: true, repeat: Math.max(0, Math.floor(end / 1.2) - 1) }, 0);

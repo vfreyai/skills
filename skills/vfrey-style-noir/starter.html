@@ -1,4 +1,7 @@
 <!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-noir): the example video's own words and numbers. Replace every one with words and figures from your script, or remove it, before you render: vfrey rejects a video that still shows one and lists them all.
+     ["PLACE NAME", "MONTH YEAR", "LAST ENTRY ON THE SLATE", "DATE", "CAUSE: UNKNOWN"] -->
 <!-- Noir starter: near-black layered SVG silhouettes, one amber accent, a swinging beam, fog, rain and dust, grain and flicker, typewriter evidence lines and big serif captions. 1080x1920.
      Replace the PLACEHOLDER silhouettes and evidence text; keep the layers, the light, the atmosphere and the captions. Any script works: shots cut at line starts.
      Sample script: four lines, any length. -->
@@ -103,15 +106,16 @@ const fogBand = (cx, cy, rx, ry, op) => `<g class="fg" style="mix-blend-mode:scr
 function drift(host, t0, t1){ $$(".cl", host).forEach((g, i) => tl.to(g, { x: (i % 2 ? -1 : 1) * 150, duration: t1 - t0, ease: "none" }, t0));
   $$(".fg", host).forEach((g, i) => tl.to(g, { x: (i % 2 ? 90 : -90), duration: 4, ease: "sine.inOut", yoyo: true, repeat: Math.ceil((t1 - t0) / 4) }, t0)); }
 
-function typeEv(t, lines, opts = {}){      // typeEv(0.35, ["PLACE NAME", "MONTH YEAR"], { hold: 2.2 }); first line cream, the rest amber
+function typeEv(t, lines, opts = {}){      // typeEv(0, ["PLACE NAME", "MONTH YEAR"], { hold: 2.2 }); first line cream, the rest amber
   const speed = opts.speed || 0.034, total = lines.reduce((a, l) => a + l.length, 0), st = { n: 0 }, el = $("#ev");
   const render = () => { let n = Math.round(st.n), out = "";
     lines.forEach((l, i) => { const take = Math.max(0, Math.min(l.length, n)); n -= l.length; if (take > 0 || i === 0) out += (i ? "\n" : "") + (i === 0 ? '<span class="k">' : "") + l.slice(0, take) + (i === 0 ? "</span>" : ""); });
     el.innerHTML = out + ((Math.floor(tl.time() * 3) % 2 === 0 || st.n < total) ? '<span class="c"></span>' : ""); };
   tl.set(el, { opacity: 1 }, t);
-  tl.fromTo(st, { n: 0 }, { n: total, duration: total * speed, ease: "none", onUpdate: render, immediateRender: false }, t);
+  if (opts.whole) st.n = total;   // frame 0: the whole evidence line is already there, not half typed
+  else tl.fromTo(st, { n: 0 }, { n: total, duration: total * speed, ease: "none", onUpdate: render, immediateRender: false }, t);
   vfrey.onFrame(render);   // onUpdate does not run when a render seeks
-  const end = t + total * speed + (opts.hold || 1.6);
+  const end = t + (opts.whole ? 0 : total * speed) + (opts.hold || 1.6);
   tl.to(el, { opacity: 0, duration: 0.25, ease: "power2.in" }, end); tl.set(el, { opacity: 0 }, end + 0.26);
 }
 
@@ -174,7 +178,7 @@ tl.fromTo(".bm1b", { rotation: 14 }, { rotation: -9, svgOrigin: "0 0", duration:
 tl.fromTo(".bm3", { rotation: 8 }, { rotation: -6, svgOrigin: "0 0", duration: 4, ease: "sine.inOut", yoyo: true, repeat: Math.ceil(S[2].end / 4) }, S[2].at);
 $$(".gl").forEach((g, i) => tl.fromTo(g, { opacity: 0.7 }, { opacity: 1, duration: 1.3 + i * 0.2, ease: "sine.inOut", yoyo: true, repeat: Math.ceil(D / 1.3) }, 0));
 tl.to(".dashes", { opacity: 0.35, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: Math.ceil(D / 1.1) }, S[1].at);
-typeEv(0.35, INPUTS.ev1, { hold: 2.2 }); typeEv(S[1].at + 0.4, INPUTS.ev2, { hold: 2 }); typeEv(S[2].at + 0.5, INPUTS.ev3, { hold: 2 });
+typeEv(0, INPUTS.ev1, { hold: 2.2, whole: true }); typeEv(S[1].at + 0.4, INPUTS.ev2, { hold: 2 }); typeEv(S[2].at + 0.5, INPUTS.ev3, { hold: 2 });
 
 vfrey.onFrame(drawFx); drawFx();   // onFrame, not a tween's onUpdate: a render seeks with events suppressed
 vfrey.captions("#captions", { style: "color", font: '"Playfair Display", Georgia, serif', size: 80, color: "#f4efe3", highlight: "#ffb347", stroke: "#000000", maxWords: 4, maxChars: 22 });
