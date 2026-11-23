@@ -10,7 +10,7 @@ Use this when the person wants to try a few hooks, titles or covers for the same
    - `cover`: the `thumbnail` field (`{ "at": 2, "title": "..." }`) in every script, v1 included; without it no covers are made.
 4. Run `npx vfrey tick --now --script scripts/<idea>.json --variants hook` (or `title`, `cover`). Add the usual flags (`--scene`, `--engine`, `--voice`) once: all versions share them, so the picture and the voice are the same.
 5. vfrey compares the scripts. If a copy differs anywhere else it prints `Warning:` with the fields (for example `lines[3]`) and a Fix line, and the report lists the warning under `variants.warnings`. The versions still render. Fix the copy and run again unless the difference is on purpose.
-6. Tell the person the run pages (one `Watch:` per version) and that the run page has a Variants panel: the versions side by side and a "Mark favourite" button. You can mark it for them with `npx vfrey desk job favourite --id <run id>` when they tell you which one they prefer.
+6. Tell the person the run pages (one `See it:` per version) and that the run page has a Variants panel: the versions side by side and a "Mark favourite" button. You can mark it for them with `npx vfrey desk job favourite --id <run id>` when they tell you which one they prefer.
 
 Good variants change a real choice: a question against a claim, a number against a story, a close-up against a wide shot for a cover. Do not change one word and call it a variant. The versions are not compared with each other by the variation check, but each is compared with the channel's earlier videos as always.
 

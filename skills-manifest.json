@@ -2,7 +2,7 @@
   "source": "vfreyai/skills",
   "skills": {
     "vfrey": {
-      "hash": "b32932a9f4960365",
+      "hash": "ffaeec277513b46e",
       "files": 30
     },
     "vfrey-style-blueprint": {
@@ -20,6 +20,10 @@
     "vfrey-style-flat-2d": {
       "hash": "f6513a2657818ee3",
       "files": 10
+    },
+    "vfrey-style-footage-split": {
+      "hash": "b60b6d249cbb5a6d",
+      "files": 11
     },
     "vfrey-style-isometric": {
       "hash": "995a23a607bfcac9",
@@ -53,8 +57,16 @@
       "hash": "a0994a9eca51b340",
       "files": 11
     },
+    "vfrey-style-parallax-25d": {
+      "hash": "cf63ab3199703d57",
+      "files": 11
+    },
     "vfrey-style-pixel-art": {
       "hash": "718e2967b9a1ec96",
+      "files": 10
+    },
+    "vfrey-style-post-comments": {
+      "hash": "87879ceb8b4cdbe1",
       "files": 10
     },
     "vfrey-style-real-3d": {

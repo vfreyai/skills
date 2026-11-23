@@ -15,15 +15,16 @@ import { fileURLToPath } from "node:url";
 export const CORE_SKILL = "vfrey";
 export const STYLE_PREFIX = "vfrey-style-";
 /** Style skills that exist in skills/ but are not published yet. Remove a slug here to export it (the README, zips, GIFs and manifest follow). */
-export const UNPUBLISHED_STYLES = ["footage-split", "parallax-25d", "post-comments"];
+export const UNPUBLISHED_STYLES = [];
 /** The stable download address of the newest release. GitHub's `latest` skips pre-releases, so the release itself must not be one. */
 export const DOWNLOAD_BASE = "https://github.com/vfreyai/skills/releases/latest/download";
 
 /** The themed bundles: every style appears in exactly one. Slugs are the folder name without `vfrey-style-`. */
 export const BUNDLES = [
   { theme: "illustrated", title: "Illustrated", blurb: "Drawn, painted and cut-paper looks.", styles: ["flat-2d", "storybook", "paper-cutout", "comic-halftone", "whiteboard-sketch", "one-line", "soft-gradient"] },
-  { theme: "3d", title: "3D and worlds", blurb: "Cameras that fly through lit objects, toy worlds and maps.", styles: ["real-3d", "low-poly", "isometric", "map-documentary"] },
+  { theme: "3d", title: "3D and worlds", blurb: "Cameras that fly through lit objects, toy worlds and maps.", styles: ["real-3d", "low-poly", "isometric", "map-documentary", "parallax-25d"] },
   { theme: "data", title: "Data and explainers", blurb: "Charts, screens, drafting sheets and big moving words.", styles: ["data-story", "screen-demo", "blueprint", "terminal", "kinetic-type"] },
+  { theme: "social", title: "Posts and footage", blurb: "Reddit and Threads posts, and your own footage.", styles: ["post-comments", "footage-split"] },
   { theme: "retro", title: "Retro and moody", blurb: "Pixels, neon, old newsprint and dark mystery.", styles: ["pixel-art", "neon-synthwave", "vintage-newspaper", "noir"] },
 ];
 

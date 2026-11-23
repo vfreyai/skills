@@ -31,7 +31,12 @@ cd ../..
 
 version="${tag#v}"
 styles=$(ls -d skills/vfrey-style-* | wc -l | tr -d " ")
-sed -e "s/{{VERSION}}/$version/g" -e "s/{{STYLES}}/$styles/g" .github/RELEASE_TEMPLATE.md >dist/release-notes.md
+cat >dist/release-notes.md <<NOTES
+vfrey skills $version: the vfrey skill and $styles video styles as zips. Unzip into your agent's skills folder and restart the agent (see the README).
+
+vfrey-complete.zip has everything; vfrey-styles-all.zip has every style; vfrey-bundle-*.zip are themed groups; vfrey-style-<name>.zip is one style.
+Check a download with: shasum -a 256 -c SHA256SUMS.txt --ignore-missing
+NOTES
 if gh release view "$tag" -R vfreyai/skills >/dev/null 2>&1; then
   gh release upload "$tag" dist/downloads/* --clobber -R vfreyai/skills
 else

@@ -1,0 +1,183 @@
+<!doctype html>
+<!-- vfrey style rules: change the hero picture on every script line and finish before the line ends (no hold past 3 s); the only numeral on a frame is the one that line says (no count-up through other values); frame 0 already shows a whole word and a picture of the first noun (nothing still entering). Keep scene graphics out of the bottom-right corner: the AI label owns it. -->
+<!-- vfrey-demo (vfrey-style-post-comments): the demo post's own words. `styles start post-comments --source <url>` replaces all of them with the real post; without --source, vfrey rejects a video that still shows one and lists them all.
+     ["PLACEHOLDER post title the voice reads first", "Placeholder body of the post, read after the title.", "Placeholder top comment the voice reads next.", "Placeholder second comment with a different take.", "Placeholder third comment that lands the payoff.", "r/PLACEHOLDER, u/PLACEHOLDER on Reddit", "r/PLACEHOLDER", "u/PLACEHOLDER", "Source: PLACEHOLDER"] -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="vfrey/fonts/fonts.css" />
+<script src="vfrey/gsap.min.js"></script>
+<script src="vfrey/vfrey.js"></script>
+<!-- vfrey-keep (vfrey-style-post-comments): the cards' own chrome, the same in every video (the score line is the post's data). ["Top comment", "comments"] -->
+<!-- STARTER (vfrey-style-post-comments). A public post and its top comments as clean cards, read out with captions.
+     `npx vfrey styles start post-comments scenes/<idea> --source <url>` replaces the demo post below with the real one
+     (and writes post.json for the credit check). Keep the credit bar: it is the on-screen credit the platforms and the
+     poster are owed. Cards appear when the voice reaches them (matched by their first words), or set SHOW yourself. -->
+<script>
+/* POST:BEGIN (the demo post: `--source` writes the real one here) */
+window.POST = {
+  platform: "reddit", platformName: "Reddit", url: "https://www.reddit.com/r/PLACEHOLDER/",
+  community: "r/PLACEHOLDER", author: "u/PLACEHOLDER",
+  title: "PLACEHOLDER post title the voice reads first",
+  body: "Placeholder body of the post, read after the title.",
+  score: 12400, commentCount: 1830,
+  comments: [
+    { author: "u/PLACEHOLDER", text: "Placeholder top comment the voice reads next.", score: 8100 },
+    { author: "u/PLACEHOLDER", text: "Placeholder second comment with a different take.", score: 5200 },
+    { author: "u/PLACEHOLDER", text: "Placeholder third comment that lands the payoff.", score: 3900 }
+  ],
+  credit: { onScreen: "r/PLACEHOLDER, u/PLACEHOLDER on Reddit", description: "Source: PLACEHOLDER" }
+};
+/* POST:END */
+</script>
+<style>
+  :root { --acc:#ff6a3d; --ink:#14171f; --mut:#6b7385; --line:#e7e9ef; --bg:#0f1218; --card:#ffffff; }
+  html,body{margin:0;width:100%;height:100%;overflow:hidden}
+  *{box-sizing:border-box}
+  #root{position:relative;width:100%;height:100%;background:var(--bg);font-family:"Google Sans Flex","Baloo 2",sans-serif;color:var(--ink);overflow:hidden}
+  #ground{position:absolute;inset:0;background:radial-gradient(900px 700px at 20% 18%,rgba(255,106,61,.22),rgba(255,106,61,0) 70%),radial-gradient(1000px 900px at 85% 80%,rgba(90,120,255,.16),rgba(90,120,255,0) 70%),linear-gradient(180deg,#141823,#0b0d12)}
+  #glow{position:absolute;left:140px;top:120px;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.07),rgba(255,255,255,0) 65%)}
+  #creditBar{position:absolute;left:50px;top:212px;height:72px;max-width:890px;display:flex;align-items:center;gap:16px;padding:0 28px 0 12px;border-radius:36px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.16);color:#fff;font-size:30px;font-weight:700;white-space:nowrap;overflow:hidden}
+  #pf{width:50px;height:50px;border-radius:50%;background:var(--acc);color:#fff;font-size:28px;font-weight:800;line-height:50px;text-align:center;flex:none}
+  #stack{position:absolute;left:50px;top:320px;width:890px;height:880px}
+  .card{position:absolute;left:0;top:0;width:890px;background:var(--card);border-radius:34px;box-shadow:0 30px 80px rgba(0,0,0,.45),0 4px 14px rgba(0,0,0,.25);padding:34px 38px 30px;opacity:0}
+  .head{display:flex;align-items:center;gap:18px;height:72px}
+  .av{width:72px;height:72px;border-radius:50%;color:#fff;font-weight:800;font-size:34px;line-height:72px;text-align:center;flex:none}
+  .who{display:flex;flex-direction:column;justify-content:center;min-width:0}
+  .handle{font-size:32px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:640px}
+  .where{font-size:26px;color:var(--mut);font-weight:600;white-space:nowrap}
+  .title{margin-top:22px;font-size:54px;line-height:1.14;font-weight:800;letter-spacing:-.01em}
+  .body{margin-top:18px;font-size:38px;line-height:1.32;color:#2b3040;overflow:hidden}
+  .text{margin-top:18px;font-size:44px;line-height:1.3;font-weight:600;overflow:hidden}
+  .meta{display:flex;gap:34px;margin-top:24px;font-size:28px;font-weight:800;color:var(--mut)}
+  .meta span b{color:var(--acc)}
+  .thread{position:absolute;left:86px;width:6px;border-radius:3px;background:rgba(255,255,255,.28);opacity:0}
+  .hl{background:linear-gradient(transparent 58%,rgba(255,106,61,.35) 58%)}
+  .rw{background:linear-gradient(transparent 60%,rgba(255,106,61,.32) 60%) no-repeat 0 0/0% 100%}
+  #capPlate{position:absolute;left:36px;right:36px;border-radius:40px;background:rgba(255,255,255,.97);box-shadow:0 18px 60px rgba(0,0,0,.45)}
+  #captions{position:absolute;left:var(--vf-safe-left);right:var(--vf-safe-right);top:var(--vf-caption-at);height:var(--vf-caption-h)}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0">
+  <div id="ground"></div><div id="glow"></div>
+  <div id="creditBar"><div id="pf">R</div><div id="creditText"></div></div>
+  <div id="stack"></div>
+  <div id="labels" hidden><span id="lblTop" data-vfrey-keep>Top comment</span></div>
+  <div id="capPlate"></div>
+  <div id="captions"></div>
+</div>
+<script>
+(function () {
+  const P = window.POST, T = vfrey.timing, tl = vfrey.timeline(), END = T.durationSec;
+  const $ = (q) => document.querySelector(q);
+  const AV = ["#e48a5c", "#5aa6a0", "#9a7bd8", "#d0698a", "#5c8fd6", "#7aa35a"];
+  const short = (n) => (n == null ? "" : n >= 1e6 ? (n / 1e6).toFixed(1).replace(/\.0$/, "") + "m" : n >= 1e3 ? (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k" : String(n));
+  const norm = (s) => String(s).toLowerCase().normalize("NFKD").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  if (P.platform === "threads") document.documentElement.style.setProperty("--acc", "#7b61ff");
+
+  // The credit: platform, community and handle, on screen the whole film.
+  $("#pf").textContent = P.platform === "threads" ? "@" : "R";
+  $("#creditText").textContent = P.credit.onScreen;
+
+  // Cards: the post, then each comment. Text sizes step down with length so a long one still fits (no measuring: fonts load late).
+  const fit = (el, text, sizes) => { const n = text.length; el.style.fontSize = (n < 90 ? sizes[0] : n < 180 ? sizes[1] : n < 300 ? sizes[2] : sizes[3]) + "px"; };
+  const card = (kind, who, where, title, text, score, i) => {
+    const c = document.createElement("div"); c.className = "card " + kind;
+    const initial = who.replace(/^u\/|^@/, "").slice(0, 1).toUpperCase() || "?";
+    c.innerHTML = '<div class="head"><div class="av"></div><div class="who"><div class="handle"></div><div class="where"></div></div></div>' +
+      (title ? '<div class="title"></div>' : "") + '<div class="' + (kind === "post" ? "body" : "text") + '"></div><div class="meta"></div>';
+    c.querySelector(".av").textContent = initial; c.querySelector(".av").style.background = AV[i % AV.length];
+    c.querySelector(".handle").textContent = who; c.querySelector(".where").textContent = where;
+    if (title) { c.querySelector(".title").textContent = title; fit(c.querySelector(".title"), title, [56, 50, 44, 40]); }
+    const t = c.querySelector(kind === "post" ? ".body" : ".text");
+    t.textContent = text; fit(t, text, kind === "post" ? [40, 38, 34, 32] : [46, 42, 38, 34]);
+    if (!text) t.style.display = "none";
+    // The score line is the post's own data (post.json), not a figure the script states: chrome for frames.numbers.
+    c.querySelector(".meta").setAttribute("data-vfrey-keep", "");
+    c.querySelector(".meta").innerHTML = score != null ? "<span><b>&#9650;</b> " + short(score) + "</span>" + (kind === "post" && P.commentCount != null ? "<span>" + short(P.commentCount) + " comments</span>" : "") : "";
+    $("#stack").appendChild(c); return c;
+  };
+  const cards = [{ el: card("post", P.author, P.community ? P.community + ", " + P.platformName : P.platformName, P.title, P.body, P.score, 0), text: P.title + " " + P.body }];
+  P.comments.forEach((m, i) => cards.push({ el: card("comment", m.author, $("#lblTop").textContent, "", m.text, m.score, i + 1), text: m.text }));
+
+  // When each card comes in: the first spoken line whose opening words are in the card. SHOW = [line, line, ...] overrides it.
+  const SHOW = null;
+  const lines = T.lines.map((l) => norm(l.text));
+  let last = 0;
+  const starts = cards.map((c, k) => {
+    if (SHOW && SHOW[k] != null) return vfrey.line(SHOW[k]).start;
+    if (k === 0) return 0;
+    const body = " " + norm(c.text) + " ";
+    for (let i = last + 1; i < lines.length; i++) {
+      const head = lines[i].split(" ").slice(0, 4).join(" ");
+      if (head.split(" ").length >= 3 && body.includes(" " + head + " ")) { last = i; return vfrey.line(i).start; }
+    }
+    // No match: spread the rest over the lines left.
+    const i = Math.min(lines.length - 1, Math.round(1 + ((lines.length - 1) * k) / cards.length)); last = Math.max(last, i);
+    return vfrey.line(i).start;
+  });
+
+  // Motion: the post sits centred and large; when a comment arrives, the post folds up to its header strip and the comment
+  // rises in under a thread line. One comment at a time; the previous one lifts away.
+  const post = cards[0].el;
+  // frame 0 already shows the whole post card and the credit bar: nothing is still entering (rule 3); the first beat is the fold below.
+  // Cards start at opacity 0 in the CSS (each comment fades in on its line), so the post is switched on here, at 0, not faded in.
+  tl.set(post, { opacity: 1 }, 0);
+
+  tl.to("#glow", { x: 60, y: 40, scale: 1.15, duration: END, ease: "sine.inOut" }, 0);
+  const postBody = post.querySelector(".body"), postMeta = post.querySelector(".meta");
+  for (let k = 1; k < cards.length; k++) {
+    const c = cards[k].el, at = Math.max(0.2, starts[k] - 0.15);
+    if (k === 1) {
+      tl.to(postBody, { height: 0, marginTop: 0, opacity: 0, duration: 0.5, ease: "power3.inOut" }, at);
+      tl.to(postMeta, { height: 0, marginTop: 0, opacity: 0, duration: 0.4, ease: "power3.inOut" }, at);
+      tl.to(post, { scale: 0.9, transformOrigin: "50% 0%", duration: 0.5, ease: "power3.inOut" }, at);
+    } else {
+      tl.to(cards[k - 1].el, { y: -60, opacity: 0, duration: 0.35, ease: "power2.in" }, at - 0.05);
+    }
+    tl.set(c, { top: 0 }, 0);
+    tl.fromTo(c, { opacity: 0, y: 520 }, { opacity: 1, y: 380, duration: 0.6, ease: "power3.out" }, at + 0.1);
+    tl.fromTo(c, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "back.out(1.6)" }, at + 0.1);
+  }
+  // Ambient motion while a card is read, so a long post or comment never holds still under the voice (frames.still fails 8 s):
+  // each word turns from grey to ink, a marker under it, as the voice reaches it, and the whole stack leans in slowly all film.
+  const GREY = "#8e95a6";
+  const ends = starts.slice(1).concat([END]);
+  const read = (els, t0, t1) => {
+    const sp = [];
+    for (const [el, ink] of els) {
+      if (!el || !el.textContent.trim()) continue;
+      const words = el.textContent.split(/\s+/).filter(Boolean);
+      el.innerHTML = words.map((w) => '<span class="rw">' + w.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</span>").join(" ");
+      el.querySelectorAll(".rw").forEach((s) => sp.push([s, ink]));
+    }
+    if (sp.length === 0 || t1 - t0 < 0.4) return;
+    // The voice's own words in this card's stretch set the pace; with none, the words spread evenly over it.
+    const spoken = (T.words || []).filter((w) => w.start >= t0 && w.start < t1);
+    const at = (j) => (spoken.length ? spoken[Math.min(spoken.length - 1, Math.floor((j * spoken.length) / sp.length))].start : t0 + ((t1 - t0) * j) / sp.length);
+    sp.forEach(([s, ink], j) => {
+      tl.set(s, { color: GREY }, 0);
+      tl.to(s, { color: ink, duration: 0.2, ease: "power2.out" }, at(j));
+      tl.fromTo(s, { backgroundSize: "0% 100%" }, { backgroundSize: "100% 100%", duration: 0.2, ease: "power2.out", immediateRender: false }, at(j));
+      tl.to(s, { backgroundSize: "0% 100%", duration: 0.25, ease: "power2.in" }, (j + 1 < sp.length ? at(j + 1) : t1) + 0.05);
+    });
+  };
+  read([[post.querySelector(".title"), "#14171f"], [postBody, "#2b3040"]], 0, ends[0] - 0.2);
+  for (let k = 1; k < cards.length; k++) read([[cards[k].el.querySelector(".text"), "#14171f"]], starts[k], ends[k] - 0.2);
+  tl.fromTo("#stack", { scale: 1, y: 0, transformOrigin: "50% 0%" }, { scale: 1.03, y: -14, duration: END, ease: "sine.inOut" }, 0);
+
+  // A comment's text never runs under the caption plate: measured from its card's top at 380 px, at most 820 px tall.
+  cards.slice(1).forEach((c) => { const t = c.el.querySelector(".text"); t.style.maxHeight = "560px"; });
+  postBody.style.maxHeight = "520px";
+
+  // The caption plate: white, one line, in vfrey's caption band, the same place all film.
+  { const cb = vfrey.captionBox; const p = $("#capPlate").style; p.top = (cb.top + cb.height - 180) + "px"; p.height = "205px"; }
+  // The chip is the accent darkened so its white word reads at 4.5:1 (frames.caption-contrast).
+  vfrey.captions("#captions", { style: "box", color: "#14171f", highlight: P.platform === "threads" ? "#5b45d6" : "#c9431b", highlightText: "#ffffff", maxWords: 3 });
+  vfrey.keepInFrame(Array.from(document.querySelectorAll("#creditText, .handle")));
+})();
+</script>
+<script>vfrey.fitStage("#root"); /* The design is 9:16 in 1080x1920 px: fitted whole and centred into any frame (16:9 too), never stretched. */</script>
+</body>
+</html>
