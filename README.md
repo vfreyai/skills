@@ -20,7 +20,7 @@ Plugins: `claude plugin marketplace add vfreyai/skills` then `claude plugin inst
 
 ## Styles
 
-A style is a look for your videos: the colours, the drawing, the camera and the music. vfrey makes every video in one style, and each style is its own small skill (`vfrey-style-<name>`) that you can install on its own, without the rest of vfrey. If vfrey is not installed, your agent offers to install it first, so a style installed alone still works. Click a picture for the style's folder and full preview video. All 23 are also on https://vfrey.ai/examples.
+A style is a look for your videos: the colours, the drawing, the camera and the music. vfrey makes every video in one style, and each style is its own small skill (`vfrey-style-<name>`) that you can install on its own, without the rest of vfrey. If vfrey is not installed, your agent offers to install it first, so a style installed alone still works. Click a picture for the style's folder and full preview video. All 23 are also on https://vfrey.ai/render/showcase.
 
 | Preview | Style | Install | Download |
 | --- | --- | --- | --- |
