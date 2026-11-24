@@ -4,7 +4,7 @@
 
 Make short videos and research social media by asking your coding agent. This is the vfrey skill for Claude Code, Codex, Cursor, Gemini CLI and Grok. It tells the agent how to write the script, build the scenes, add captions, voice and music, and render the video on your own machine. It also runs vfrey search: creators, trends and competitors on TikTok, Instagram, YouTube and Reddit.
 
-Version 1.0.0-beta.8. Generated from the vfrey release; do not edit by hand.
+Version 1.0.0-beta.9. Generated from the vfrey release; do not edit by hand.
 
 ## Install
 
